@@ -1,0 +1,90 @@
+# Dapr Resiliency Configuration
+# Defines retry policies, circuit breakers, and timeouts for reliable operation
+apiVersion: dapr.io/v1alpha1
+kind: Resiliency
+metadata:
+  name: blockchain-events-resiliency
+scopes:
+  - blockchain-events
+spec:
+  policies:
+    # Timeout definitions
+    timeouts:
+      general: 30s
+      pubsubTimeout: 10s
+      stateTimeout: 5s
+      secretTimeout: 5s
+
+    # Retry policies
+    retries:
+      # For pub/sub event publishing - constant retry for transient failures
+      pubsubRetry:
+        policy: constant
+        duration: 2s
+        maxRetries: 10
+
+      # For state store operations - exponential backoff
+      stateRetry:
+        policy: exponential
+        maxInterval: 10s
+        maxRetries: 5
+
+      # For secret retrieval - limited retries
+      secretRetry:
+        policy: constant
+        duration: 1s
+        maxRetries: 3
+
+      # For critical operations - aggressive retry
+      criticalRetry:
+        policy: exponential
+        maxInterval: 30s
+        maxRetries: 20
+
+    # Circuit breaker policies
+    circuitBreakers:
+      # For pub/sub broker
+      pubsubCircuitBreaker:
+        maxRequests: 1
+        interval: 8s
+        timeout: 45s
+        trip: consecutiveFailures > 8
+
+      # For state store
+      stateCircuitBreaker:
+        maxRequests: 1
+        interval: 10s
+        timeout: 60s
+        trip: consecutiveFailures >= 5
+
+  targets:
+    # Apply policies to components
+    components:
+      # State store resiliency
+      statestore:
+        outbound:
+          timeout: stateTimeout
+          retry: stateRetry
+          circuitBreaker: stateCircuitBreaker
+
+      # Pub/sub resiliency
+      pubsub:
+        outbound:
+          timeout: pubsubTimeout
+          retry: pubsubRetry
+          circuitBreaker: pubsubCircuitBreaker
+        inbound:
+          timeout: pubsubTimeout
+          retry: criticalRetry
+
+      # Secret store resiliency
+      secretstore:
+        outbound:
+          timeout: secretTimeout
+          retry: secretRetry
+
+      # Configuration store resiliency
+      configstore:
+        outbound:
+          timeout: stateTimeout
+          retry: stateRetry
