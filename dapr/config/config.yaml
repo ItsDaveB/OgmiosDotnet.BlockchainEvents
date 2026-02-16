@@ -1,0 +1,20 @@
+apiVersion: dapr.io/v1alpha1
+kind: Configuration
+metadata:
+  name: blockchain-events-config
+spec:
+  tracing:
+    samplingRate: '1'
+    zipkin:
+      endpointAddress: 'http://zipkin:9411/api/v2/spans'
+
+  metrics:
+    enabled: true
+    recordErrorCodes: true
+    http:
+      increasedCardinality: false
+
+  logging:
+    apiLogging:
+      enabled: true
+      obfuscateURLs: false

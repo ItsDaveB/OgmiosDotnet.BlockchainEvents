@@ -1,0 +1,69 @@
+apiVersion: dapr.io/v1alpha1
+kind: Resiliency
+metadata:
+  name: blockchain-events-resiliency
+scopes:
+  - blockchain-events
+spec:
+  policies:
+    timeouts:
+      general: 30s
+      pubsubTimeout: 10s
+      stateTimeout: 5s
+      secretTimeout: 5s
+
+    retries:
+      pubsubRetry:
+        policy: constant
+        duration: 2s
+        maxRetries: 10
+
+      stateRetry:
+        policy: exponential
+        maxInterval: 10s
+        maxRetries: 5
+
+      secretRetry:
+        policy: constant
+        duration: 1s
+        maxRetries: 3
+
+      criticalRetry:
+        policy: exponential
+        maxInterval: 30s
+        maxRetries: 20
+
+    circuitBreakers:
+      pubsubCircuitBreaker:
+        maxRequests: 1
+        interval: 8s
+        timeout: 45s
+        trip: consecutiveFailures > 8
+
+      stateCircuitBreaker:
+        maxRequests: 1
+        interval: 10s
+        timeout: 60s
+        trip: consecutiveFailures >= 5
+
+  targets:
+    components:
+      statestore:
+        outbound:
+          timeout: stateTimeout
+          retry: stateRetry
+          circuitBreaker: stateCircuitBreaker
+
+      pubsub:
+        outbound:
+          timeout: pubsubTimeout
+          retry: pubsubRetry
+          circuitBreaker: pubsubCircuitBreaker
+        inbound:
+          timeout: pubsubTimeout
+          retry: criticalRetry
+
+      secretstore:
+        outbound:
+          timeout: secretTimeout
+          retry: secretRetry
