@@ -1,0 +1,123 @@
+services:
+  blockchain-events:
+    build:
+      context: .
+      dockerfile: src/BlockchainEvents.Worker/Dockerfile
+    ports:
+      - '5050:5050'
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5050
+    volumes:
+      - ./src/BlockchainEvents.Worker/appsettings.json:/app/appsettings.json:ro
+    networks:
+      - blockchain-events-network
+    depends_on:
+      - redis
+      - placement
+
+  blockchain-events-dapr:
+    image: 'daprio/daprd:1.13.0'
+    command: ['./daprd', '--app-id', 'blockchain-events', '--app-port', '5050', '--dapr-http-port', '3500', '--dapr-grpc-port', '50001', '--placement-host-address', 'placement:50006', '--resources-path', '/components', '--config', '/config/config.yaml', '--log-level', 'info']
+    volumes:
+      - ./dapr/components:/components:ro
+      - ./dapr/config:/config:ro
+      - ./dapr/secrets:/secrets:ro
+    network_mode: 'service:blockchain-events'
+    depends_on:
+      - blockchain-events
+      - redis
+      - placement
+
+  placement:
+    image: 'daprio/placement:1.13.0'
+    command: ['./placement', '--port', '50006']
+    ports:
+      - '50006:50006'
+    networks:
+      - blockchain-events-network
+
+  redis:
+    image: 'redis:7-alpine'
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis-data:/data
+    command: ['redis-server', '--appendonly', 'yes']
+    networks:
+      - blockchain-events-network
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  zipkin:
+    image: 'openzipkin/zipkin:latest'
+    ports:
+      - '9411:9411'
+    networks:
+      - blockchain-events-network
+
+  prometheus:
+    image: 'prom/prometheus:latest'
+    ports:
+      - '9090:9090'
+    volumes:
+      - ./observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    networks:
+      - blockchain-events-network
+
+  grafana:
+    image: 'grafana/grafana:latest'
+    ports:
+      - '3000:3000'
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./observability/grafana/provisioning:/etc/grafana/provisioning:ro
+    networks:
+      - blockchain-events-network
+    depends_on:
+      - prometheus
+
+  dapr-dashboard:
+    image: 'daprio/dashboard:latest'
+    ports:
+      - '8080:8080'
+    command: ['--docker-compose=true', '--docker-compose-path=/docker-compose.yml', '--components-path=/components', '--config-path=/config/config.yaml']
+    volumes:
+      - ./docker-compose.yml:/docker-compose.yml:ro
+      - ./dapr/components:/components:ro
+      - ./dapr/config:/config:ro
+    networks:
+      - blockchain-events-network
+    depends_on:
+      - placement
+
+  redis-commander:
+    image: 'rediscommander/redis-commander:latest'
+    ports:
+      - '8081:8081'
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    networks:
+      - blockchain-events-network
+    depends_on:
+      - redis
+
+volumes:
+  redis-data:
+  prometheus-data:
+  grafana-data:
+
+networks:
+  blockchain-events-network:
+    driver: bridge
