@@ -48,13 +48,11 @@ public sealed class MetadataKeyValueRule(IOptions<MetadataKeyValueRuleOptions> o
     {
         if (value is null) return false;
 
-        // Handle JsonElement
         if (value is JsonElement element)
         {
             return SearchJsonElement(element, keyPatterns, valuePatterns);
         }
 
-        // Handle Dictionary
         if (value is IDictionary<string, object> dict)
         {
             foreach (var (key, val) in dict)
@@ -70,13 +68,11 @@ public sealed class MetadataKeyValueRule(IOptions<MetadataKeyValueRuleOptions> o
             }
         }
 
-        // Handle string value
         if (value is string str)
         {
             return valuePatterns.Any(pattern => str.Contains(pattern, StringComparison.OrdinalIgnoreCase));
         }
 
-        // Handle collections
         if (value is IEnumerable<object> list)
         {
             foreach (var item in list)
