@@ -34,6 +34,39 @@ services:
       placement:
         condition: service_started
 
+  demo-subscriber:
+    build:
+      context: ./tools/BlockchainEvents.DemoSubscriber
+      dockerfile: Dockerfile
+    ports:
+      - '5001:5001'
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5001
+    networks:
+      - blockchain-events-network
+    depends_on:
+      redis:
+        condition: service_healthy
+      placement:
+        condition: service_started
+
+  demo-subscriber-dapr:
+    image: 'daprio/daprd:1.13.0'
+    command: ['./daprd', '--app-id', 'demo-subscriber', '--app-port', '5001', '--dapr-http-port', '3501', '--dapr-grpc-port', '50002', '--placement-host-address', 'placement:50006', '--resources-path', '/components', '--config', '/config/config.yaml', '--log-level', 'info']
+    volumes:
+      - ./dapr/components:/components:ro
+      - ./dapr/config:/config:ro
+      - ./dapr/secrets:/secrets:ro
+    network_mode: 'service:demo-subscriber'
+    depends_on:
+      demo-subscriber:
+        condition: service_started
+      redis:
+        condition: service_healthy
+      placement:
+        condition: service_started
+
   placement:
     image: 'daprio/placement:1.13.0'
     command: ['./placement', '--port', '50006']
