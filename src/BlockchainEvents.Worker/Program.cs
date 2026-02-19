@@ -7,7 +7,6 @@ builder.Services.Configure<OgmiosConfiguration>(
 
 builder.Services.AddDaprClient();
 
-// Transaction rules - add or remove rules here
 builder.Services.Configure<MetadataKeyValueRuleOptions>(opts =>
 {
     opts.Enabled = true;
@@ -43,6 +42,6 @@ var app = builder.Build();
 
 app.MapSubscriptionEndpoints();
 app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTimeOffset.UtcNow }));
-app.MapMetrics(); // Prometheus metrics endpoint at /metrics
+app.MapMetrics();
 
 await app.RunAsync();

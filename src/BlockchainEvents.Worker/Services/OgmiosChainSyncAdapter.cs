@@ -66,7 +66,6 @@ public sealed class OgmiosChainSyncAdapter(
         if (hasValidCheckpoint)
             return (_resumeSlot, _resumeBlockHash);
 
-        // No checkpoint - use configured starting point if available
         var configuredStart = _config.StartingPoints?.FirstOrDefault();
         if (configuredStart is not null)
         {
@@ -74,7 +73,6 @@ public sealed class OgmiosChainSyncAdapter(
             return (configuredStart.Slot, configuredStart.Id);
         }
 
-        // No configured starting point - start from origin
         logger.LogInformation("No checkpoint or configured starting point found, starting from origin");
         return (null, null);
     }

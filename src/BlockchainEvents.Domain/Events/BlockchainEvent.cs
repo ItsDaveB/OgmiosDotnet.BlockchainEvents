@@ -19,7 +19,6 @@ public sealed class BlockchainEvent<TData> where TData : class
     public string? DataSchema { get; init; }
     public required TData Data { get; init; }
 
-    // Cardano-specific extension attributes
     public long CardanoSlot { get; init; }
     public string? CardanoBlock { get; init; }
     public long CardanoBlockHeight { get; init; }

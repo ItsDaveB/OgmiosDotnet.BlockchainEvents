@@ -4,7 +4,8 @@ public static class SubscriptionEndpoints
 {
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
-        PropertyNameCaseInsensitive = true
+        PropertyNameCaseInsensitive = true,
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
     };
 
     private static long _eventsReceived;
@@ -23,8 +24,19 @@ public static class SubscriptionEndpoints
         {
             try
             {
-                var blockchainEvent = await JsonSerializer.DeserializeAsync<BlockchainEvent<TransactionMatchedData>>(
+                var daprEnvelope = await JsonSerializer.DeserializeAsync<JsonElement>(
                     context.Request.Body, JsonOptions);
+
+                BlockchainEvent<TransactionMatchedData>? blockchainEvent = null;
+
+                if (daprEnvelope.TryGetProperty("data", out var dataElement))
+                {
+                    blockchainEvent = dataElement.Deserialize<BlockchainEvent<TransactionMatchedData>>(JsonOptions);
+                }
+                else
+                {
+                    blockchainEvent = daprEnvelope.Deserialize<BlockchainEvent<TransactionMatchedData>>(JsonOptions);
+                }
 
                 _eventsReceived++;
                 _lastEventTime = DateTimeOffset.UtcNow;
