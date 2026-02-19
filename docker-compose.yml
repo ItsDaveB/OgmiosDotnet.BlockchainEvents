@@ -13,8 +13,10 @@ services:
     networks:
       - blockchain-events-network
     depends_on:
-      - redis
-      - placement
+      redis:
+        condition: service_healthy
+      placement:
+        condition: service_started
 
   blockchain-events-dapr:
     image: 'daprio/daprd:1.13.0'
@@ -25,9 +27,12 @@ services:
       - ./dapr/secrets:/secrets:ro
     network_mode: 'service:blockchain-events'
     depends_on:
-      - blockchain-events
-      - redis
-      - placement
+      blockchain-events:
+        condition: service_started
+      redis:
+        condition: service_healthy
+      placement:
+        condition: service_started
 
   placement:
     image: 'daprio/placement:1.13.0'
@@ -48,9 +53,10 @@ services:
       - blockchain-events-network
     healthcheck:
       test: ['CMD', 'redis-cli', 'ping']
-      interval: 10s
-      timeout: 5s
+      interval: 5s
+      timeout: 3s
       retries: 5
+      start_period: 5s
 
   zipkin:
     image: 'openzipkin/zipkin:latest'
