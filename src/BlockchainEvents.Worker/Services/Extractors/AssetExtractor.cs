@@ -6,19 +6,19 @@ public sealed class AssetExtractor : ITransactionExtractor<IReadOnlyDictionary<s
 
     public IReadOnlyDictionary<string, Dictionary<string, long>> Extract(Transaction tx)
     {
-        if (tx.Mint.ValueKind != JsonValueKind.Object)
+        if (!tx.Mint.IsNotNullOrUndefined())
             return new Dictionary<string, Dictionary<string, long>>();
 
         var result = new Dictionary<string, Dictionary<string, long>>();
 
         foreach (var policy in tx.Mint)
         {
-            if (policy.Value.ValueKind != JsonValueKind.Object) continue;
+            if (!policy.Value.IsNotNullOrUndefined()) continue;
 
             var policyId = policy.Key.GetString();
             var assets = new Dictionary<string, long>();
 
-            foreach (var asset in policy.Value.Where(a => a.Value.ValueKind == JsonValueKind.Number))
+            foreach (var asset in policy.Value.Where(a => a.Value.IsNotNullOrUndefined()))
                 assets[asset.Key.GetString()] = (long)asset.Value;
 
             if (assets.Count > 0)

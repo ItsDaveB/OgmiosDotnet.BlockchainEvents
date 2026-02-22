@@ -8,7 +8,6 @@ public sealed class DaprCheckpointService(
     private readonly BlockchainEventsOptions _options = options.Value;
     private string? _currentEtag;
 
-    /// <inheritdoc />
     public async Task<SyncCheckpoint?> GetCheckpointAsync(CancellationToken cancellationToken = default)
     {
         var (checkpoint, etag) = await daprClient.GetStateAndETagAsync<SyncCheckpoint>(
@@ -31,7 +30,6 @@ public sealed class DaprCheckpointService(
         return checkpoint;
     }
 
-    /// <inheritdoc />
     public async Task SaveCheckpointAsync(SyncCheckpoint checkpoint, CancellationToken cancellationToken = default)
     {
         if (_currentEtag is not null)
@@ -69,7 +67,6 @@ public sealed class DaprCheckpointService(
             checkpoint.Slot, checkpoint.BlockHeight);
     }
 
-    /// <inheritdoc />
     public async Task DeleteCheckpointAsync(CancellationToken cancellationToken = default)
     {
         await daprClient.DeleteStateAsync(
