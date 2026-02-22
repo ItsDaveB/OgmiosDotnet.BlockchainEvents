@@ -12,10 +12,20 @@ var jsonOptions = new JsonSerializerOptions
     PropertyNamingPolicy = JsonNamingPolicy.CamelCase
 };
 
-app.MapGet("/dapr/subscribe", () => Results.Json(new[]
+app.MapGet("/dapr/subscribe", () =>
 {
-    new { pubsubname = "pubsub", topic = "blockchain-events", route = "/events/blockchain" }
-}));
+    var subscriptions = new[]
+    {
+        new { pubsubname = "pubsub", topic = "blockchain-events", route = "/events/blockchain" }
+    };
+
+    logger.LogInformation("Registering {Count} subscription(s):", subscriptions.Length);
+    foreach (var sub in subscriptions)
+        logger.LogInformation("  ↳ Subscribed to topic '{Topic}', delivering to route '{Route}'",
+            sub.topic, sub.route);
+
+    return Results.Json(subscriptions);
+});
 
 app.MapPost("/events/blockchain", async (HttpContext context) =>
 {
@@ -24,47 +34,42 @@ app.MapPost("/events/blockchain", async (HttpContext context) =>
         var envelope = await JsonSerializer.DeserializeAsync<JsonElement>(
             context.Request.Body, jsonOptions);
 
-        JsonElement eventData = envelope.TryGetProperty("data", out var data) ? data : envelope;
+        var blockchainEvent = envelope.TryGetProperty("data", out var dataElement)
+            ? dataElement.Deserialize<BlockchainEvent<TransactionMatchedData>>(jsonOptions)
+            : envelope.Deserialize<BlockchainEvent<TransactionMatchedData>>(jsonOptions);
 
-        var txId = eventData.TryGetProperty("data", out var innerData)
-            && innerData.TryGetProperty("transactionId", out var txIdProp)
-            ? txIdProp.GetString()
-            : "unknown";
-
-        var slot = eventData.TryGetProperty("cardanoSlot", out var slotProp)
-            ? slotProp.GetInt64()
-            : 0;
-
-        var blockHeight = eventData.TryGetProperty("cardanoBlockHeight", out var heightProp)
-            ? heightProp.GetInt64()
-            : 0;
-
-        var network = eventData.TryGetProperty("cardanoNetwork", out var netProp)
-            ? netProp.GetString()
-            : "unknown";
-
-        var ruleName = eventData.TryGetProperty("data", out var d2)
-            && d2.TryGetProperty("ruleName", out var ruleNameProp)
-            ? ruleNameProp.GetString()
-            : "unknown";
-
-        var count = Interlocked.Increment(ref eventsReceived);
-
-        logger.LogInformation(
-            "📥 Event #{Count} | {Network} | Slot {Slot} | Block {BlockHeight} | Rule: {Rule} | Tx: {TxId}",
-            count, network, slot, blockHeight, ruleName, txId);
-
-        if (eventData.TryGetProperty("data", out var d3)
-            && d3.TryGetProperty("matchedCriteria", out var criteria))
+        if (blockchainEvent is null)
         {
-            logger.LogInformation("   🔍 Matched: {Criteria}", criteria.GetRawText());
+            logger.LogWarning("Received null event payload — skipping");
+            return Results.Ok(new { status = "DROP" });
         }
 
+        var count = Interlocked.Increment(ref eventsReceived);
+        var matched = blockchainEvent.Data;
+
+        logger.LogInformation("Received event #{Count} from topic 'blockchain-events'", count);
+        logger.LogInformation("  Event Type : {EventType}", blockchainEvent.Type);
+        logger.LogInformation("  Event Id   : {EventId}", blockchainEvent.Id);
+        logger.LogInformation("  Network    : {Network}", blockchainEvent.CardanoNetwork);
+        logger.LogInformation("  Era        : {Era}", blockchainEvent.CardanoEra);
+        logger.LogInformation("  Slot       : {Slot}", blockchainEvent.CardanoSlot);
+        logger.LogInformation("  Block      : {BlockHeight}", blockchainEvent.CardanoBlockHeight);
+        logger.LogInformation("  Rule       : {RuleName} ({RuleId})", matched.RuleName, matched.RuleId);
+        logger.LogInformation("  Transaction: {TxId}", matched.TransactionId);
+        logger.LogInformation("  Fee        : {Fee} lovelace", matched.Transaction.Fee);
+
+        if (matched.MatchedCriteria.Count > 0)
+        {
+            logger.LogInformation("  Matched criteria: {Criteria}",
+                JsonSerializer.Serialize(matched.MatchedCriteria, jsonOptions));
+        }
+
+        logger.LogInformation("Acknowledged event #{Count} with status SUCCESS", count);
         return Results.Ok(new { status = "SUCCESS" });
     }
     catch (Exception ex)
     {
-        logger.LogError(ex, "❌ Error processing event");
+        logger.LogError(ex, "Failed to process event — acknowledging with status DROP to prevent redelivery");
         return Results.Ok(new { status = "DROP" });
     }
 });
@@ -76,5 +81,6 @@ app.MapGet("/status", () => new
     uptime = (DateTime.UtcNow - System.Diagnostics.Process.GetCurrentProcess().StartTime.ToUniversalTime()).ToString()
 });
 
-logger.LogInformation("🚀 Demo Subscriber starting — listening for blockchain events on /events/blockchain");
+logger.LogInformation("Demo Subscriber starting on {Urls}", builder.Configuration["ASPNETCORE_URLS"] ?? "http://localhost:5001");
+logger.LogInformation("Waiting for subscription registration via GET /dapr/subscribe ...");
 app.Run();

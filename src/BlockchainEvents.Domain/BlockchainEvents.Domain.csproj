@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="CloudNative.CloudEvents" Version="2.7.1" />
     <PackageReference Include="CloudNative.CloudEvents.SystemTextJson" Version="2.7.1" />
+    <PackageReference Include="OgmiosDotnetClient.Domain" Version="6.13.1.2" />
   </ItemGroup>
 
 </Project>

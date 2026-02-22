@@ -19,7 +19,6 @@ public sealed class RuleEngine(IEnumerable<ITransactionRule> rules, ILogger<Rule
     public int EnabledRuleCount => _rules.Count(r => r.IsEnabled);
     public IEnumerable<string> EnabledRuleNames => _rules.Where(r => r.IsEnabled).Select(r => r.Name);
 
-    /// <inheritdoc />
     public IEnumerable<RuleMatchResult> MatchTransaction(TransactionData transaction, RuleContext context)
     {
         foreach (var rule in _rules.Where(r => r.IsEnabled))
@@ -45,7 +44,6 @@ public sealed class RuleEngine(IEnumerable<ITransactionRule> rules, ILogger<Rule
         }
     }
 
-    /// <inheritdoc />
     public IEnumerable<TransactionMatchResult> MatchTransactions(
         IEnumerable<TransactionData> transactions,
         RuleContext context)

@@ -10,9 +10,9 @@
   <ItemGroup>
     <PackageReference Include="Dapr.AspNetCore" Version="1.16.1" />
     <PackageReference Include="Dapr.Client" Version="1.16.1" />
-    <PackageReference Include="OgmiosDotnetClient.Domain" Version="6.13.1.1" />
-    <PackageReference Include="OgmiosDotnetClient.Schema" Version="6.13.0" />
-    <PackageReference Include="OgmiosDotnetClient.Services" Version="6.13.1.4" />
+    <PackageReference Include="OgmiosDotnetClient.Domain" Version="6.13.1.2" />
+    <PackageReference Include="OgmiosDotnetClient.Schema" Version="6.13.0.1" />
+    <PackageReference Include="OgmiosDotnetClient.Services" Version="6.13.1.5" />
     <PackageReference Include="prometheus-net.AspNetCore" Version="8.2.1" />
   </ItemGroup>
 

@@ -2,8 +2,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.Configure<BlockchainEventsOptions>(
     builder.Configuration.GetSection(BlockchainEventsOptions.SectionName));
-builder.Services.Configure<OgmiosConfiguration>(
-    builder.Configuration.GetSection(OgmiosConfiguration.SectionName));
+builder.Services.Configure<OgmiosOptions>(
+    builder.Configuration.GetSection(OgmiosOptions.SectionName));
 
 builder.Services.AddDaprClient();
 
@@ -14,6 +14,17 @@ builder.Services.Configure<MetadataKeyValueRuleOptions>(opts =>
 });
 builder.Services.AddSingleton<ITransactionRule, MetadataKeyValueRule>();
 
+builder.Services.Configure<GovernanceTreasuryRuleOptions>(opts =>
+{
+    opts.Enabled = true;
+    opts.IncludeGovernanceActions = true;
+    opts.IncludeTreasuryWithdrawals = true;
+    opts.IncludeDelegations = true;
+    opts.IncludeStakeRegistrations = true;
+    opts.IncludeVotes = true;
+});
+builder.Services.AddSingleton<ITransactionRule, GovernanceTreasuryRule>();
+
 builder.Services.AddSingleton<IRuleEngine, RuleEngine>();
 builder.Services.AddSingleton<IEventMetrics, EventMetrics>();
 builder.Services.AddSingleton<IBlockchainEventEmitter, DaprEventEmitter>();
@@ -21,15 +32,13 @@ builder.Services.AddSingleton<ICheckpointService, DaprCheckpointService>();
 
 builder.Services.AddOgmiosServices();
 
-builder.Services.ConfigureHttpClientDefaults(clientBuilder =>
-{
-    clientBuilder.ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+builder.Services.ConfigureHttpClientDefaults(http =>
+    http.ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
     {
-        ServerCertificateCustomValidationCallback = (_, _, _, sslPolicyErrors) =>
-            sslPolicyErrors is System.Net.Security.SslPolicyErrors.None
-                          or System.Net.Security.SslPolicyErrors.RemoteCertificateNameMismatch
-    });
-});
+        ServerCertificateCustomValidationCallback = (_, _, _, errors) =>
+            errors is System.Net.Security.SslPolicyErrors.None
+                    or System.Net.Security.SslPolicyErrors.RemoteCertificateNameMismatch
+    }));
 
 builder.Services.AddSingleton<OgmiosChainSyncAdapter>();
 builder.Services.AddSingleton<IChainSyncService>(sp => sp.GetRequiredService<OgmiosChainSyncAdapter>());
