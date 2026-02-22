@@ -1,6 +1,7 @@
 global using System.Diagnostics;
 global using System.Text.Json;
 global using BlockchainEvents.Domain.Checkpoints;
+global using Corvus.Json;
 global using BlockchainEvents.Domain.Configuration;
 global using BlockchainEvents.Domain.Events;
 global using BlockchainEvents.Domain.Rules;
@@ -17,8 +18,8 @@ global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.Hosting;
 global using Microsoft.Extensions.Logging;
 global using Microsoft.Extensions.Options;
+global using Ogmios.Domain;
 global using Ogmios.Services.ChainSynchronization;
 global using Ogmios.Services.Extensions;
 global using Ogmios.Services.InteractionContext;
 global using Prometheus;
-global using OgmiosDomainConfig = Ogmios.Domain;

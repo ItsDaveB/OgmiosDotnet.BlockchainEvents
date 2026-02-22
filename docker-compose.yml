@@ -36,8 +36,8 @@ services:
 
   demo-subscriber:
     build:
-      context: ./tools/BlockchainEvents.DemoSubscriber
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: tools/BlockchainEvents.DemoSubscriber/Dockerfile
     ports:
       - '5001:5001'
     environment:
