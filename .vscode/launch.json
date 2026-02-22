@@ -1,0 +1,40 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug: Worker (Docker)",
+            "type": "docker",
+            "request": "attach",
+            "platform": "netCore",
+            "sourceFileMap": {
+                "/src/src/BlockchainEvents.Worker": "${workspaceFolder}/src/BlockchainEvents.Worker",
+                "/src/src/BlockchainEvents.Domain": "${workspaceFolder}/src/BlockchainEvents.Domain",
+                "/src/src/BlockchainEvents.Engine": "${workspaceFolder}/src/BlockchainEvents.Engine"
+            },
+            "containerName": "ogmiosdotnetblockchainevents-blockchain-events-1",
+            "netCore": {
+                "debuggerPath": "/vsdbg/vsdbg",
+                "appProject": "${workspaceFolder}/src/BlockchainEvents.Worker/BlockchainEvents.Worker.csproj"
+            },
+            "preLaunchTask": "docker-compose-up-debug",
+            "postDebugTask": "docker-compose-down"
+        },
+        {
+            "name": "Debug: Subscriber (Docker)",
+            "type": "docker",
+            "request": "attach",
+            "platform": "netCore",
+            "sourceFileMap": {
+                "/src/tools/BlockchainEvents.DemoSubscriber": "${workspaceFolder}/tools/BlockchainEvents.DemoSubscriber",
+                "/src/src/BlockchainEvents.Domain": "${workspaceFolder}/src/BlockchainEvents.Domain"
+            },
+            "containerName": "ogmiosdotnetblockchainevents-demo-subscriber-1",
+            "netCore": {
+                "debuggerPath": "/vsdbg/vsdbg",
+                "appProject": "${workspaceFolder}/tools/BlockchainEvents.DemoSubscriber/BlockchainEvents.DemoSubscriber.csproj"
+            },
+            "preLaunchTask": "docker-compose-up-debug",
+            "postDebugTask": "docker-compose-down"
+        }
+    ]
+}
