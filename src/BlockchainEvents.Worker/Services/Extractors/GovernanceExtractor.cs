@@ -8,8 +8,8 @@ public sealed class GovernanceExtractor : ITransactionExtractor<GovernanceFlags>
 
     public GovernanceFlags Extract(Transaction tx)
     {
-        var hasProposals = tx.Proposals.ValueKind == JsonValueKind.Array && tx.Proposals.Any();
-        var hasVotes = tx.Votes.ValueKind == JsonValueKind.Array && tx.Votes.Any();
+        var hasProposals = tx.Proposals.IsNotNullOrUndefined() && tx.Proposals.Any();
+        var hasVotes = tx.Votes.IsNotNullOrUndefined() && tx.Votes.Any();
 
         return new GovernanceFlags(hasProposals, hasVotes);
     }

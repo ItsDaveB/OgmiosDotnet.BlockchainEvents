@@ -2,10 +2,10 @@ namespace BlockchainEvents.Worker.Services;
 
 public sealed class OgmiosChainSyncAdapter(
     IServiceProvider serviceProvider,
-    IOptions<OgmiosConfiguration> ogmiosOptions,
+    IOptions<OgmiosOptions> ogmiosOptions,
     ILogger<OgmiosChainSyncAdapter> logger) : IChainSyncService, IChainSynchronizationMessageHandlers
 {
-    private readonly OgmiosConfiguration _config = ogmiosOptions.Value;
+    private readonly OgmiosOptions _config = ogmiosOptions.Value;
     private IChainEventHandler? _handler;
     private long? _resumeSlot;
     private string? _resumeBlockHash;
@@ -21,27 +21,15 @@ public sealed class OgmiosChainSyncAdapter(
     {
         _handler = handler;
 
-        var (startSlot, startHash) = DetermineStartingPoint();
+        var startingPoint = DetermineStartingPoint();
 
-        logger.LogInformation("Starting chain sync from slot {Slot}", startSlot ?? 0);
+        logger.LogInformation("Starting chain sync from slot {Slot}", startingPoint.StartingPointSlot ?? 0);
 
         var chainSync = serviceProvider.GetRequiredService<IChainSynchronizationClientService>();
         var contextService = serviceProvider.GetRequiredService<IInteractionContextService>();
 
-        var connectionConfig = new OgmiosDomainConfig.ConnectionConfig
-        {
-            Host = _config.Host,
-            Port = _config.Port,
-            Tls = _config.Tls
-        };
-
-        var startingPoint = new OgmiosDomainConfig.StartingPointConfiguration
-        {
-            StartingPointIdOrOrigin = startHash ?? "origin",
-            StartingPointSlot = startSlot
-        };
-
-        var context = await contextService.CreateInteractionContextAsync("chain-sync", startingPoint, connectionConfig);
+        var context = await contextService.CreateInteractionContextAsync(
+            "chain-sync", startingPoint, _config.Connection);
         await chainSync.ResumeAsync([context], 100);
     }
 
@@ -57,24 +45,28 @@ public sealed class OgmiosChainSyncAdapter(
         await _handler.OnRollbackAsync(TransformRollbackPoint(point), TransformTip(tip));
     }
 
-    private (long?, string?) DetermineStartingPoint()
+    private StartingPointConfiguration DetermineStartingPoint()
     {
         var hasValidCheckpoint = _resumeSlot > 0 &&
                                   !string.IsNullOrEmpty(_resumeBlockHash) &&
                                   _resumeBlockHash != "unknown";
 
         if (hasValidCheckpoint)
-            return (_resumeSlot, _resumeBlockHash);
+            return new StartingPointConfiguration
+            {
+                StartingPointIdOrOrigin = _resumeBlockHash!,
+                StartingPointSlot = _resumeSlot
+            };
 
         var configuredStart = _config.StartingPoints?.FirstOrDefault();
         if (configuredStart is not null)
         {
-            logger.LogInformation("No checkpoint found, using configured starting point at slot {Slot}", configuredStart.Slot);
-            return (configuredStart.Slot, configuredStart.Id);
+            logger.LogInformation("No checkpoint found, using configured starting point at slot {Slot}", configuredStart.StartingPointSlot);
+            return configuredStart;
         }
 
         logger.LogInformation("No checkpoint or configured starting point found, starting from origin");
-        return (null, null);
+        return new StartingPointConfiguration { StartingPointIdOrOrigin = "origin" };
     }
 
     private OgmiosBlockData TransformBlock(Block block, string blockType) =>

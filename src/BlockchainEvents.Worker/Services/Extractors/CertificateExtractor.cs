@@ -11,7 +11,7 @@ public sealed class CertificateExtractor : ITransactionExtractor<CertificateFlag
 
     public CertificateFlags Extract(Transaction tx)
     {
-        if (tx.Certificates.ValueKind != JsonValueKind.Array)
+        if (!tx.Certificates.IsNotNullOrUndefined())
             return default;
 
         bool governance = false, delegation = false, registration = false;

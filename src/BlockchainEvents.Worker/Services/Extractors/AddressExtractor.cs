@@ -6,12 +6,11 @@ public sealed class AddressExtractor : ITransactionExtractor<IReadOnlyList<strin
 
     public IReadOnlyList<string> Extract(Transaction tx)
     {
-        if (tx.Outputs.ValueKind != JsonValueKind.Array)
+        if (!tx.Outputs.IsNotNullOrUndefined())
             return [];
 
-        return tx.Outputs
-            .Where(o => o.Address.ValueKind is not JsonValueKind.Null and not JsonValueKind.Undefined)
-            .Select(o => (string)o.Address.AsString)
-            .ToList();
+        return [.. tx.Outputs
+            .Where(o => o.Address.IsNotNullOrUndefined())
+            .Select(o => (string)o.Address.AsString)];
     }
 }
