@@ -130,7 +130,7 @@ public sealed class TransactionData
     public IEnumerable<string> AllAddresses { get; }      // Combined, deduplicated
 
     // Assets
-    public IReadOnlyDictionary<string, Dictionary<string, long>> MintedAssets { get; init; }
+    public IReadOnlyDictionary<string, IReadOnlyDictionary<string, long>> MintedAssets { get; init; }
 
     // Metadata
     public IReadOnlyDictionary<int, object?> Metadata { get; init; }
@@ -394,7 +394,7 @@ docker compose up redis placement -d
 
 # Run with your rule enabled
 dapr run --app-id blockchain-events \
-         --app-port 5000 \
+         --app-port 4000 \
          --resources-path ./dapr/components \
          -- dotnet run --project src/BlockchainEvents.Worker
 ```
