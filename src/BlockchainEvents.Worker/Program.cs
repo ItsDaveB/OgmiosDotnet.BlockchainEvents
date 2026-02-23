@@ -9,14 +9,17 @@ builder.Services.AddDaprClient();
 
 // Rule 1: Minswap V2 DEX — match batched swap orders by contract address prefix.
 // The order script hash c3e28c36c3447315ba5a56f33da6a6ddc1770a876a8d9f0cb3a97c4c
-// produces bech32 prefixes addr1z (script+key staking) and addr1x (script+script staking).
+// produces bech32 prefixes addr1z (script+key staking), addr1x (script+script staking),
+// and addr1w (enterprise / no staking). Derived from the official order enterprise address:
+// addr1w8p79rpkcdz8x9d6tft0x0dx5mwuzac2sa4gm8cvkw5hcnqst2ctf
 builder.Services.Configure<AddressMatchRuleOptions>(opts =>
 {
     opts.Enabled = true;
     opts.Prefixes =
     [
-        "addr1z8p79rpkcdz8x9d6tft0x0dx5m0wpwu9gw65dnuvkw5hc",
-        "addr1x8p79rpkcdz8x9d6tft0x0dx5m0wpwu9gw65dnuvkw5hc"
+        "addr1z8p79rpkcdz8x9d6tft0x0dx5mwuzac2sa4gm8cvkw5hc",
+        "addr1x8p79rpkcdz8x9d6tft0x0dx5mwuzac2sa4gm8cvkw5hc",
+        "addr1w8p79rpkcdz8x9d6tft0x0dx5mwuzac2sa4gm8cvkw5hc"
     ];
 });
 builder.Services.AddSingleton<ITransactionRule, AddressMatchRule>();
