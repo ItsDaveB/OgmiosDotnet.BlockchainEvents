@@ -34,7 +34,8 @@ public sealed class DaprEventEmitter(
             }
 
             metrics.RecordEventEmitted(matchResult.RuleName);
-            logger.LogDebug("Emitted event for {TransactionId} matched by {Rule}", transaction.Id, matchResult.RuleName);
+            logger.LogInformation("📤 Emitted [{RuleId}] {RuleName} event for tx {TransactionId}",
+                matchResult.RuleId, matchResult.RuleName, transaction.Id[..16]);
         }
         catch (Exception ex)
         {

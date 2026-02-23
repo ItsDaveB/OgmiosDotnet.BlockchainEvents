@@ -1,15 +1,15 @@
 namespace BlockchainEvents.Worker.Services.Extractors;
 
-public sealed class AssetExtractor : ITransactionExtractor<IReadOnlyDictionary<string, Dictionary<string, long>>>
+public sealed class AssetExtractor : ITransactionExtractor<IReadOnlyDictionary<string, IReadOnlyDictionary<string, long>>>
 {
     public static readonly AssetExtractor Instance = new();
 
-    public IReadOnlyDictionary<string, Dictionary<string, long>> Extract(Transaction tx)
+    public IReadOnlyDictionary<string, IReadOnlyDictionary<string, long>> Extract(Transaction tx)
     {
         if (!tx.Mint.IsNotNullOrUndefined())
-            return new Dictionary<string, Dictionary<string, long>>();
+            return new Dictionary<string, IReadOnlyDictionary<string, long>>();
 
-        var result = new Dictionary<string, Dictionary<string, long>>();
+        var result = new Dictionary<string, IReadOnlyDictionary<string, long>>();
 
         foreach (var policy in tx.Mint)
         {
