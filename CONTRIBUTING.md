@@ -14,8 +14,11 @@ Thank you for your interest in contributing! This document provides guidelines f
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/OgmiosDotnet.BlockchainEvents.git
+git clone https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents.git
 cd OgmiosDotnet.BlockchainEvents
+
+# Optional: adds blockchain.local hostname (use instead of localhost)
+./setup.sh
 
 # Restore dependencies
 dotnet restore
