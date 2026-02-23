@@ -143,7 +143,7 @@
       "gridPos": { "h": 5, "w": 8, "x": 0, "y": 6 },
       "id": 60,
       "options": { "colorMode": "background_solid", "graphMode": "area", "justifyMode": "auto", "orientation": "horizontal", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "value_and_name" },
-      "targets": [{ "expr": "blockchain_events_emitted_total{rule=\"Address Match\"} or vector(0)", "legendFormat": "Minswap Swaps", "refId": "A" }],
+      "targets": [{ "expr": "sum(blockchain_events_emitted_total{rule=\"Address Match\"}) or vector(0)", "legendFormat": "Minswap Swaps", "refId": "A" }],
       "title": "🔄 Minswap Swap Orders",
       "type": "stat"
     },
@@ -161,7 +161,7 @@
       "gridPos": { "h": 5, "w": 8, "x": 8, "y": 6 },
       "id": 61,
       "options": { "colorMode": "background_solid", "graphMode": "area", "justifyMode": "auto", "orientation": "horizontal", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "value_and_name" },
-      "targets": [{ "expr": "blockchain_events_emitted_total{rule=\"Governance & Treasury\"} or vector(0)", "legendFormat": "Governance Votes", "refId": "A" }],
+      "targets": [{ "expr": "sum(blockchain_events_emitted_total{rule=\"Governance & Treasury\"}) or vector(0)", "legendFormat": "Governance Votes", "refId": "A" }],
       "title": "🗳️ Governance Votes",
       "type": "stat"
     },
@@ -179,7 +179,7 @@
       "gridPos": { "h": 5, "w": 8, "x": 16, "y": 6 },
       "id": 62,
       "options": { "colorMode": "background_solid", "graphMode": "area", "justifyMode": "auto", "orientation": "horizontal", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "value_and_name" },
-      "targets": [{ "expr": "blockchain_events_emitted_total{rule=\"Metadata Key/Value Match\"} or vector(0)", "legendFormat": "Metadata Transactions", "refId": "A" }],
+      "targets": [{ "expr": "sum(blockchain_events_emitted_total{rule=\"Metadata Key/Value Match\"}) or vector(0)", "legendFormat": "Metadata Transactions", "refId": "A" }],
       "title": "📝 Metadata Transactions",
       "type": "stat"
     },
