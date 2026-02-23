@@ -12,8 +12,8 @@ public sealed class TransactionDataBuilder
     private long _fee;
     private IReadOnlyList<string> _inputAddresses = [];
     private IReadOnlyList<string> _outputAddresses = [];
-    private IReadOnlyDictionary<string, Dictionary<string, long>> _mintedAssets =
-        new Dictionary<string, Dictionary<string, long>>();
+    private IReadOnlyDictionary<string, IReadOnlyDictionary<string, long>> _mintedAssets =
+        new Dictionary<string, IReadOnlyDictionary<string, long>>();
     private IReadOnlyDictionary<int, object?> _metadata = new Dictionary<int, object?>();
     private CertificateFlags _certificateFlags;
     private GovernanceFlags _governanceFlags;
@@ -90,9 +90,7 @@ public sealed class TransactionDataBuilder
         Fee = _fee,
         InputAddresses = _inputAddresses.ToList(),
         OutputAddresses = _outputAddresses.ToList(),
-        MintedAssets = _mintedAssets.ToDictionary(
-            kvp => kvp.Key,
-            kvp => kvp.Value),
+        MintedAssets = _mintedAssets,
         Metadata = _metadata.ToDictionary(
             kvp => kvp.Key,
             kvp => kvp.Value),

@@ -3,6 +3,7 @@ services:
     build:
       context: .
       dockerfile: src/BlockchainEvents.Worker/Dockerfile
+      target: runtime
     ports:
       - '4000:4000'
     environment:
@@ -38,6 +39,7 @@ services:
     build:
       context: .
       dockerfile: tools/BlockchainEvents.DemoSubscriber/Dockerfile
+      target: runtime
     ports:
       - '4001:4001'
     environment:
