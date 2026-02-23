@@ -403,7 +403,7 @@ dapr run --app-id blockchain-events \
 
 1. **Log rule matches**: Add logging in `Evaluate()` to see matches
 2. **Use AllTransactionsRule**: Temporarily enable to see all transactions
-3. **Check Redis Commander**: View events at http://localhost:8081
+3. **Check Redis Commander**: View events at http://localhost:4006
 4. **Inspect CloudEvents**: The event payload includes full transaction data
 
 ## Next Steps
