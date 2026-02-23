@@ -21,14 +21,14 @@ RUN dotnet tool install --tool-path /vsdbg vsdbg 2>/dev/null; \
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
 COPY --from=build /app ./
-ENV ASPNETCORE_URLS=http://+:5001
-EXPOSE 5001
+ENV ASPNETCORE_URLS=http://+:4001
+EXPOSE 4001
 ENTRYPOINT ["dotnet", "BlockchainEvents.DemoSubscriber.dll"]
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime-debug
 WORKDIR /app
 COPY --from=debug /app ./
 COPY --from=debug /vsdbg /vsdbg
-ENV ASPNETCORE_URLS=http://+:5001
-EXPOSE 5001
+ENV ASPNETCORE_URLS=http://+:4001
+EXPOSE 4001
 ENTRYPOINT ["dotnet", "BlockchainEvents.DemoSubscriber.dll"]
