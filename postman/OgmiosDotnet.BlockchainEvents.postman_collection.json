@@ -1,0 +1,272 @@
+{
+  "info": {
+    "_postman_id": "blockchain-events-dapr",
+    "name": "OgmiosDotnet.BlockchainEvents - Dapr Sidecar API",
+    "description": "Demonstrates direct Dapr sidecar HTTP calls for SDK-less consumption.\n\nThis collection proves that any language can consume blockchain events by calling the Dapr sidecar directly - no Ogmios SDK or Dapr SDK required.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "dapr_host",
+      "value": "localhost"
+    },
+    {
+      "key": "dapr_http_port",
+      "value": "3500"
+    },
+    {
+      "key": "pubsub_name",
+      "value": "pubsub"
+    },
+    {
+      "key": "topic_name",
+      "value": "cardano-transactions"
+    },
+    {
+      "key": "statestore_name",
+      "value": "statestore"
+    },
+    {
+      "key": "secretstore_name",
+      "value": "secretstore"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health & Metadata",
+      "item": [
+        {
+          "name": "Sidecar Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://{{dapr_host}}:{{dapr_http_port}}/v1.0/healthz",
+              "protocol": "http",
+              "host": ["{{dapr_host}}"],
+              "port": "{{dapr_http_port}}",
+              "path": ["v1.0", "healthz"]
+            },
+            "description": "Check if the Dapr sidecar is healthy and ready to accept requests."
+          },
+          "response": []
+        },
+        {
+          "name": "Sidecar Metadata",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://{{dapr_host}}:{{dapr_http_port}}/v1.0/metadata",
+              "protocol": "http",
+              "host": ["{{dapr_host}}"],
+              "port": "{{dapr_http_port}}",
+              "path": ["v1.0", "metadata"]
+            },
+            "description": "Get metadata about the Dapr sidecar including registered components."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Pub/Sub - Publishing Events",
+      "item": [
+        {
+          "name": "Publish Transaction Event (CloudEvents)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"specVersion\": \"1.0\",\n  \"id\": \"test-tx-123-governance-1706180400000\",\n  \"source\": \"cardano://preprod/slot/12345678/block/abc123def456\",\n  \"type\": \"io.cardano.transaction.governance-treasury\",\n  \"subject\": \"Governance & Treasury\",\n  \"time\": \"2026-01-25T10:00:00Z\",\n  \"dataContentType\": \"application/json\",\n  \"data\": {\n    \"transactionId\": \"test-tx-123\",\n    \"slot\": 12345678,\n    \"blockHeight\": 9876543,\n    \"blockHash\": \"abc123def456\",\n    \"ruleId\": \"governance-treasury\",\n    \"ruleName\": \"Governance & Treasury\",\n    \"matchedCriteria\": {\n      \"match_types\": \"governance\"\n    },\n    \"transaction\": {\n      \"id\": \"test-tx-123\",\n      \"slot\": 12345678,\n      \"blockHash\": \"abc123def456\",\n      \"blockHeight\": 9876543,\n      \"index\": 0,\n      \"fee\": 200000,\n      \"outputAddresses\": [\"addr_test1...\"],\n      \"isGovernance\": true\n    }\n  },\n  \"cardanoSlot\": 12345678,\n  \"cardanoBlock\": \"abc123def456\",\n  \"cardanoBlockHeight\": 9876543,\n  \"cardanoEra\": \"Conway\",\n  \"cardanoNetwork\": \"preprod\"\n}"
+            },
+            "url": {
+              "raw": "http://{{dapr_host}}:{{dapr_http_port}}/v1.0/publish/{{pubsub_name}}/{{topic_name}}",
+              "protocol": "http",
+              "host": ["{{dapr_host}}"],
+              "port": "{{dapr_http_port}}",
+              "path": ["v1.0", "publish", "{{pubsub_name}}", "{{topic_name}}"]
+            },
+            "description": "Publish a blockchain event in CloudEvents format to the pub/sub topic.\n\nThis demonstrates how the BlockchainEventsWorker publishes filtered transactions."
+          },
+          "response": []
+        },
+        {
+          "name": "Publish Raw JSON (No CloudEvents Envelope)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"transactionId\": \"test-tx-456\",\n  \"slot\": 12345679,\n  \"blockHeight\": 9876544,\n  \"ruleId\": \"address-match\",\n  \"ruleName\": \"Address Match\",\n  \"matchedCriteria\": {\n    \"matched_addresses\": \"addr_test1qz...\"\n  }\n}"
+            },
+            "url": {
+              "raw": "http://{{dapr_host}}:{{dapr_http_port}}/v1.0/publish/{{pubsub_name}}/{{topic_name}}?metadata.rawPayload=true",
+              "protocol": "http",
+              "host": ["{{dapr_host}}"],
+              "port": "{{dapr_http_port}}",
+              "path": ["v1.0", "publish", "{{pubsub_name}}", "{{topic_name}}"],
+              "query": [
+                {
+                  "key": "metadata.rawPayload",
+                  "value": "true"
+                }
+              ]
+            },
+            "description": "Publish a raw JSON payload without CloudEvents envelope.\n\nUse `?metadata.rawPayload=true` to skip the CloudEvents wrapper."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "State Management",
+      "item": [
+        {
+          "name": "Get Sync Checkpoint",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://{{dapr_host}}:{{dapr_http_port}}/v1.0/state/{{statestore_name}}/sync-checkpoint",
+              "protocol": "http",
+              "host": ["{{dapr_host}}"],
+              "port": "{{dapr_http_port}}",
+              "path": ["v1.0", "state", "{{statestore_name}}", "sync-checkpoint"]
+            },
+            "description": "Retrieve the current sync checkpoint from the state store.\n\nThis shows the last processed block position for crash recovery."
+          },
+          "response": []
+        },
+        {
+          "name": "Save Sync Checkpoint",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  {\n    \"key\": \"sync-checkpoint\",\n    \"value\": {\n      \"slot\": 12345678,\n      \"blockHash\": \"abc123def456\",\n      \"blockHeight\": 9876543,\n      \"processedAt\": \"2026-01-25T10:00:00Z\",\n      \"transactionsProcessed\": 1000,\n      \"eventsEmitted\": 50\n    }\n  }\n]"
+            },
+            "url": {
+              "raw": "http://{{dapr_host}}:{{dapr_http_port}}/v1.0/state/{{statestore_name}}",
+              "protocol": "http",
+              "host": ["{{dapr_host}}"],
+              "port": "{{dapr_http_port}}",
+              "path": ["v1.0", "state", "{{statestore_name}}"]
+            },
+            "description": "Save a sync checkpoint to the state store.\n\nDemonstrates how any consumer can maintain their own processing state."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Checkpoint",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://{{dapr_host}}:{{dapr_http_port}}/v1.0/state/{{statestore_name}}/sync-checkpoint",
+              "protocol": "http",
+              "host": ["{{dapr_host}}"],
+              "port": "{{dapr_http_port}}",
+              "path": ["v1.0", "state", "{{statestore_name}}", "sync-checkpoint"]
+            },
+            "description": "Delete the sync checkpoint (for testing/reset purposes)."
+          },
+          "response": []
+        },
+        {
+          "name": "Bulk Get State",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"keys\": [\"sync-checkpoint\", \"last-processed-tx\", \"consumer-offset\"]\n}"
+            },
+            "url": {
+              "raw": "http://{{dapr_host}}:{{dapr_http_port}}/v1.0/state/{{statestore_name}}/bulk",
+              "protocol": "http",
+              "host": ["{{dapr_host}}"],
+              "port": "{{dapr_http_port}}",
+              "path": ["v1.0", "state", "{{statestore_name}}", "bulk"]
+            },
+            "description": "Retrieve multiple state values in a single request."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Secrets",
+      "item": [
+        {
+          "name": "Get Ogmios Credentials",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://{{dapr_host}}:{{dapr_http_port}}/v1.0/secrets/{{secretstore_name}}/ogmios",
+              "protocol": "http",
+              "host": ["{{dapr_host}}"],
+              "port": "{{dapr_http_port}}",
+              "path": ["v1.0", "secrets", "{{secretstore_name}}", "ogmios"]
+            },
+            "description": "Retrieve Ogmios connection credentials from the secret store.\n\nShows how to securely access sensitive configuration."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Consumer Simulation",
+      "item": [
+        {
+          "name": "Simulate Event Subscription Response (SUCCESS)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"SUCCESS\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:4001/events",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "4001",
+              "path": ["events"]
+            },
+            "description": "Example response a consumer would return to acknowledge successful event processing.\n\nDapr expects: {\"status\": \"SUCCESS\"}, {\"status\": \"RETRY\"}, or {\"status\": \"DROP\"}"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
