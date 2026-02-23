@@ -6,7 +6,7 @@ Thank you for your interest in contributing! This document provides guidelines f
 
 ### Prerequisites
 
-- .NET 9 SDK
+- .NET 10 SDK
 - Docker & Docker Compose
 - Git
 
