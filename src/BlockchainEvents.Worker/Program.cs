@@ -7,23 +7,39 @@ builder.Services.Configure<OgmiosOptions>(
 
 builder.Services.AddDaprClient();
 
-builder.Services.Configure<MetadataKeyValueRuleOptions>(opts =>
+// Rule 1: Minswap V2 DEX — match batched swap orders by contract address prefix.
+// The order script hash c3e28c36c3447315ba5a56f33da6a6ddc1770a876a8d9f0cb3a97c4c
+// produces bech32 prefixes addr1z (script+key staking) and addr1x (script+script staking).
+builder.Services.Configure<AddressMatchRuleOptions>(opts =>
 {
     opts.Enabled = true;
-    opts.Labels = [674]; // CIP-20 transaction messages
+    opts.Prefixes =
+    [
+        "addr1z8p79rpkcdz8x9d6tft0x0dx5m0wpwu9gw65dnuvkw5hc",
+        "addr1x8p79rpkcdz8x9d6tft0x0dx5m0wpwu9gw65dnuvkw5hc"
+    ];
 });
-builder.Services.AddSingleton<ITransactionRule, MetadataKeyValueRule>();
+builder.Services.AddSingleton<ITransactionRule, AddressMatchRule>();
 
+// Rule 2: Governance votes — match only on-chain voting transactions.
 builder.Services.Configure<GovernanceTreasuryRuleOptions>(opts =>
 {
     opts.Enabled = true;
-    opts.IncludeGovernanceActions = true;
-    opts.IncludeTreasuryWithdrawals = true;
-    opts.IncludeDelegations = true;
-    opts.IncludeStakeRegistrations = true;
+    opts.IncludeGovernanceActions = false;
+    opts.IncludeTreasuryWithdrawals = false;
+    opts.IncludeDelegations = false;
+    opts.IncludeStakeRegistrations = false;
     opts.IncludeVotes = true;
 });
 builder.Services.AddSingleton<ITransactionRule, GovernanceTreasuryRule>();
+
+// Rule 3: Any transaction with metadata — match all metadata regardless of label.
+builder.Services.Configure<MetadataKeyValueRuleOptions>(opts =>
+{
+    opts.Enabled = true;
+    opts.MatchAny = true;
+});
+builder.Services.AddSingleton<ITransactionRule, MetadataKeyValueRule>();
 
 builder.Services.AddSingleton<IRuleEngine, RuleEngine>();
 builder.Services.AddSingleton<IEventMetrics, EventMetrics>();
