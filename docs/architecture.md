@@ -224,9 +224,9 @@ See [event-schema.md](event-schema.md) for complete specification.
 │  └──────────────────────────────────────────────────┘   │
 │                                                          │
 │  ┌──────────────────────────────────────────────────┐   │
-│  │           sdkless-subscriber (demo)               │   │
+│  │             demo-subscriber (demo)                │   │
 │  │  ┌──────────────┐     ┌──────────────────────┐   │   │
-│  │  │   Python     │◀───▶│    Dapr Sidecar      │   │   │
+│  │  │  .NET / C#   │◀───▶│    Dapr Sidecar      │   │   │
 │  │  │   (HTTP)     │     │                      │   │   │
 │  │  └──────────────┘     └──────────────────────┘   │   │
 │  └──────────────────────────────────────────────────┘   │
@@ -244,7 +244,7 @@ See [event-schema.md](event-schema.md) for complete specification.
 
 | Layer            | Technology                   |
 | ---------------- | ---------------------------- |
-| Runtime          | .NET 9                       |
+| Runtime          | .NET 10                      |
 | Chain Sync       | OgmiosDotnet 6.13.x          |
 | Event Bus        | Dapr Pub/Sub (Redis Streams) |
 | State Store      | Dapr State (Redis)           |
