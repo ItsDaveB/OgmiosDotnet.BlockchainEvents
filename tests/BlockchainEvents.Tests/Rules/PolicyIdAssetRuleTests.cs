@@ -129,7 +129,9 @@ public class PolicyIdAssetRuleTests
             BlockHash = "abc123",
             BlockHeight = 9876543,
             Index = 0,
-            MintedAssets = mintedAssets
+            MintedAssets = mintedAssets.ToDictionary(
+                kvp => kvp.Key,
+                kvp => (IReadOnlyDictionary<string, long>)kvp.Value)
         };
     }
 }
