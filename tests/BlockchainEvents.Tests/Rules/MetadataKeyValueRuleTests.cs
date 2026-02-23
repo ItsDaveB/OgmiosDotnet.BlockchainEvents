@@ -162,6 +162,86 @@ public class MetadataKeyValueRuleTests
         result.Should().BeFalse();
     }
 
+    [Fact]
+    public void IsMatch_WithMatchAny_MatchesAnyMetadata()
+    {
+        // Arrange
+        var options = Options.Create(new MetadataKeyValueRuleOptions
+        {
+            Enabled = true,
+            MatchAny = true
+        });
+        var rule = new MetadataKeyValueRule(options);
+        var transaction = CreateTransactionWithMetadata(new Dictionary<int, object?>
+        {
+            [999] = new { something = "arbitrary" }
+        });
+
+        // Act
+        var result = rule.IsMatch(transaction, _context);
+
+        // Assert
+        result.Should().BeTrue();
+    }
+
+    [Fact]
+    public void IsMatch_WithMatchAny_EmptyMetadata_ReturnsFalse()
+    {
+        // Arrange
+        var options = Options.Create(new MetadataKeyValueRuleOptions
+        {
+            Enabled = true,
+            MatchAny = true
+        });
+        var rule = new MetadataKeyValueRule(options);
+        var transaction = CreateTransactionWithMetadata(new Dictionary<int, object?>());
+
+        // Act
+        var result = rule.IsMatch(transaction, _context);
+
+        // Assert
+        result.Should().BeFalse();
+    }
+
+    [Fact]
+    public void IsEnabled_WithMatchAnyOnly_ReturnsTrue()
+    {
+        // Arrange — no labels, patterns, or values; just MatchAny
+        var options = Options.Create(new MetadataKeyValueRuleOptions
+        {
+            Enabled = true,
+            MatchAny = true
+        });
+        var rule = new MetadataKeyValueRule(options);
+
+        // Act & Assert
+        rule.IsEnabled.Should().BeTrue();
+    }
+
+    [Fact]
+    public void Evaluate_WithMatchAny_IncludesMatchModeInCriteria()
+    {
+        // Arrange
+        var options = Options.Create(new MetadataKeyValueRuleOptions
+        {
+            Enabled = true,
+            MatchAny = true
+        });
+        var rule = new MetadataKeyValueRule(options);
+        var transaction = CreateTransactionWithMetadata(new Dictionary<int, object?>
+        {
+            [674] = new Dictionary<string, object> { ["msg"] = "Hello" }
+        });
+
+        // Act
+        var result = rule.Evaluate(transaction, _context);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.MatchedCriteria.Should().ContainKey("match_mode");
+        result.MatchedCriteria["match_mode"].Should().Be("any_metadata");
+    }
+
     private static TransactionData CreateTransactionWithMetadata(
         Dictionary<int, object?> metadata)
     {
