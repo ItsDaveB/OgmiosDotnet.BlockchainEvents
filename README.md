@@ -1,6 +1,6 @@
 # OgmiosDotnet.BlockchainEvents
 
-[![CI](https://github.com/your-org/OgmiosDotnet.BlockchainEvents/actions/workflows/ci.yml/badge.svg)](https://github.com/your-org/OgmiosDotnet.BlockchainEvents/actions/workflows/ci.yml)
+[![CI](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/actions/workflows/ci.yml/badge.svg)](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Rule-based transaction filtering for Cardano. Connects to [Ogmios](https://ogmios.dev/), applies configurable rules, and emits [CloudEvents](https://cloudevents.io/) via Dapr pub/sub.
@@ -61,8 +61,10 @@ Minimal config (`appsettings.json`):
     "CheckpointKey": "sync-checkpoint"
   },
   "Ogmios": {
-    "Host": "localhost",
-    "Port": 1337
+    "Connection": {
+      "Host": "localhost",
+      "Port": 1337
+    }
   }
 }
 ```
@@ -71,16 +73,22 @@ Minimal config (`appsettings.json`):
 
 ### Prerequisites
 
-- .NET 9 SDK
+- .NET 10 SDK
 - Docker (for full stack)
 - Ogmios running locally (port 1337)
+
+### First-Time Setup (optional)
+
+```bash
+./setup.sh          # adds blockchain.local to /etc/hosts — use instead of localhost
+```
 
 ### Docker Compose (full stack)
 
 ```bash
 docker compose up --build
 
-# View traces at http://localhost:9411
+# View traces at http://localhost:4004
 ```
 
 ### Local Development
@@ -91,7 +99,7 @@ docker compose up redis placement zipkin
 
 # Terminal 2: Run with Dapr CLI
 dapr run --app-id blockchain-events \
-         --app-port 5000 \
+         --app-port 4000 \
          --resources-path ./dapr/components \
          --config ./dapr/config/config.yaml \
          -- dotnet run --project src/BlockchainEvents.Worker
