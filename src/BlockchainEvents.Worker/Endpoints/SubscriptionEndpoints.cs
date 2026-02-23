@@ -9,7 +9,7 @@ public static class SubscriptionEndpoints
     };
 
     private static long _eventsReceived;
-    private static DateTimeOffset _lastEventTime = DateTimeOffset.MinValue;
+    private static long _lastEventTimeTicks = DateTimeOffset.MinValue.Ticks;
 
     public static void MapSubscriptionEndpoints(this WebApplication app)
     {
@@ -38,14 +38,14 @@ public static class SubscriptionEndpoints
                     blockchainEvent = daprEnvelope.Deserialize<BlockchainEvent<TransactionMatchedData>>(JsonOptions);
                 }
 
-                _eventsReceived++;
-                _lastEventTime = DateTimeOffset.UtcNow;
+                Interlocked.Increment(ref _eventsReceived);
+                Interlocked.Exchange(ref _lastEventTimeTicks, DateTimeOffset.UtcNow.Ticks);
 
                 var txId = blockchainEvent?.Data?.TransactionId ?? "unknown";
                 var slot = blockchainEvent?.CardanoSlot;
 
                 logger.LogInformation("📥 Event #{Count}: Transaction {Tx}, Slot {Slot}",
-                    _eventsReceived, txId, slot);
+                    Interlocked.Read(ref _eventsReceived), txId, slot);
 
                 return Results.Ok();
             }
@@ -56,10 +56,15 @@ public static class SubscriptionEndpoints
             }
         });
 
-        app.MapGet("/subscriptions/status", () => new
+        app.MapGet("/subscriptions/status", () =>
         {
-            eventsReceived = _eventsReceived,
-            lastEventTime = _lastEventTime == DateTimeOffset.MinValue ? null : _lastEventTime.ToString("o")
+            var ticks = Interlocked.Read(ref _lastEventTimeTicks);
+            var lastTime = ticks == DateTimeOffset.MinValue.Ticks ? null : new DateTimeOffset(ticks, TimeSpan.Zero).ToString("o");
+            return new
+            {
+                eventsReceived = Interlocked.Read(ref _eventsReceived),
+                lastEventTime = lastTime
+            };
         });
     }
 }

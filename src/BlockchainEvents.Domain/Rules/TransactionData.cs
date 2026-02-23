@@ -18,8 +18,8 @@ public sealed class TransactionData
     public IEnumerable<string> AllAddresses => InputAddresses.Concat(OutputAddresses).Distinct();
 
     /// <summary>PolicyId → AssetName → Amount (negative = burned).</summary>
-    public IReadOnlyDictionary<string, Dictionary<string, long>> MintedAssets { get; init; } =
-        new Dictionary<string, Dictionary<string, long>>();
+    public IReadOnlyDictionary<string, IReadOnlyDictionary<string, long>> MintedAssets { get; init; } =
+        new Dictionary<string, IReadOnlyDictionary<string, long>>();
 
     /// <summary>Metadata by label (CIP-10 format).</summary>
     public IReadOnlyDictionary<int, object?> Metadata { get; init; } = new Dictionary<int, object?>();
