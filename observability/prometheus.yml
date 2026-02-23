@@ -5,7 +5,7 @@ global:
 scrape_configs:
   - job_name: 'blockchain-events'
     static_configs:
-      - targets: ['blockchain-events:5050']
+      - targets: ['blockchain-events:4000']
     metrics_path: /metrics
 
   - job_name: 'dapr-sidecar'

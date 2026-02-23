@@ -81,6 +81,6 @@ app.MapGet("/status", () => new
     uptime = (DateTime.UtcNow - System.Diagnostics.Process.GetCurrentProcess().StartTime.ToUniversalTime()).ToString()
 });
 
-logger.LogInformation("Demo Subscriber starting on {Urls}", builder.Configuration["ASPNETCORE_URLS"] ?? "http://localhost:5001");
+logger.LogInformation("Demo Subscriber starting on {Urls}", builder.Configuration["ASPNETCORE_URLS"] ?? "http://localhost:4001");
 logger.LogInformation("Waiting for subscription registration via GET /dapr/subscribe ...");
 app.Run();

@@ -35,8 +35,8 @@ RUN chown -R appuser:appgroup /app
 
 USER appuser
 
-ENV ASPNETCORE_URLS=http://+:5050
-EXPOSE 5050
+ENV ASPNETCORE_URLS=http://+:4000
+EXPOSE 4000
 
 ENTRYPOINT ["dotnet", "BlockchainEvents.Worker.dll"]
 
@@ -51,7 +51,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 COPY --from=debug /app/debug-publish .
 
-ENV ASPNETCORE_URLS=http://+:5050
-EXPOSE 5050
+ENV ASPNETCORE_URLS=http://+:4000
+EXPOSE 4000
 
 ENTRYPOINT ["dotnet", "BlockchainEvents.Worker.dll"]
