@@ -125,6 +125,68 @@
     {
       "collapsed": false,
       "gridPos": { "h": 1, "w": 24, "x": 0, "y": 5 },
+      "id": 106,
+      "title": "🎯 Active Rules",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "description": "Minswap V2 DEX batched swap orders detected by matching the order contract address prefix.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "fixedColor": "#5794F2", "mode": "fixed" },
+          "mappings": [{ "options": { "0": { "color": "text", "index": 0, "text": "0" } }, "type": "value" }],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "#5794F2", "value": null }] },
+          "unit": "short"
+        }
+      },
+      "gridPos": { "h": 5, "w": 8, "x": 0, "y": 6 },
+      "id": 60,
+      "options": { "colorMode": "background_solid", "graphMode": "area", "justifyMode": "auto", "orientation": "horizontal", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "value_and_name" },
+      "targets": [{ "expr": "blockchain_events_emitted_total{rule=\"Address Match\"} or vector(0)", "legendFormat": "Minswap Swaps", "refId": "A" }],
+      "title": "🔄 Minswap Swap Orders",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "description": "On-chain governance voting transactions from Cardano's CIP-1694 governance model.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "fixedColor": "#FF9830", "mode": "fixed" },
+          "mappings": [{ "options": { "0": { "color": "text", "index": 0, "text": "0" } }, "type": "value" }],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "#FF9830", "value": null }] },
+          "unit": "short"
+        }
+      },
+      "gridPos": { "h": 5, "w": 8, "x": 8, "y": 6 },
+      "id": 61,
+      "options": { "colorMode": "background_solid", "graphMode": "area", "justifyMode": "auto", "orientation": "horizontal", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "value_and_name" },
+      "targets": [{ "expr": "blockchain_events_emitted_total{rule=\"Governance & Treasury\"} or vector(0)", "legendFormat": "Governance Votes", "refId": "A" }],
+      "title": "🗳️ Governance Votes",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "description": "Any transaction carrying metadata — CIP-20 messages, NFT mints, DApp annotations, etc.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "fixedColor": "#B877D9", "mode": "fixed" },
+          "mappings": [{ "options": { "0": { "color": "text", "index": 0, "text": "0" } }, "type": "value" }],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "#B877D9", "value": null }] },
+          "unit": "short"
+        }
+      },
+      "gridPos": { "h": 5, "w": 8, "x": 16, "y": 6 },
+      "id": 62,
+      "options": { "colorMode": "background_solid", "graphMode": "area", "justifyMode": "auto", "orientation": "horizontal", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "value_and_name" },
+      "targets": [{ "expr": "blockchain_events_emitted_total{rule=\"Metadata Key/Value Match\"} or vector(0)", "legendFormat": "Metadata Transactions", "refId": "A" }],
+      "title": "📝 Metadata Transactions",
+      "type": "stat"
+    },
+
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 11 },
       "id": 101,
       "title": "📈 Throughput",
       "type": "row"
@@ -140,7 +202,7 @@
           "unit": "ops"
         }
       },
-      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 6 },
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 12 },
       "id": 10,
       "options": { "legend": { "calcs": ["mean", "max", "lastNotNull"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
       "targets": [{ "expr": "rate(blockchain_blocks_processed_total[1m])", "legendFormat": "blocks/sec", "refId": "A" }],
@@ -158,7 +220,7 @@
           "unit": "ops"
         }
       },
-      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 6 },
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 12 },
       "id": 11,
       "options": { "legend": { "calcs": ["mean", "max", "lastNotNull"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
       "targets": [
@@ -179,7 +241,7 @@
           "unit": "ops"
         }
       },
-      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 6 },
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 12 },
       "id": 12,
       "options": { "legend": { "calcs": ["mean", "max", "lastNotNull"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
       "targets": [{ "expr": "rate(blockchain_transactions_processed_total[1m])", "legendFormat": "transactions/sec", "refId": "A" }],
@@ -189,7 +251,7 @@
 
     {
       "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 14 },
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 20 },
       "id": 102,
       "title": "⏱️ Latency & Reliability",
       "type": "row"
@@ -211,7 +273,7 @@
           "unit": "s"
         }
       },
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 15 },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 21 },
       "id": 20,
       "options": { "legend": { "calcs": ["mean", "max", "lastNotNull"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
       "targets": [
@@ -234,7 +296,7 @@
           "min": 0
         }
       },
-      "gridPos": { "h": 8, "w": 6, "x": 12, "y": 15 },
+      "gridPos": { "h": 8, "w": 6, "x": 12, "y": 21 },
       "id": 21,
       "options": { "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "single", "sort": "none" } },
       "targets": [{ "expr": "blockchain_events_in_flight", "legendFormat": "in-flight", "refId": "A" }],
@@ -261,7 +323,7 @@
           }
         ]
       },
-      "gridPos": { "h": 8, "w": 6, "x": 18, "y": 15 },
+      "gridPos": { "h": 8, "w": 6, "x": 18, "y": 21 },
       "id": 22,
       "options": { "cellHeight": "sm", "footer": { "countRows": false, "enablePagination": false, "fields": "", "reducer": ["sum"], "show": true }, "showHeader": true, "sortBy": [{ "desc": true, "displayName": "Events" }] },
       "targets": [{ "expr": "blockchain_events_emitted_total", "format": "table", "instant": true, "legendFormat": "", "refId": "A" }],
@@ -272,7 +334,7 @@
 
     {
       "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 23 },
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 29 },
       "id": 103,
       "title": "🖥️ .NET Runtime",
       "type": "row"
@@ -290,7 +352,7 @@
           "max": 100
         }
       },
-      "gridPos": { "h": 7, "w": 6, "x": 0, "y": 24 },
+      "gridPos": { "h": 7, "w": 6, "x": 0, "y": 30 },
       "id": 30,
       "options": { "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "single", "sort": "none" } },
       "targets": [{ "expr": "system_runtime_cpu_usage{job=\"blockchain-events\"}", "legendFormat": "CPU %", "refId": "A" }],
@@ -309,7 +371,7 @@
           "min": 0
         }
       },
-      "gridPos": { "h": 7, "w": 6, "x": 6, "y": 24 },
+      "gridPos": { "h": 7, "w": 6, "x": 6, "y": 30 },
       "id": 31,
       "options": { "legend": { "calcs": ["mean", "max", "lastNotNull"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
       "targets": [
@@ -332,7 +394,7 @@
           "min": 0
         }
       },
-      "gridPos": { "h": 7, "w": 6, "x": 12, "y": 24 },
+      "gridPos": { "h": 7, "w": 6, "x": 12, "y": 30 },
       "id": 32,
       "options": { "legend": { "calcs": ["lastNotNull"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
       "targets": [
@@ -355,7 +417,7 @@
           "min": 0
         }
       },
-      "gridPos": { "h": 7, "w": 6, "x": 18, "y": 24 },
+      "gridPos": { "h": 7, "w": 6, "x": 18, "y": 30 },
       "id": 33,
       "options": { "legend": { "calcs": ["mean", "lastNotNull"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
       "targets": [
@@ -369,7 +431,7 @@
 
     {
       "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 31 },
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 37 },
       "id": 104,
       "title": "🌐 Network & Connections",
       "type": "row"
@@ -385,7 +447,7 @@
           "unit": "Bps"
         }
       },
-      "gridPos": { "h": 7, "w": 8, "x": 0, "y": 32 },
+      "gridPos": { "h": 7, "w": 8, "x": 0, "y": 38 },
       "id": 40,
       "options": { "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
       "targets": [
@@ -407,7 +469,7 @@
           "min": 0
         }
       },
-      "gridPos": { "h": 7, "w": 8, "x": 8, "y": 32 },
+      "gridPos": { "h": 7, "w": 8, "x": 8, "y": 38 },
       "id": 41,
       "options": { "legend": { "calcs": ["mean", "lastNotNull"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
       "targets": [
@@ -429,7 +491,7 @@
           "unit": "s"
         }
       },
-      "gridPos": { "h": 7, "w": 8, "x": 16, "y": 32 },
+      "gridPos": { "h": 7, "w": 8, "x": 16, "y": 38 },
       "id": 42,
       "options": { "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
       "targets": [
@@ -442,7 +504,7 @@
 
     {
       "collapsed": true,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 39 },
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 45 },
       "id": 105,
       "title": "🔧 Dapr Sidecar",
       "type": "row",
@@ -458,7 +520,7 @@
               "unit": "ops"
             }
           },
-          "gridPos": { "h": 7, "w": 12, "x": 0, "y": 40 },
+          "gridPos": { "h": 7, "w": 12, "x": 0, "y": 46 },
           "id": 50,
           "options": { "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
           "targets": [
@@ -479,7 +541,7 @@
               "unit": "s"
             }
           },
-          "gridPos": { "h": 7, "w": 12, "x": 12, "y": 40 },
+          "gridPos": { "h": 7, "w": 12, "x": 12, "y": 46 },
           "id": 51,
           "options": { "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
           "targets": [
@@ -504,6 +566,6 @@
   "timezone": "browser",
   "title": "Blockchain Events",
   "uid": "blockchain-events",
-  "version": 2,
+  "version": 3,
   "weekStart": ""
 }
