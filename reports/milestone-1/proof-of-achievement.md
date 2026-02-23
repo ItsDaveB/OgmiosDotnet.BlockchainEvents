@@ -151,9 +151,9 @@ Total tests: 59
 | [`docs/architecture.md`](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/blob/main/docs/architecture.md)           | System architecture, component design, data flow, deployment, performance characteristics |
 | [`docs/event-schema.md`](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/blob/main/docs/event-schema.md)           | Complete CloudEvents schema specification, field definitions, examples                    |
 | [`docs/integration-guide.md`](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/blob/main/docs/integration-guide.md) | Step-by-step guide for building custom rules with examples                                |
-| [`README.md`](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/blob/main/README.md)                                | Project overview, quick start, configuration reference                                    |
-| [`CONTRIBUTING.md`](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/blob/main/CONTRIBUTING.md)                    | Development setup, project structure, adding new rules                                    |
-| [`postman/`](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/tree/main/postman)                                   | Postman collection and environment for API testing                                        |
+| [`README.md`](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/blob/main/README.md)                                 | Project overview, quick start, configuration reference                                    |
+| [`CONTRIBUTING.md`](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/blob/main/CONTRIBUTING.md)                     | Development setup, project structure, adding new rules                                    |
+| [`postman/`](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/tree/main/postman)                                    | Postman collection and environment for API testing                                        |
 
 ---
 
