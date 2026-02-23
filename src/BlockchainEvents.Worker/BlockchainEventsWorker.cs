@@ -21,8 +21,8 @@ public sealed class BlockchainEventsWorker(
         if (!skipDapr)
             await WaitForDaprSidecarAsync(stoppingToken);
 
-        logger.LogInformation("Starting chain sync - Network: {Network}, Rules: {Count}",
-            _options.Network, ruleEngine.EnabledRuleCount);
+        logger.LogInformation("Starting chain sync - Network: {Network}, Enabled rules: {Rules}",
+            _options.Network, string.Join(", ", ruleEngine.EnabledRuleNames));
 
         metrics.SetEnabledRules(ruleEngine.EnabledRuleCount, ruleEngine.EnabledRuleNames);
 
@@ -79,11 +79,15 @@ public sealed class BlockchainEventsWorker(
 
         if (matches.Count == 0) return;
 
-        logger.LogInformation("Block {Slot}: {TxCount} tx, {MatchCount} matches",
+        logger.LogInformation("Block {Slot}: {TxCount} tx, {MatchCount} rule matches",
             block.Slot, block.Transactions.Count, matches.Count);
 
         foreach (var match in matches)
         {
+            logger.LogInformation("[{RuleId}] {RuleName} matched tx {TxId} at slot {Slot}",
+                match.MatchResult.RuleId, match.MatchResult.RuleName,
+                match.Transaction.Id[..16], block.Slot);
+
             await eventEmitter.EmitAsync(match.Transaction, match.MatchResult, context, ct);
             _eventsEmitted++;
         }
