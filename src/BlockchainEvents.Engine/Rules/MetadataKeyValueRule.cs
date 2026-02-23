@@ -4,6 +4,7 @@ public sealed class MetadataKeyValueRuleOptions
 {
     public const string SectionName = "Rules:MetadataKeyValue";
     public bool Enabled { get; set; } = true;
+    public bool MatchAny { get; set; } = false;
     public List<int> Labels { get; set; } = [];
     public List<string> KeyPatterns { get; set; } = [];
     public List<string> ValuePatterns { get; set; } = [];
@@ -19,11 +20,14 @@ public sealed class MetadataKeyValueRule(IOptions<MetadataKeyValueRuleOptions> o
     public override string Id => "metadata-key-value";
     public override string Name => "Metadata Key/Value Match";
     public override string Description => "Matches transactions containing specific metadata labels or patterns";
-    public override bool IsEnabled => _options.Enabled && (_labels.Count > 0 || _keyPatterns.Count > 0 || _valuePatterns.Count > 0);
+    public override bool IsEnabled => _options.Enabled &&
+        (_options.MatchAny || _labels.Count > 0 || _keyPatterns.Count > 0 || _valuePatterns.Count > 0);
 
     public override bool IsMatch(TransactionData transaction, RuleContext context)
     {
         if (transaction.Metadata.Count == 0) return false;
+
+        if (_options.MatchAny) return true;
 
         if (_labels.Count > 0 && transaction.Metadata.Keys.Any(label => _labels.Contains(label)))
             return true;
@@ -34,10 +38,17 @@ public sealed class MetadataKeyValueRule(IOptions<MetadataKeyValueRuleOptions> o
 
     public override RuleMatchResult Evaluate(TransactionData transaction, RuleContext context)
     {
-        var matchedLabels = transaction.Metadata.Keys.Where(l => _labels.Contains(l)).ToList();
-        var criteria = new Dictionary<string, object>();
+        var allLabels = transaction.Metadata.Keys.ToList();
+        var matchedLabels = _labels.Count > 0
+            ? allLabels.Where(l => _labels.Contains(l)).ToList()
+            : allLabels;
 
-        if (matchedLabels.Count > 0) criteria["matched_labels"] = matchedLabels;
+        var criteria = new Dictionary<string, object>
+        {
+            ["matched_labels"] = matchedLabels
+        };
+
+        if (_options.MatchAny) criteria["match_mode"] = "any_metadata";
         if (_keyPatterns.Count > 0) criteria["key_patterns"] = _keyPatterns.ToList();
         if (_valuePatterns.Count > 0) criteria["value_patterns"] = _valuePatterns.ToList();
 
