@@ -274,13 +274,13 @@ Brings up 11 containers: worker, Dapr sidecars, Redis, Prometheus, Grafana, Zipk
 | 4   | 59 passing unit tests                                           | [`tests/BlockchainEvents.Tests/`](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/tree/main/tests/BlockchainEvents.Tests)           |
 | 5   | Architecture, event schema, and integration guide documentation | [`docs/`](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/tree/main/docs)                                                           |
 | 6   | CI/CD pipelines (build, security, release)                      | [`.github/workflows/`](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/tree/main/.github/workflows)                                 |
-| 7   | Demo video showing end-to-end operation                         | [Demo Video](https://www.youtube.com/watch?v=k9JfsHKHyBw)                                                                                     |
+| 7   | Demo video showing end-to-end operation                         | [Demo Video](https://www.youtube.com/watch?v=ibzgzwJAm2U)                                                                                     |
 
 ---
 
 ## Demo Video
 
-> **Video link:** [https://www.youtube.com/watch?v=k9JfsHKHyBw](https://www.youtube.com/watch?v=k9JfsHKHyBw)
+> **Video link:** [https://www.youtube.com/watch?v=ibzgzwJAm2U](https://www.youtube.com/watch?v=ibzgzwJAm2U)
 
 ---
 
