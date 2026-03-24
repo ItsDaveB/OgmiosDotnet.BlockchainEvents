@@ -2,8 +2,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.Configure<BlockchainEventsOptions>(
     builder.Configuration.GetSection(BlockchainEventsOptions.SectionName));
-builder.Services.Configure<OgmiosOptions>(
-    builder.Configuration.GetSection(OgmiosOptions.SectionName));
+builder.Services.AddOptions<OgmiosOptions>()
+    .Bind(builder.Configuration.GetSection(OgmiosOptions.SectionName))
+    .Validate(opts => opts.Connection.Host != "localhost" || !opts.Connection.Tls,
+        "Ogmios connection still has defaults (localhost + TLS). Check that the Ogmios section in appsettings.json is loading correctly.")
+    .ValidateOnStart();
 
 builder.Services.AddDaprClient();
 
