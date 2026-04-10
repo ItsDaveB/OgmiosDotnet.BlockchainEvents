@@ -43,6 +43,13 @@ public sealed class EventMetrics : IEventMetrics
         "blockchain_transactions_processed_total",
         "Total number of transactions processed");
 
+    private static readonly Gauge TransactionsPerSecond = Metrics.CreateGauge(
+        "blockchain_transactions_per_second",
+        "Transactions processed per second (10-second sliding window)");
+
+    private static readonly ConcurrentQueue<(long Timestamp, int Count)> _txWindow = new();
+    private static readonly TimeSpan WindowSize = TimeSpan.FromSeconds(10);
+
     private static readonly Gauge EventsInFlightGauge = Metrics.CreateGauge(
         "blockchain_events_in_flight",
         "Number of events currently being processed");
@@ -76,6 +83,27 @@ public sealed class EventMetrics : IEventMetrics
         BlocksProcessedTotal.Inc();
         LastProcessedSlot.Set(slot);
         TransactionsProcessedTotal.Inc(transactionCount);
+        UpdateTps(transactionCount);
+    }
+
+    private static void UpdateTps(int transactionCount)
+    {
+        var now = Stopwatch.GetTimestamp();
+        _txWindow.Enqueue((now, transactionCount));
+
+        var cutoff = now - (long)(WindowSize.TotalSeconds * Stopwatch.Frequency);
+        while (_txWindow.TryPeek(out var oldest) && oldest.Timestamp < cutoff)
+            _txWindow.TryDequeue(out _);
+
+        var total = 0;
+        foreach (var entry in _txWindow)
+            total += entry.Count;
+
+        var elapsed = _txWindow.TryPeek(out var first)
+            ? (double)(now - first.Timestamp) / Stopwatch.Frequency
+            : 0;
+
+        TransactionsPerSecond.Set(elapsed > 0 ? total / elapsed : 0);
     }
 
     public void SetEnabledRules(int count, IEnumerable<string> ruleNames)

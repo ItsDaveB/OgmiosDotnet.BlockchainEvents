@@ -23,11 +23,6 @@ RUN dotnet publish src/BlockchainEvents.Worker/BlockchainEvents.Worker.csproj \
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates \
-    && update-ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
-
 RUN groupadd -r appgroup && useradd -r -g appgroup appuser
 
 COPY --from=build /app/publish .

@@ -1,3 +1,4 @@
+global using System.Collections.Concurrent;
 global using System.Diagnostics;
 global using System.Text.Json;
 global using BlockchainEvents.Domain.Checkpoints;

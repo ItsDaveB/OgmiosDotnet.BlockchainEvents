@@ -1,0 +1,319 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "OgmiosDotnet.BlockchainEvents API",
+    "description": "Real-time Cardano blockchain event filtering and delivery via CloudEvents 1.0. Supports HTTP (Dapr pub/sub) and gRPC streaming consumption.",
+    "contact": {
+      "name": "Dave",
+      "url": "https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    },
+    "version": "v1"
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": ["Health"],
+        "summary": "Health Check",
+        "description": "Returns the current health status of the service.",
+        "operationId": "HealthCheck",
+        "responses": {
+          "200": {
+            "description": "Service is healthy",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "healthy"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-03-27T12:00:00Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/events/blockchain": {
+      "post": {
+        "tags": ["Events"],
+        "summary": "Receive Blockchain Event",
+        "description": "Dapr subscription endpoint. Receives CloudEvents from the Dapr pub/sub topic. This endpoint is called by the Dapr sidecar when new events are published.",
+        "operationId": "ReceiveBlockchainEvent",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BlockchainEvent"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Event processed successfully"
+          },
+          "500": {
+            "description": "Event processing failed"
+          }
+        }
+      }
+    },
+    "/dapr/subscribe": {
+      "get": {
+        "tags": ["Dapr"],
+        "summary": "Dapr Subscription Registration",
+        "description": "Returns the list of pub/sub topic subscriptions for Dapr to discover.",
+        "operationId": "DaprSubscribe",
+        "responses": {
+          "200": {
+            "description": "Subscription list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "pubsubname": {
+                        "type": "string",
+                        "example": "pubsub"
+                      },
+                      "topic": {
+                        "type": "string",
+                        "example": "cardano-transactions"
+                      },
+                      "route": {
+                        "type": "string",
+                        "example": "/events/blockchain"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "BlockchainEvent": {
+        "type": "object",
+        "description": "CloudEvents 1.0 compliant blockchain event with Cardano extensions.",
+        "required": ["specVersion", "id", "source", "type", "time", "data"],
+        "properties": {
+          "specVersion": {
+            "type": "string",
+            "example": "1.0",
+            "description": "CloudEvents specification version"
+          },
+          "id": {
+            "type": "string",
+            "example": "tx-abc123-address-match-1705312200000",
+            "description": "Unique event identifier (format: {txId}-{ruleId}-{timestampMs})"
+          },
+          "source": {
+            "type": "string",
+            "format": "uri",
+            "example": "cardano://mainnet/slot/115545883/block/4e58bb36...",
+            "description": "Event origin (format: cardano://{network}/slot/{slot}/block/{hash})"
+          },
+          "type": {
+            "type": "string",
+            "example": "io.cardano.transaction.address-match",
+            "description": "Event type (format: io.cardano.transaction.{ruleId})"
+          },
+          "subject": {
+            "type": "string",
+            "example": "Address Match",
+            "description": "Rule name that matched"
+          },
+          "time": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-01-15T10:30:00.000Z",
+            "description": "Event timestamp (RFC 3339)"
+          },
+          "dataContentType": {
+            "type": "string",
+            "example": "application/json"
+          },
+          "dataSchema": {
+            "type": "string",
+            "format": "uri",
+            "example": "https://schema.cardano.org/events/transaction-matched/v1"
+          },
+          "cardanoSlot": {
+            "type": "integer",
+            "format": "int64",
+            "example": 115545883,
+            "description": "Absolute Cardano slot number"
+          },
+          "cardanoBlock": {
+            "type": "string",
+            "example": "4e58bb36837b32f894c8a57006e24b64c2d77bf4fc13b3b2c428fee8871e2491",
+            "description": "Block hash (hex)"
+          },
+          "cardanoBlockHeight": {
+            "type": "integer",
+            "format": "int64",
+            "example": 10842567,
+            "description": "Block height"
+          },
+          "cardanoEra": {
+            "type": "string",
+            "example": "Conway",
+            "description": "Cardano era name"
+          },
+          "cardanoNetwork": {
+            "type": "string",
+            "example": "mainnet",
+            "description": "Network identifier (mainnet, preprod, preview)"
+          },
+          "data": {
+            "$ref": "#/components/schemas/TransactionMatchedData"
+          }
+        }
+      },
+      "TransactionMatchedData": {
+        "type": "object",
+        "description": "Payload containing matched transaction details.",
+        "required": ["transactionId", "slot", "blockHeight", "blockHash", "ruleId", "ruleName", "matchedCriteria", "transaction"],
+        "properties": {
+          "transactionId": {
+            "type": "string",
+            "example": "8a3b2c1d4e5f6789abcdef0123456789abcdef0123456789abcdef0123456789"
+          },
+          "slot": {
+            "type": "integer",
+            "format": "int64",
+            "example": 115545883
+          },
+          "blockHeight": {
+            "type": "integer",
+            "format": "int64",
+            "example": 10842567
+          },
+          "blockHash": {
+            "type": "string",
+            "example": "4e58bb36837b32f894c8a57006e24b64c2d77bf4fc13b3b2c428fee8871e2491"
+          },
+          "ruleId": {
+            "type": "string",
+            "example": "address-match"
+          },
+          "ruleName": {
+            "type": "string",
+            "example": "Address Match"
+          },
+          "matchedCriteria": {
+            "type": "object",
+            "additionalProperties": true,
+            "example": {
+              "matched_addresses": ["addr1qx..."]
+            }
+          },
+          "transaction": {
+            "$ref": "#/components/schemas/TransactionData"
+          }
+        }
+      },
+      "TransactionData": {
+        "type": "object",
+        "description": "Normalized Cardano transaction data.",
+        "required": ["id", "slot", "blockHash", "blockHeight", "index"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Transaction hash"
+          },
+          "slot": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "blockHash": {
+            "type": "string"
+          },
+          "blockHeight": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "index": {
+            "type": "integer",
+            "description": "Index within block"
+          },
+          "fee": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Fee in lovelace"
+          },
+          "inputAddresses": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "outputAddresses": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "mintedAssets": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "integer",
+                "format": "int64"
+              }
+            }
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "hasGovernanceAction": { "type": "boolean" },
+          "hasTreasuryWithdrawal": { "type": "boolean" },
+          "hasStakeDelegation": { "type": "boolean" },
+          "hasStakeRegistration": { "type": "boolean" },
+          "hasVote": { "type": "boolean" }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Health",
+      "description": "Health check endpoints"
+    },
+    {
+      "name": "Events",
+      "description": "Blockchain event subscription endpoints (Dapr pub/sub)"
+    },
+    {
+      "name": "Dapr",
+      "description": "Dapr integration endpoints"
+    }
+  ],
+  "servers": [
+    {
+      "url": "http://localhost:4000",
+      "description": "Local development (HTTP)"
+    },
+    {
+      "url": "http://localhost:4010",
+      "description": "Local development (gRPC on HTTP/2)"
+    }
+  ]
+}

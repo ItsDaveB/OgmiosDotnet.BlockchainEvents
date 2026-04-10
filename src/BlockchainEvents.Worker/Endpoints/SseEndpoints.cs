@@ -1,0 +1,77 @@
+namespace BlockchainEvents.Worker.Endpoints;
+
+public static class SseEndpoints
+{
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
+    };
+
+    public static void MapSseEndpoints(this WebApplication app)
+    {
+        app.MapGet("/events/stream", async (HttpContext context, IEventBroadcaster broadcaster, IEventMetrics metrics) =>
+        {
+            context.Response.ContentType = "text/event-stream";
+            context.Response.Headers.CacheControl = "no-cache";
+            context.Response.Headers.Connection = "keep-alive";
+            await context.Response.Body.FlushAsync();
+
+            using var subscription = broadcaster.Subscribe();
+            var ct = context.RequestAborted;
+
+            try
+            {
+                while (!ct.IsCancellationRequested)
+                {
+                    if (!await subscription.WaitToReadAsync(ct))
+                        break;
+
+                    while (subscription.TryRead(out var cloudEvent))
+                    {
+                        if (cloudEvent is null) continue;
+
+                        var payload = new
+                        {
+                            id = cloudEvent.Id,
+                            type = cloudEvent.Type,
+                            source = cloudEvent.Source,
+                            time = cloudEvent.Time,
+                            subject = cloudEvent.Subject,
+                            cardanoSlot = cloudEvent.CardanoSlot,
+                            cardanoBlockHeight = cloudEvent.CardanoBlockHeight,
+                            cardanoBlock = cloudEvent.CardanoBlock,
+                            cardanoEra = cloudEvent.CardanoEra,
+                            cardanoNetwork = cloudEvent.CardanoNetwork,
+                            data = cloudEvent.Data is null ? null : new
+                            {
+                                transactionId = cloudEvent.Data.TransactionId,
+                                slot = cloudEvent.Data.Slot,
+                                blockHeight = cloudEvent.Data.BlockHeight,
+                                blockHash = cloudEvent.Data.BlockHash,
+                                ruleId = cloudEvent.Data.RuleId,
+                                ruleName = cloudEvent.Data.RuleName,
+                                matchedCriteria = cloudEvent.Data.MatchedCriteria,
+                                transaction = cloudEvent.Data.Transaction is null ? null : new
+                                {
+                                    id = cloudEvent.Data.Transaction.Id,
+                                    fee = cloudEvent.Data.Transaction.Fee,
+                                    inputAddresses = cloudEvent.Data.Transaction.InputAddresses,
+                                    outputAddresses = cloudEvent.Data.Transaction.OutputAddresses
+                                }
+                            }
+                        };
+
+                        var json = JsonSerializer.Serialize(payload, JsonOptions);
+                        await context.Response.WriteAsync($"data: {json}\n\n", ct);
+                        await context.Response.Body.FlushAsync(ct);
+                    }
+                }
+            }
+            catch (OperationCanceledException) { }
+        })
+        .WithName("EventStream")
+        .WithTags("Streaming")
+        .WithDescription("Server-Sent Events stream of blockchain events");
+    }
+}

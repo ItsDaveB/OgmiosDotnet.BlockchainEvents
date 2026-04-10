@@ -12,16 +12,15 @@ builder.Services.AddDaprClient();
 builder.Services.AddGrpc();
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
+builder.Services.AddOpenApi("v1", options =>
 {
-    c.SwaggerDoc("v1", new()
+    options.AddDocumentTransformer((document, context, ct) =>
     {
-        Title = "OgmiosDotnet.BlockchainEvents API",
-        Version = "v1",
-        Description = "Real-time Cardano blockchain event filtering and delivery via CloudEvents 1.0. " +
-                      "Supports HTTP (Dapr pub/sub) and gRPC streaming consumption.",
-        Contact = new() { Name = "Dave Beaumont", Url = new Uri("https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents") },
-        License = new() { Name = "MIT", Url = new Uri("https://opensource.org/licenses/MIT") }
+        document.Info.Title = "OgmiosDotnet.BlockchainEvents API";
+        document.Info.Version = "v1";
+        document.Info.Description = "Real-time Cardano blockchain event filtering and delivery via CloudEvents 1.0. " +
+                      "Supports HTTP (Dapr pub/sub) and gRPC streaming consumption.";
+        return Task.CompletedTask;
     });
 });
 
@@ -62,6 +61,13 @@ builder.Services.Configure<MetadataKeyValueRuleOptions>(opts =>
 });
 builder.Services.AddSingleton<ITransactionRule, MetadataKeyValueRule>();
 
+// Rule 4: All transactions — emit an event for every transaction (demo/benchmarking).
+builder.Services.Configure<AllTransactionsRuleOptions>(opts =>
+{
+    opts.Enabled = true;
+});
+builder.Services.AddSingleton<ITransactionRule, AllTransactionsRule>();
+
 builder.Services.AddSingleton<IRuleEngine, RuleEngine>();
 builder.Services.AddSingleton<IEventMetrics, EventMetrics>();
 builder.Services.AddSingleton<IEventBroadcaster, EventBroadcaster>();
@@ -73,9 +79,15 @@ builder.Services.AddOgmiosServices();
 builder.Services.ConfigureHttpClientDefaults(http =>
     http.ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
     {
-        ServerCertificateCustomValidationCallback = (_, _, _, errors) =>
-            errors is System.Net.Security.SslPolicyErrors.None
-                    or System.Net.Security.SslPolicyErrors.RemoteCertificateNameMismatch
+        ServerCertificateCustomValidationCallback = (message, cert, chain, errors) =>
+        {
+            // Demeter hosted Ogmios endpoints use a proxy whose TLS certificate
+            // does not match the per-tenant hostname, producing NameMismatch.
+            // Allow connections when NameMismatch is the only issue.
+            if (errors == System.Net.Security.SslPolicyErrors.None)
+                return true;
+            return errors == System.Net.Security.SslPolicyErrors.RemoteCertificateNameMismatch;
+        }
     }));
 
 builder.Services.AddSingleton<OgmiosChainSyncAdapter>();
@@ -84,14 +96,19 @@ builder.Services.AddSingleton<Ogmios.Services.ChainSynchronization.IChainSynchro
     sp => sp.GetRequiredService<OgmiosChainSyncAdapter>());
 
 builder.Services.AddHostedService<BlockchainEventsWorker>();
+builder.Services.AddCors(options =>
+    options.AddPolicy("AllowAll", policy =>
+        policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
 
 var app = builder.Build();
 
-app.UseSwagger();
-app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "BlockchainEvents API v1"));
+app.UseCors("AllowAll");
+app.MapOpenApi();
+app.UseSwaggerUI(c => c.SwaggerEndpoint("/openapi/v1.json", "BlockchainEvents API v1"));
 
 app.MapGrpcService<BlockchainEventGrpcService>();
 app.MapSubscriptionEndpoints();
+app.MapSseEndpoints();
 app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTimeOffset.UtcNow }))
     .WithName("HealthCheck")
     .WithTags("Health")
