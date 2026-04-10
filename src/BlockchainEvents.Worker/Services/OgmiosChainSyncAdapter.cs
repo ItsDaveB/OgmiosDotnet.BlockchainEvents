@@ -5,7 +5,6 @@ public sealed class OgmiosChainSyncAdapter(
     IOptions<OgmiosOptions> ogmiosOptions,
     ILogger<OgmiosChainSyncAdapter> logger) : IChainSyncService, IChainSynchronizationMessageHandlers
 {
-    private readonly OgmiosOptions _config = ogmiosOptions.Value;
     private IChainEventHandler? _handler;
     private long? _resumeSlot;
     private string? _resumeBlockHash;
@@ -29,7 +28,7 @@ public sealed class OgmiosChainSyncAdapter(
         var contextService = serviceProvider.GetRequiredService<IInteractionContextService>();
 
         var context = await contextService.CreateInteractionContextAsync(
-            "chain-sync", startingPoint, _config.Connection);
+            "chain-sync", startingPoint, ogmiosOptions.Value.Connection);
         await chainSync.ResumeAsync([context], 100);
     }
 
@@ -58,7 +57,7 @@ public sealed class OgmiosChainSyncAdapter(
                 StartingPointSlot = _resumeSlot
             };
 
-        var configuredStart = _config.StartingPoints?.FirstOrDefault();
+        var configuredStart = ogmiosOptions.Value.StartingPoints?.FirstOrDefault();
         if (configuredStart is not null)
         {
             logger.LogInformation("No checkpoint found, using configured starting point at slot {Slot}", configuredStart.StartingPointSlot);

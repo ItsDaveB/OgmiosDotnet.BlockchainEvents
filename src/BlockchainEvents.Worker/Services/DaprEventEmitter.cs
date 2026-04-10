@@ -6,11 +6,10 @@ namespace BlockchainEvents.Worker.Services;
 public sealed class DaprEventEmitter(
     DaprClient daprClient,
     IOptions<BlockchainEventsOptions> options,
+    IEventBroadcaster broadcaster,
     IEventMetrics metrics,
     ILogger<DaprEventEmitter> logger) : IBlockchainEventEmitter
 {
-    private readonly BlockchainEventsOptions _options = options.Value;
-
     public async Task EmitAsync(
         TransactionData transaction,
         RuleMatchResult matchResult,
@@ -22,20 +21,22 @@ public sealed class DaprEventEmitter(
 
         try
         {
-            if (_options.UseRawPayload)
+            if (options.Value.UseRawPayload)
             {
                 await daprClient.PublishEventAsync(
-                    _options.PubSubName, _options.TopicName, cloudEvent.Data,
+                    options.Value.PubSubName, options.Value.TopicName, cloudEvent.Data,
                     new Dictionary<string, string> { ["rawPayload"] = "true" }, ct);
             }
             else
             {
-                await daprClient.PublishEventAsync(_options.PubSubName, _options.TopicName, cloudEvent, ct);
+                await daprClient.PublishEventAsync(options.Value.PubSubName, options.Value.TopicName, cloudEvent, ct);
             }
 
             metrics.RecordEventEmitted(matchResult.RuleName);
             logger.LogInformation("📤 Emitted [{RuleId}] {RuleName} event for tx {TransactionId}",
                 matchResult.RuleId, matchResult.RuleName, transaction.Id[..16]);
+
+            await broadcaster.BroadcastAsync(cloudEvent, ct);
         }
         catch (Exception ex)
         {
@@ -72,9 +73,9 @@ public sealed class DaprEventEmitter(
                 RetryCount = 0
             };
 
-            await daprClient.PublishEventAsync(_options.PubSubName, _options.DeadLetterTopicName, dlqPayload, ct);
+            await daprClient.PublishEventAsync(options.Value.PubSubName, options.Value.DeadLetterTopicName, dlqPayload, ct);
             logger.LogWarning("Sent failed event {TransactionId} to DLQ topic {DlqTopic}",
-                transaction.Id, _options.DeadLetterTopicName);
+                transaction.Id, options.Value.DeadLetterTopicName);
         }
         catch (Exception dlqEx)
         {

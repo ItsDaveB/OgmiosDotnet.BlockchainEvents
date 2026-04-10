@@ -10,6 +10,7 @@ global using BlockchainEvents.Engine.Rules;
 global using BlockchainEvents.Worker;
 global using BlockchainEvents.Worker.Abstractions;
 global using BlockchainEvents.Worker.Endpoints;
+global using BlockchainEvents.Worker.Grpc;
 global using BlockchainEvents.Worker.Services;
 global using BlockchainEvents.Worker.Services.Extractors;
 global using Dapr.Client;

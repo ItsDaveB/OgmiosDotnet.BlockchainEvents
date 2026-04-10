@@ -5,14 +5,13 @@ public sealed class DaprCheckpointService(
     IOptions<BlockchainEventsOptions> options,
     ILogger<DaprCheckpointService> logger) : ICheckpointService
 {
-    private readonly BlockchainEventsOptions _options = options.Value;
     private string? _currentEtag;
 
     public async Task<SyncCheckpoint?> GetCheckpointAsync(CancellationToken cancellationToken = default)
     {
         var (checkpoint, etag) = await daprClient.GetStateAndETagAsync<SyncCheckpoint>(
-            _options.StateStoreName,
-            _options.CheckpointKey,
+            options.Value.StateStoreName,
+            options.Value.CheckpointKey,
             cancellationToken: cancellationToken);
 
         if (checkpoint is not null)
@@ -35,8 +34,8 @@ public sealed class DaprCheckpointService(
         if (_currentEtag is not null)
         {
             var success = await daprClient.TrySaveStateAsync(
-                _options.StateStoreName,
-                _options.CheckpointKey,
+                options.Value.StateStoreName,
+                options.Value.CheckpointKey,
                 checkpoint,
                 _currentEtag,
                 cancellationToken: cancellationToken);
@@ -50,15 +49,15 @@ public sealed class DaprCheckpointService(
         else
         {
             await daprClient.SaveStateAsync(
-                _options.StateStoreName,
-                _options.CheckpointKey,
+                options.Value.StateStoreName,
+                options.Value.CheckpointKey,
                 checkpoint,
                 cancellationToken: cancellationToken);
         }
 
         var (_, newEtag) = await daprClient.GetStateAndETagAsync<SyncCheckpoint>(
-            _options.StateStoreName,
-            _options.CheckpointKey,
+            options.Value.StateStoreName,
+            options.Value.CheckpointKey,
             cancellationToken: cancellationToken);
         _currentEtag = newEtag;
 
@@ -70,8 +69,8 @@ public sealed class DaprCheckpointService(
     public async Task DeleteCheckpointAsync(CancellationToken cancellationToken = default)
     {
         await daprClient.DeleteStateAsync(
-            _options.StateStoreName,
-            _options.CheckpointKey,
+            options.Value.StateStoreName,
+            options.Value.CheckpointKey,
             cancellationToken: cancellationToken);
 
         _currentEtag = null;

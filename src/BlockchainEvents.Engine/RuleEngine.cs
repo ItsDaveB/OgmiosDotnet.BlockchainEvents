@@ -13,15 +13,16 @@ public interface IRuleEngine
 
 public sealed class RuleEngine(IEnumerable<ITransactionRule> rules, ILogger<RuleEngine> logger) : IRuleEngine
 {
-    private readonly List<ITransactionRule> _rules = rules.ToList();
+    private readonly List<ITransactionRule> _enabledRules = rules.Where(r => r.IsEnabled).ToList();
+    private readonly List<ITransactionRule> _allRules = rules.ToList();
 
-    public int RuleCount => _rules.Count;
-    public int EnabledRuleCount => _rules.Count(r => r.IsEnabled);
-    public IEnumerable<string> EnabledRuleNames => _rules.Where(r => r.IsEnabled).Select(r => r.Name);
+    public int RuleCount => _allRules.Count;
+    public int EnabledRuleCount => _enabledRules.Count;
+    public IEnumerable<string> EnabledRuleNames => _enabledRules.Select(r => r.Name);
 
     public IEnumerable<RuleMatchResult> MatchTransaction(TransactionData transaction, RuleContext context)
     {
-        foreach (var rule in _rules.Where(r => r.IsEnabled))
+        foreach (var rule in _enabledRules)
         {
             RuleMatchResult? result = null;
             try

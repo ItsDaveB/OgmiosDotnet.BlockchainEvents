@@ -38,7 +38,17 @@ The system addresses the need for real-time, filtered blockchain event streams. 
 │  ┌──────────────┐    ┌──────────────┐    ┌──────────────────────────┐   │
 │  │    Dapr      │◀───│   Event      │◀───│   CloudEvent Factory     │   │
 │  │   Pub/Sub    │    │   Emitter    │    │                          │   │
-│  └──────────────┘    └──────────────┘    └──────────────────────────┘   │
+│  └──────────────┘    └──────┬───────┘    └──────────────────────────┘   │
+│         │                   │                                           │
+│         │            ┌──────▼───────┐                                   │
+│         │            │   Event      │── In-memory fan-out (Channels)    │
+│         │            │  Broadcaster │                                   │
+│         │            └──────┬───────┘                                   │
+│         │                   │                                           │
+│         │            ┌──────▼───────┐                                   │
+│         │            │  gRPC Stream │── Port 4010 (HTTP/2)              │
+│         │            │   Service    │                                   │
+│         │            └──────────────┘                                   │
 │         │                                                                │
 │         │            ┌──────────────┐                                   │
 │         │            │  Checkpoint  │◀── Dapr State Store (Redis)       │
@@ -50,8 +60,8 @@ The system addresses the need for real-time, filtered blockchain event streams. 
 ┌─────────────────────────────────────────────────────────────────────────┐
 │                         Downstream Consumers                             │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐                   │
-│  │   Service A  │  │   Service B  │  │   Service C  │                   │
-│  │  (Any Lang)  │  │  (Any Lang)  │  │  (Any Lang)  │                   │
+│  │  HTTP/Dapr   │  │   gRPC       │  │   Service C  │                   │
+│  │  (Any Lang)  │  │  (Streaming) │  │  (Any Lang)  │                   │
 │  └──────────────┘  └──────────────┘  └──────────────┘                   │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
@@ -88,13 +98,15 @@ Rule engine implementation and built-in rules.
 
 The runtime service connecting all components.
 
-| Component                | Purpose                                   |
-| ------------------------ | ----------------------------------------- |
-| `BlockchainEventsWorker` | Background service orchestrating sync     |
-| `OgmiosChainSyncAdapter` | Bridges OgmiosDotnet to abstraction layer |
-| `DaprEventEmitter`       | Publishes CloudEvents via Dapr pub/sub    |
-| `DaprCheckpointService`  | Persists sync state with ETag concurrency |
-| `TransactionTransformer` | Converts Ogmios types to TransactionData  |
+| Component                     | Purpose                                           |
+| ----------------------------- | ------------------------------------------------- |
+| `BlockchainEventsWorker`      | Background service orchestrating sync             |
+| `OgmiosChainSyncAdapter`     | Bridges OgmiosDotnet to abstraction layer         |
+| `DaprEventEmitter`            | Publishes CloudEvents via Dapr pub/sub            |
+| `EventBroadcaster`            | In-memory fan-out to gRPC subscribers (Channels)  |
+| `BlockchainEventGrpcService`  | gRPC server-streaming on port 4010 (HTTP/2)       |
+| `DaprCheckpointService`       | Persists sync state with ETag concurrency         |
+| `TransactionTransformer`      | Converts Ogmios types to TransactionData          |
 
 ## Data Flow
 
@@ -113,7 +125,9 @@ The runtime service connecting all components.
    │                                                    │
    ├──▶ BlockchainEventFactory.Create() ──▶ CloudEvent │
    │                                                    │
-   └──▶ DaprEventEmitter.EmitAsync() ──▶ Pub/Sub ──────┘
+   └──▶ DaprEventEmitter.EmitAsync() ──▶ Pub/Sub       │
+              │                                         │
+              └──▶ EventBroadcaster ──▶ gRPC Streams ──┘
                                               │
 6. DaprCheckpointService.SaveCheckpointAsync() ◀───────┘
 ```
@@ -242,16 +256,18 @@ See [event-schema.md](event-schema.md) for complete specification.
 
 ## Technology Stack
 
-| Layer            | Technology                   |
-| ---------------- | ---------------------------- |
-| Runtime          | .NET 10                      |
-| Chain Sync       | OgmiosDotnet 6.13.x          |
-| Event Bus        | Dapr Pub/Sub (Redis Streams) |
-| State Store      | Dapr State (Redis)           |
-| Serialization    | System.Text.Json             |
-| Testing          | xUnit, FluentAssertions, Moq |
-| Containerization | Docker, Docker Compose       |
-| CI/CD            | GitHub Actions               |
+| Layer            | Technology                              |
+| ---------------- | --------------------------------------- |
+| Runtime          | .NET 10                                 |
+| Chain Sync       | OgmiosDotnet 6.13.x                    |
+| Event Bus        | Dapr Pub/Sub (Redis Streams)            |
+| gRPC Streaming   | Grpc.AspNetCore 2.71.0 (HTTP/2)         |
+| State Store      | Dapr State (Redis)                      |
+| Serialization    | System.Text.Json / Protobuf 3.32.0      |
+| API Documentation| OpenAPI 3.0 / Swagger (Swashbuckle)     |
+| Testing          | xUnit, FluentAssertions, Moq            |
+| Containerization | Docker, Docker Compose                  |
+| CI/CD            | GitHub Actions                          |
 
 ## Performance Characteristics
 
@@ -260,6 +276,32 @@ See [event-schema.md](event-schema.md) for complete specification.
 - **Memory footprint**: ~100MB base + transaction buffer
 - **Checkpoint overhead**: <10ms per checkpoint operation
 
+## Event Delivery Protocols
+
+### HTTP (Dapr Pub/Sub)
+
+Consumers receive events as CloudEvents JSON via HTTP POST. Any language can subscribe by exposing a POST endpoint — no SDK required. Delivery is at-least-once with configurable retry policies and dead letter queues.
+
+### gRPC (Server-Side Streaming)
+
+Consumers connect to port 4010 (HTTP/2) and receive a continuous stream of `BlockchainEventMessage` protobuf messages. The gRPC payload is identical to the HTTP payload, just serialised as protobuf.
+
+```bash
+# Subscribe to all events
+grpcurl -plaintext -import-path . -proto protos/blockchain_events.proto \
+  -d '{}' localhost:4010 blockchain_events.BlockchainEventService/Subscribe
+
+# Subscribe with rule filter
+grpcurl -plaintext -import-path . -proto protos/blockchain_events.proto \
+  -d '{"rule_filter": "address-match"}' localhost:4010 blockchain_events.BlockchainEventService/Subscribe
+```
+
+The `EventBroadcaster` uses bounded `System.Threading.Channels` (capacity 1,000) with `DropOldest` back-pressure to protect the pipeline from slow consumers.
+
+### API Documentation
+
+OpenAPI/Swagger UI is available at `http://localhost:4000/swagger` when the worker is running. The static OpenAPI spec is at `docs/openapi.json`.
+
 ## Extensibility Points
 
 1. **Custom Rules**: Implement `ITransactionRule` interface
@@ -267,3 +309,4 @@ See [event-schema.md](event-schema.md) for complete specification.
 3. **Alternative Pub/Sub**: Configure different Dapr component
 4. **Custom State Store**: Configure different Dapr state provider
 5. **Chain Source**: Implement `IChainSyncService` for non-Ogmios sources
+6. **gRPC Consumers**: Connect to port 4010 for real-time streaming

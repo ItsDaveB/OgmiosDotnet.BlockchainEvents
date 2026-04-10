@@ -9,6 +9,21 @@ builder.Services.AddOptions<OgmiosOptions>()
     .ValidateOnStart();
 
 builder.Services.AddDaprClient();
+builder.Services.AddGrpc();
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new()
+    {
+        Title = "OgmiosDotnet.BlockchainEvents API",
+        Version = "v1",
+        Description = "Real-time Cardano blockchain event filtering and delivery via CloudEvents 1.0. " +
+                      "Supports HTTP (Dapr pub/sub) and gRPC streaming consumption.",
+        Contact = new() { Name = "Dave Beaumont", Url = new Uri("https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents") },
+        License = new() { Name = "MIT", Url = new Uri("https://opensource.org/licenses/MIT") }
+    });
+});
 
 // Rule 1: Minswap V2 DEX — match batched swap orders by contract address prefix.
 // The order script hash c3e28c36c3447315ba5a56f33da6a6ddc1770a876a8d9f0cb3a97c4c
@@ -49,6 +64,7 @@ builder.Services.AddSingleton<ITransactionRule, MetadataKeyValueRule>();
 
 builder.Services.AddSingleton<IRuleEngine, RuleEngine>();
 builder.Services.AddSingleton<IEventMetrics, EventMetrics>();
+builder.Services.AddSingleton<IEventBroadcaster, EventBroadcaster>();
 builder.Services.AddSingleton<IBlockchainEventEmitter, DaprEventEmitter>();
 builder.Services.AddSingleton<ICheckpointService, DaprCheckpointService>();
 
@@ -71,8 +87,15 @@ builder.Services.AddHostedService<BlockchainEventsWorker>();
 
 var app = builder.Build();
 
+app.UseSwagger();
+app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "BlockchainEvents API v1"));
+
+app.MapGrpcService<BlockchainEventGrpcService>();
 app.MapSubscriptionEndpoints();
-app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTimeOffset.UtcNow }));
+app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTimeOffset.UtcNow }))
+    .WithName("HealthCheck")
+    .WithTags("Health")
+    .WithDescription("Returns the current health status of the service.");
 app.MapMetrics();
 
 await app.RunAsync();

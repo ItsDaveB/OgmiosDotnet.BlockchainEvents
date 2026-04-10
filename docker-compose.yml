@@ -6,6 +6,7 @@ services:
       target: runtime
     ports:
       - '4000:4000'
+      - '4010:4010'
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:4000

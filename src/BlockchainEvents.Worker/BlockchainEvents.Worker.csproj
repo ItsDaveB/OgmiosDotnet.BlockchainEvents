@@ -11,10 +11,19 @@
   <ItemGroup>
     <PackageReference Include="Dapr.AspNetCore" Version="1.16.1" />
     <PackageReference Include="Dapr.Client" Version="1.16.1" />
+    <PackageReference Include="Google.Protobuf" Version="3.32.0" />
+    <PackageReference Include="Grpc.AspNetCore" Version="2.71.0" />
+    <PackageReference Include="Grpc.Tools" Version="2.71.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0-preview.1.25120.3" />
     <PackageReference Include="OgmiosDotnetClient.Domain" Version="6.13.1.2" />
     <PackageReference Include="OgmiosDotnetClient.Schema" Version="6.13.0.1" />
     <PackageReference Include="OgmiosDotnetClient.Services" Version="6.13.1.5" />
     <PackageReference Include="prometheus-net.AspNetCore" Version="8.2.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Protobuf Include="..\..\protos\blockchain_events.proto" GrpcServices="Server" />
   </ItemGroup>
 
   <ItemGroup>

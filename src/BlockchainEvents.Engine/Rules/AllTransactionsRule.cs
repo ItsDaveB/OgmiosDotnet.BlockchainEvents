@@ -8,12 +8,10 @@ public sealed class AllTransactionsRuleOptions
 
 public sealed class AllTransactionsRule(IOptions<AllTransactionsRuleOptions> options) : TransactionRuleBase
 {
-    private readonly AllTransactionsRuleOptions _options = options.Value;
-
     public override string Id => "all-transactions";
     public override string Name => "All Transactions";
     public override string Description => "Matches all transactions for testing or full capture";
-    public override bool IsEnabled => _options.Enabled;
+    public override bool IsEnabled => options.Value.Enabled;
 
     public override bool IsMatch(TransactionData transaction, RuleContext context) => true;
 

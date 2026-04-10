@@ -10,14 +10,13 @@ public sealed class PolicyIdAssetRuleOptions
 
 public sealed class PolicyIdAssetRule(IOptions<PolicyIdAssetRuleOptions> options) : TransactionRuleBase
 {
-    private readonly PolicyIdAssetRuleOptions _options = options.Value;
     private readonly HashSet<string> _policyIds = new(options.Value.PolicyIds, StringComparer.OrdinalIgnoreCase);
     private readonly HashSet<string> _assetNames = new(options.Value.AssetNames, StringComparer.OrdinalIgnoreCase);
 
     public override string Id => "policy-id-asset";
     public override string Name => "Policy ID / Asset Match";
     public override string Description => "Matches transactions containing specific policy IDs or asset names";
-    public override bool IsEnabled => _options.Enabled && (_policyIds.Count > 0 || _assetNames.Count > 0);
+    public override bool IsEnabled => options.Value.Enabled && (_policyIds.Count > 0 || _assetNames.Count > 0);
 
     public override bool IsMatch(TransactionData transaction, RuleContext context) =>
         transaction.MintedAssets.Keys.Any(pid => _policyIds.Contains(pid)) ||

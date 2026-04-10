@@ -12,7 +12,6 @@ public sealed class MetadataKeyValueRuleOptions
 
 public sealed class MetadataKeyValueRule(IOptions<MetadataKeyValueRuleOptions> options) : TransactionRuleBase
 {
-    private readonly MetadataKeyValueRuleOptions _options = options.Value;
     private readonly HashSet<int> _labels = [.. options.Value.Labels];
     private readonly HashSet<string> _keyPatterns = new(options.Value.KeyPatterns, StringComparer.OrdinalIgnoreCase);
     private readonly HashSet<string> _valuePatterns = new(options.Value.ValuePatterns, StringComparer.OrdinalIgnoreCase);
@@ -20,14 +19,14 @@ public sealed class MetadataKeyValueRule(IOptions<MetadataKeyValueRuleOptions> o
     public override string Id => "metadata-key-value";
     public override string Name => "Metadata Key/Value Match";
     public override string Description => "Matches transactions containing specific metadata labels or patterns";
-    public override bool IsEnabled => _options.Enabled &&
-        (_options.MatchAny || _labels.Count > 0 || _keyPatterns.Count > 0 || _valuePatterns.Count > 0);
+    public override bool IsEnabled => options.Value.Enabled &&
+        (options.Value.MatchAny || _labels.Count > 0 || _keyPatterns.Count > 0 || _valuePatterns.Count > 0);
 
     public override bool IsMatch(TransactionData transaction, RuleContext context)
     {
         if (transaction.Metadata.Count == 0) return false;
 
-        if (_options.MatchAny) return true;
+        if (options.Value.MatchAny) return true;
 
         if (_labels.Count > 0 && transaction.Metadata.Keys.Any(label => _labels.Contains(label)))
             return true;
@@ -48,7 +47,7 @@ public sealed class MetadataKeyValueRule(IOptions<MetadataKeyValueRuleOptions> o
             ["matched_labels"] = matchedLabels
         };
 
-        if (_options.MatchAny) criteria["match_mode"] = "any_metadata";
+        if (options.Value.MatchAny) criteria["match_mode"] = "any_metadata";
         if (_keyPatterns.Count > 0) criteria["key_patterns"] = _keyPatterns.ToList();
         if (_valuePatterns.Count > 0) criteria["value_patterns"] = _valuePatterns.ToList();
 

@@ -9,7 +9,6 @@ public sealed class BlockchainEventsWorker(
     IOptions<BlockchainEventsOptions> options,
     ILogger<BlockchainEventsWorker> logger) : BackgroundService, IChainEventHandler
 {
-    private readonly BlockchainEventsOptions _options = options.Value;
     private SyncCheckpoint? _checkpoint;
     private long _transactionsProcessed;
     private long _eventsEmitted;
@@ -22,7 +21,7 @@ public sealed class BlockchainEventsWorker(
             await WaitForDaprSidecarAsync(stoppingToken);
 
         logger.LogInformation("Starting chain sync - Network: {Network}, Enabled rules: {Rules}",
-            _options.Network, string.Join(", ", ruleEngine.EnabledRuleNames));
+            options.Value.Network, string.Join(", ", ruleEngine.EnabledRuleNames));
 
         metrics.SetEnabledRules(ruleEngine.EnabledRuleCount, ruleEngine.EnabledRuleNames);
 
@@ -117,7 +116,7 @@ public sealed class BlockchainEventsWorker(
     }
 
     private RuleContext CreateRuleContext(IBlockData block) =>
-        new(block.Slot, block.BlockHash, block.BlockHeight, block.Era, _options.Network, DateTimeOffset.UtcNow);
+        new(block.Slot, block.BlockHash, block.BlockHeight, block.Era, options.Value.Network, DateTimeOffset.UtcNow);
 
     private void LogCheckpointStatus()
     {

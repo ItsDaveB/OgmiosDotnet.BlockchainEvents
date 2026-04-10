@@ -8,6 +8,7 @@ COPY src/BlockchainEvents.Worker/BlockchainEvents.Worker.csproj src/BlockchainEv
 
 RUN dotnet restore src/BlockchainEvents.Worker/BlockchainEvents.Worker.csproj
 
+COPY protos/ protos/
 COPY src/ src/
 
 RUN dotnet publish src/BlockchainEvents.Worker/BlockchainEvents.Worker.csproj \
@@ -35,8 +36,8 @@ RUN chown -R appuser:appgroup /app
 
 USER appuser
 
-ENV ASPNETCORE_URLS=http://+:4000
-EXPOSE 4000
+ENV ASPNETCORE_URLS="http://+:4000;http://+:4010"
+EXPOSE 4000 4010
 
 ENTRYPOINT ["dotnet", "BlockchainEvents.Worker.dll"]
 
@@ -51,7 +52,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 COPY --from=debug /app/debug-publish .
 
-ENV ASPNETCORE_URLS=http://+:4000
-EXPOSE 4000
+ENV ASPNETCORE_URLS="http://+:4000;http://+:4010"
+EXPOSE 4000 4010
 
 ENTRYPOINT ["dotnet", "BlockchainEvents.Worker.dll"]

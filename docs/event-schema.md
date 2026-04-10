@@ -2,6 +2,12 @@
 
 This document defines the structure of events emitted by OgmiosDotnet.BlockchainEvents. All events conform to the [CloudEvents 1.0 specification](https://cloudevents.io/) with Cardano-specific extensions.
 
+Events are delivered identically via two protocols:
+- **HTTP** — JSON/CloudEvents via Dapr pub/sub (port 4000)
+- **gRPC** — Protobuf via server-side streaming (port 4010, see `protos/blockchain_events.proto`)
+
+The payload structure is the same regardless of delivery protocol.
+
 ## CloudEvents Envelope
 
 Every emitted event follows the CloudEvents 1.0 structured content mode:

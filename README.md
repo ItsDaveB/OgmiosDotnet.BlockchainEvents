@@ -10,7 +10,10 @@ Rule-based transaction filtering for Cardano. Connects to [Ogmios](https://ogmio
 - Real-time chain sync via Ogmios
 - Pluggable rule engine with built-in rules
 - CloudEvents 1.0 output with Cardano extensions
+- **Dual delivery**: HTTP (Dapr pub/sub) and gRPC server-streaming
+- At-least-once delivery with configurable retry and dead letter queues
 - Dapr state store checkpointing with ETag concurrency
+- OpenAPI/Swagger API documentation
 - SDK-less event consumption (any language)
 
 ## Documentation
@@ -18,6 +21,8 @@ Rule-based transaction filtering for Cardano. Connects to [Ogmios](https://ogmio
 - [Architecture Overview](docs/architecture.md) - System design and components
 - [Event Schema](docs/event-schema.md) - CloudEvents specification
 - [Integration Guide](docs/integration-guide.md) - Building custom rules
+- [Benchmark Results](docs/benchmarks.md) - Performance and delivery guarantees
+- [OpenAPI Spec](docs/openapi.json) - API specification
 - [Contributing](CONTRIBUTING.md) - Development guidelines
 
 ## Project Structure
@@ -26,13 +31,21 @@ Rule-based transaction filtering for Cardano. Connects to [Ogmios](https://ogmio
 src/
 ├── BlockchainEvents.Domain/   # Models, abstractions, events
 ├── BlockchainEvents.Engine/   # Rule engine and implementations
-└── BlockchainEvents.Worker/   # .NET Worker service
+└── BlockchainEvents.Worker/   # .NET Worker service (HTTP + gRPC)
+protos/
+└── blockchain_events.proto    # gRPC service definitions
 tests/
-└── BlockchainEvents.Tests/    # Unit tests
+└── BlockchainEvents.Tests/    # Unit tests (76 tests)
+tools/
+├── grpcurl-subscribe.sh       # gRPC streaming demo script
+├── redelivery-demo.sh         # At-least-once delivery demo
+└── restart-demo.sh            # Checkpoint recovery demo
 docs/
 ├── architecture.md            # System architecture
 ├── event-schema.md            # Event schema specification
-└── integration-guide.md       # Custom rule development
+├── integration-guide.md       # Custom rule development
+├── benchmarks.md              # Performance benchmarks
+└── openapi.json               # OpenAPI 3.0 spec
 ```
 
 ## Built-in Rules
@@ -109,6 +122,29 @@ dapr run --app-id blockchain-events \
 
 ```bash
 dotnet test
+```
+
+### gRPC Subscription
+
+```bash
+# Install grpcurl
+brew install grpcurl
+
+# Subscribe to all events (streams until Ctrl+C)
+./tools/grpcurl-subscribe.sh
+
+# Subscribe to address-match events only
+./tools/grpcurl-subscribe.sh address-match
+```
+
+### Demo Scripts
+
+```bash
+# Demonstrate at-least-once redelivery
+./tools/redelivery-demo.sh
+
+# Demonstrate checkpoint-based restart recovery
+./tools/restart-demo.sh
 ```
 
 ## Custom Rules

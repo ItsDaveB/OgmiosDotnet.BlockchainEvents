@@ -10,24 +10,23 @@ public sealed class AddressMatchRuleOptions
 
 public sealed class AddressMatchRule(IOptions<AddressMatchRuleOptions> options) : TransactionRuleBase
 {
-    private readonly AddressMatchRuleOptions _options = options.Value;
     private readonly HashSet<string> _addresses = new(options.Value.Addresses, StringComparer.OrdinalIgnoreCase);
 
     public override string Id => "address-match";
     public override string Name => "Address Match";
     public override string Description => "Matches transactions involving specific addresses or prefixes";
-    public override bool IsEnabled => _options.Enabled && (_addresses.Count > 0 || _options.Prefixes.Count > 0);
+    public override bool IsEnabled => options.Value.Enabled && (_addresses.Count > 0 || options.Value.Prefixes.Count > 0);
 
     public override bool IsMatch(TransactionData transaction, RuleContext context) =>
         transaction.AllAddresses.Any(addr =>
             _addresses.Contains(addr) ||
-            _options.Prefixes.Any(p => addr.StartsWith(p, StringComparison.OrdinalIgnoreCase)));
+            options.Value.Prefixes.Any(p => addr.StartsWith(p, StringComparison.OrdinalIgnoreCase)));
 
     public override RuleMatchResult Evaluate(TransactionData transaction, RuleContext context)
     {
         var matchedAddresses = transaction.AllAddresses.Where(a => _addresses.Contains(a)).ToList();
         var matchedPrefixes = transaction.AllAddresses
-            .SelectMany(addr => _options.Prefixes
+            .SelectMany(addr => options.Value.Prefixes
                 .Where(p => addr.StartsWith(p, StringComparison.OrdinalIgnoreCase))
                 .Select(p => $"{p}* -> {addr}"))
             .ToList();
