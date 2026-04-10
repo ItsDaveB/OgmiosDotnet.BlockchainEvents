@@ -1,0 +1,6 @@
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
+WORKDIR /app
+COPY publish/demo-subscriber/ .
+ENV ASPNETCORE_URLS=http://+:4001
+EXPOSE 4001
+ENTRYPOINT ["dotnet", "BlockchainEvents.DemoSubscriber.dll"]
