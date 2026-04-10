@@ -2,8 +2,7 @@ services:
   blockchain-events:
     build:
       context: .
-      dockerfile: src/BlockchainEvents.Worker/Dockerfile
-      target: runtime
+      dockerfile: src/BlockchainEvents.Worker/Dockerfile.local
     ports:
       - '4000:4000'
       - '4010:4010'
@@ -39,8 +38,7 @@ services:
   demo-subscriber:
     build:
       context: .
-      dockerfile: tools/BlockchainEvents.DemoSubscriber/Dockerfile
-      target: runtime
+      dockerfile: tools/BlockchainEvents.DemoSubscriber/Dockerfile.local
     ports:
       - '4001:4001'
     environment:
@@ -154,6 +152,62 @@ services:
       - blockchain-events-network
     depends_on:
       - redis
+
+  event-viewer-1:
+    build:
+      context: tools/event-viewer
+      dockerfile: Dockerfile
+    ports:
+      - '4020:80'
+    environment:
+      - SSE_URL=http://localhost:4000/events/stream
+      - INSTANCE_ID=Consumer 1
+    networks:
+      - blockchain-events-network
+    depends_on:
+      - blockchain-events
+
+  event-viewer-2:
+    build:
+      context: tools/event-viewer
+      dockerfile: Dockerfile
+    ports:
+      - '4021:80'
+    environment:
+      - SSE_URL=http://localhost:4000/events/stream
+      - INSTANCE_ID=Consumer 2
+    networks:
+      - blockchain-events-network
+    depends_on:
+      - blockchain-events
+
+  event-viewer-3:
+    build:
+      context: tools/event-viewer
+      dockerfile: Dockerfile
+    ports:
+      - '4022:80'
+    environment:
+      - SSE_URL=http://localhost:4000/events/stream
+      - INSTANCE_ID=Consumer 3
+    networks:
+      - blockchain-events-network
+    depends_on:
+      - blockchain-events
+
+  event-viewer-4:
+    build:
+      context: tools/event-viewer
+      dockerfile: Dockerfile
+    ports:
+      - '4023:80'
+    environment:
+      - SSE_URL=http://localhost:4000/events/stream
+      - INSTANCE_ID=Consumer 4
+    networks:
+      - blockchain-events-network
+    depends_on:
+      - blockchain-events
 
 volumes:
   redis-data:

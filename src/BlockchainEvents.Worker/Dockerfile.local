@@ -1,0 +1,15 @@
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
+WORKDIR /app
+
+RUN groupadd -r appgroup && useradd -r -g appgroup appuser
+
+COPY publish/worker/ .
+
+RUN chown -R appuser:appgroup /app
+
+USER appuser
+
+ENV ASPNETCORE_URLS="http://+:4000;http://+:4010"
+EXPOSE 4000 4010
+
+ENTRYPOINT ["dotnet", "BlockchainEvents.Worker.dll"]
