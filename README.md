@@ -37,9 +37,7 @@ protos/
 tests/
 └── BlockchainEvents.Tests/    # Unit tests (76 tests)
 tools/
-├── grpcurl-subscribe.sh       # gRPC streaming demo script
-├── redelivery-demo.sh         # At-least-once delivery demo
-└── restart-demo.sh            # Checkpoint recovery demo
+└── milestone-2-demo.sh        # Guided demo (AC-1 through AC-3)
 docs/
 ├── architecture.md            # System architecture
 ├── event-schema.md            # Event schema specification
@@ -131,20 +129,19 @@ dotnet test
 brew install grpcurl
 
 # Subscribe to all events (streams until Ctrl+C)
-./tools/grpcurl-subscribe.sh
+grpcurl -plaintext -import-path . -proto protos/blockchain_events.proto \
+  -d '{}' localhost:4010 blockchain_events.BlockchainEventService/Subscribe
 
 # Subscribe to address-match events only
-./tools/grpcurl-subscribe.sh address-match
+grpcurl -plaintext -import-path . -proto protos/blockchain_events.proto \
+  -d '{"rule_filter": "address-match"}' localhost:4010 blockchain_events.BlockchainEventService/Subscribe
 ```
 
-### Demo Scripts
+### Guided Demo
 
 ```bash
-# Demonstrate at-least-once redelivery
-./tools/redelivery-demo.sh
-
-# Demonstrate checkpoint-based restart recovery
-./tools/restart-demo.sh
+# Runs five live demonstrations covering AC-1 through AC-3
+./tools/milestone-2-demo.sh
 ```
 
 ## Custom Rules

@@ -422,7 +422,7 @@
               "host": ["{{worker_host}}"],
               "port": "{{grpc_port}}"
             },
-            "description": "Subscribe to all blockchain events via gRPC server-side streaming. Events are delivered as protobuf BlockchainEventMessage with identical data to HTTP/Dapr.\n\n**Shell command:**\n```bash\ngrpcurl -plaintext -import-path . -proto protos/blockchain_events.proto \\\n  -d '{}' localhost:4010 blockchain_events.BlockchainEventService/Subscribe\n```\n\nOr use the provided script:\n```bash\n./tools/grpcurl-subscribe.sh\n```"
+            "description": "Subscribe to all blockchain events via gRPC server-side streaming. Events are delivered as protobuf BlockchainEventMessage with identical data to HTTP/Dapr.\n\n**Shell command:**\n```bash\ngrpcurl -plaintext -import-path . -proto protos/blockchain_events.proto \\\n  -d '{}' localhost:4010 blockchain_events.BlockchainEventService/Subscribe\n```"
           },
           "response": []
         },
@@ -463,7 +463,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "// Run in terminal:\n// ./tools/redelivery-demo.sh\n//\n// Manual steps:\n// 1. docker compose up -d\n// 2. Wait for events to flow\n// 3. docker compose stop demo-subscriber\n// 4. Wait 60s (events queue in Redis Streams)\n// 5. docker compose start demo-subscriber\n// 6. docker compose logs demo-subscriber  (observe redelivered events)"
+              "raw": "// Run the guided demo: ./tools/milestone-2-demo.sh\n//\n// Manual steps:\n// 1. docker compose up -d\n// 2. Wait for events to flow\n// 3. docker compose stop demo-subscriber\n// 4. Wait 60s (events queue in Redis Streams)\n// 5. docker compose start demo-subscriber\n// 6. docker compose logs demo-subscriber  (observe redelivered events)"
             },
             "url": {
               "raw": "http://{{worker_host}}:{{worker_http_port}}/health",
@@ -472,7 +472,7 @@
               "port": "{{worker_http_port}}",
               "path": ["health"]
             },
-            "description": "Demonstrates at-least-once delivery by killing the consumer and verifying events are redelivered on restart.\n\n**Script:**\n```bash\n./tools/redelivery-demo.sh\n```\n\nThe script will:\n1. Start the full Docker Compose stack\n2. Let events flow for 10 seconds\n3. Kill the demo-subscriber container\n4. Wait 20 seconds for events to queue\n5. Restart the subscriber\n6. Show redelivered events in logs"
+            "description": "Demonstrates at-least-once delivery by killing the consumer and verifying events are redelivered on restart.\n\n**Guided demo:**\n```bash\n./tools/milestone-2-demo.sh\n```\n\nDemo 4 will:\n1. Start the full Docker Compose stack\n2. Let events flow for 10 seconds\n3. Kill the demo-subscriber container\n4. Wait 20 seconds for events to queue\n5. Restart the subscriber\n6. Show redelivered events in logs"
           },
           "response": []
         },
@@ -483,7 +483,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "// Run in terminal:\n// ./tools/restart-demo.sh\n//\n// Manual steps:\n// 1. docker compose up -d\n// 2. Wait for blocks to process\n// 3. Read checkpoint: curl http://localhost:3500/v1.0/state/statestore/sync-checkpoint\n// 4. docker compose stop blockchain-events blockchain-events-dapr\n// 5. Wait 30s\n// 6. docker compose start blockchain-events-dapr blockchain-events\n// 7. docker compose logs blockchain-events  (observe 'Resuming from checkpoint')"
+              "raw": "// Run the guided demo: ./tools/milestone-2-demo.sh\n//\n// Manual steps:\n// 1. docker compose up -d\n// 2. Wait for blocks to process\n// 3. Read checkpoint: curl http://localhost:3500/v1.0/state/statestore/sync-checkpoint\n// 4. docker compose stop blockchain-events blockchain-events-dapr\n// 5. Wait 30s\n// 6. docker compose start blockchain-events-dapr blockchain-events\n// 7. docker compose logs blockchain-events  (observe 'Resuming from checkpoint')"
             },
             "url": {
               "raw": "http://{{worker_host}}:{{worker_http_port}}/health",
@@ -492,7 +492,7 @@
               "port": "{{worker_http_port}}",
               "path": ["health"]
             },
-            "description": "Demonstrates checkpoint-based recovery by killing the worker and verifying it resumes from the last saved slot.\n\n**Script:**\n```bash\n./tools/restart-demo.sh\n```\n\nThe script will:\n1. Start the full stack and let it process blocks\n2. Read the checkpoint from Dapr state store\n3. Kill the worker container\n4. Restart and observe resume from last checkpoint (not genesis)"
+            "description": "Demonstrates checkpoint-based recovery by killing the worker and verifying it resumes from the last saved slot.\n\n**Guided demo:**\n```bash\n./tools/milestone-2-demo.sh\n```\n\nDemo 5 will:\n1. Start the full stack and let it process blocks\n2. Read the checkpoint from Dapr state store\n3. Kill the worker container\n4. Restart and observe resume from last checkpoint (not genesis)"
           },
           "response": []
         },

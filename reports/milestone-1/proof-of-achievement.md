@@ -173,13 +173,13 @@ Three GitHub Actions workflows provide automated quality gates:
 
 The project ships with a complete observability stack:
 
-| Component           | Purpose                         | Port   |
-| ------------------- | ------------------------------- | ------ |
-| **Grafana**         | Dashboard visualization         | `4002` |
-| **Prometheus**      | Metrics scraping (15s interval) | `4003` |
-| **Zipkin**          | Distributed tracing             | `4004` |
+| Component      | Purpose                         | Port   |
+| -------------- | ------------------------------- | ------ |
+| **Grafana**    | Dashboard visualization         | `4002` |
+| **Prometheus** | Metrics scraping (15s interval) | `4003` |
+| **Zipkin**     | Distributed tracing             | `4004` |
 
-| **Redis Commander** | State store inspection          | `4006` |
+| **Redis Commander** | State store inspection | `4006` |
 
 **Custom Prometheus metrics** (9 metrics exposed at `/metrics`):
 
@@ -197,15 +197,14 @@ The project ships with a complete observability stack:
 
 **Grafana dashboard** — 23 data panels across 6 organised rows:
 
-| Row                        | Panels                                                                                               |
-| -------------------------- | ---------------------------------------------------------------------------------------------------- |
-| Chain Sync Overview        | Current Slot, Blocks Processed, Transactions Processed, Events Emitted, Events Failed, Enabled Rules |
-| Active Rules               | Minswap Swap Orders, Governance Votes, Metadata Transactions                                         |
-| Throughput                 | Block Processing Rate, Event Emission Rate by Rule, Transaction Processing Rate                      |
-| Latency & Reliability      | Processing Latency (p50/p90/p99), Events In-Flight, Events by Rule table                             |
-| .NET Runtime               | CPU Usage, Memory Usage, GC Collections, ThreadPool & Timers                                         |
-| Network & Connections      | Network I/O, Active Connections, Outbound HTTP Latency                                               |
-
+| Row                   | Panels                                                                                               |
+| --------------------- | ---------------------------------------------------------------------------------------------------- |
+| Chain Sync Overview   | Current Slot, Blocks Processed, Transactions Processed, Events Emitted, Events Failed, Enabled Rules |
+| Active Rules          | Minswap Swap Orders, Governance Votes, Metadata Transactions                                         |
+| Throughput            | Block Processing Rate, Event Emission Rate by Rule, Transaction Processing Rate                      |
+| Latency & Reliability | Processing Latency (p50/p90/p99), Events In-Flight, Events by Rule table                             |
+| .NET Runtime          | CPU Usage, Memory Usage, GC Collections, ThreadPool & Timers                                         |
+| Network & Connections | Network I/O, Active Connections, Outbound HTTP Latency                                               |
 
 ---
 
@@ -330,7 +329,7 @@ All services on `localhost` (or `blockchain.local` if you ran `./setup.sh`):
 | Prometheus          | `4003` |
 | Zipkin traces       | `4004` |
 
-| Redis Commander     | `4006` |
+| Redis Commander | `4006` |
 
 ### Run Tests
 
