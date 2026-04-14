@@ -1,9 +1,9 @@
 # Milestone 2 — Proof of Achievement
 
-**Project:** OgmiosDotnet.BlockchainEvents
-**Repository:** [github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents)
-**Milestone:** 2 — Event Delivery Layer
-**Date:** April 2026
+**Project:** OgmiosDotnet.BlockchainEvents  
+**Repository:** [github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents)  
+**Milestone:** 2 — Event Delivery Layer  
+**Date:** April 2026  
 **Commit:** `0091279` (main)
 
 ---
