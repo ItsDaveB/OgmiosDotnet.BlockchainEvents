@@ -22,14 +22,14 @@
 
 ## Project Overview
 
-OgmiosDotnet.BlockchainEvents is a rule-based transaction filtering and event emission engine for Cardano. It connects to [Ogmios](https://ogmios.dev/) via the [OgmiosDotnet](https://github.com/ItsDaveB/OgmiosDotnet) SDK, applies configurable transaction rules in real-time, and emits standardized [CloudEvents 1.0](https://cloudevents.io/) via [Dapr](https://dapr.io/) pub/sub — enabling any downstream service (in any language) to subscribe to filtered blockchain events over HTTP.
+OgmiosDotnet.BlockchainEvents is a rule-based transaction filtering and event emission engine for Cardano. It connects to [Ogmios](https://ogmios.dev/) via the [OgmiosDotnet](https://github.com/ItsDaveB/OgmiosDotnet) SDK, applies configurable transaction rules in real-time, and emits standardized [CloudEvents 1.0](https://cloudevents.io/) via Redis Streams pub/sub — enabling any downstream service (in any language) to subscribe to filtered blockchain events over HTTP.
 
 ### Architecture at a Glance
 
 ```
-Ogmios (Cardano) ──▶ Chain Sync Adapter ──▶ Rule Engine ──▶ CloudEvent Factory ──▶ Dapr Pub/Sub ──▶ Subscribers
+Ogmios (Cardano) ──▶ Chain Sync Adapter ──▶ Rule Engine ──▶ CloudEvent Factory ──▶ Redis Streams ──▶ Subscribers
                                                                                           │
-                                                                          Dapr State Store (checkpoint)
+                                                                          Redis State Store (checkpoint)
 ```
 
 The system is composed of three .NET projects following clean architecture:
@@ -131,7 +131,7 @@ The test project contains **59 unit tests** across **10 test classes**, all pass
 | `RuleEngineTests`             | 7     | Multi-rule evaluation, disabled rules, empty rule set                         |
 | `BlockchainEventFactoryTests` | 5     | CloudEvent creation, unique IDs, Cardano extensions                           |
 | `SyncCheckpointTests`         | 6     | Serialization round-trip, equality, camelCase                                 |
-| `DaprCheckpointServiceTests`  | 6     | Get/save/delete with ETag concurrency                                         |
+| `CheckpointServiceTests`      | 6     | Get/save/delete with ETag concurrency                                         |
 
 **Test run output:**
 
@@ -178,7 +178,7 @@ The project ships with a complete observability stack:
 | **Grafana**         | Dashboard visualization         | `4002` |
 | **Prometheus**      | Metrics scraping (15s interval) | `4003` |
 | **Zipkin**          | Distributed tracing             | `4004` |
-| **Dapr Dashboard**  | Sidecar monitoring              | `4005` |
+
 | **Redis Commander** | State store inspection          | `4006` |
 
 **Custom Prometheus metrics** (9 metrics exposed at `/metrics`):
@@ -205,7 +205,7 @@ The project ships with a complete observability stack:
 | Latency & Reliability      | Processing Latency (p50/p90/p99), Events In-Flight, Events by Rule table                             |
 | .NET Runtime               | CPU Usage, Memory Usage, GC Collections, ThreadPool & Timers                                         |
 | Network & Connections      | Network I/O, Active Connections, Outbound HTTP Latency                                               |
-| Dapr Sidecar _(collapsed)_ | Pub/Sub Rate, Pub/Sub Latency                                                                        |
+
 
 ---
 
@@ -237,7 +237,7 @@ The `BlockchainEventFactory` produces CloudEvents 1.0 payloads with standard att
 
 ### 4. Downstream services can subscribe to events without requiring the .NET SDK
 
-Dapr delivers events as plain HTTP + JSON (CloudEvents), so any language can subscribe by exposing a POST endpoint. The included `tools/BlockchainEvents.DemoSubscriber/` demonstrates strongly-typed consumption in C#.
+Events are delivered as plain HTTP + JSON (CloudEvents), so any language can subscribe by exposing a POST endpoint. The included `tools/BlockchainEvents.DemoSubscriber/` demonstrates strongly-typed consumption in C#.
 
 ### 5. Unit tests pass with adequate coverage of rules, events, and checkpointing
 
@@ -248,7 +248,7 @@ Dapr delivers events as plain HTTP + JSON (CloudEvents), so any language can sub
 - Rule engine multi-rule evaluation logic
 - CloudEvent factory output correctness
 - Checkpoint serialization and concurrency
-- Dapr state store interactions (mocked)
+- State store interactions (mocked)
 
 ### 6. Developer documentation enables new contributors to build custom rules
 
@@ -260,7 +260,7 @@ Dapr delivers events as plain HTTP + JSON (CloudEvents), so any language can sub
 docker compose up --build
 ```
 
-Brings up 11 containers: worker, Dapr sidecars, Redis, Prometheus, Grafana, Zipkin, and demo subscriber.
+Brings up all containers: worker, Redis, Prometheus, Grafana, Zipkin, and demo subscriber.
 
 ---
 
@@ -329,7 +329,7 @@ All services on `localhost` (or `blockchain.local` if you ran `./setup.sh`):
 | Grafana dashboard   | `4002` |
 | Prometheus          | `4003` |
 | Zipkin traces       | `4004` |
-| Dapr dashboard      | `4005` |
+
 | Redis Commander     | `4006` |
 
 ### Run Tests
