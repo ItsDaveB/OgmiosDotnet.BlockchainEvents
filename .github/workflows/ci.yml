@@ -100,3 +100,11 @@ jobs:
         run: |
           npm ci
           npm run build
+
+      - name: Build event-viewer Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: tools/event-viewer
+          file: tools/event-viewer/Dockerfile
+          push: false
+          tags: event-viewer:ci

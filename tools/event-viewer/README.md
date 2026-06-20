@@ -53,7 +53,7 @@ tools/event-viewer/
 │   ├── EventDetailDrawer.tsx
 │   ├── types.ts
 │   └── App.css
-├── Dockerfile               # nginx static serving
+├── Dockerfile               # Multi-stage build (npm build + nginx)
 ├── docker-entrypoint.sh     # Runtime config injection
 └── package.json
 ```

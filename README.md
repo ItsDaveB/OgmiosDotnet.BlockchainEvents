@@ -152,9 +152,6 @@ grpcurl -plaintext -import-path . -proto protos/blockchain_events.proto \
 ```bash
 # Milestone 2: event delivery layer (AC-1 through AC-3)
 ./tools/milestone-2-demo.sh
-
-# Milestone 3: interactive UI consumer & visualisation
-./tools/milestone-3-demo.sh
 ```
 
 ### Event Viewer UI

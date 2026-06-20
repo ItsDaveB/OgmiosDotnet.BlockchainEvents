@@ -109,6 +109,21 @@ export function useEventStream(baseUrl: string, ruleFilter: string | null): Even
   }, []);
 
   useEffect(() => {
+    // Reset buffer when filter changes so results are immediately distinct (AC-3)
+    setEvents([]);
+    totalRef.current = 0;
+    ruleBreakdownRef.current = {};
+    recentTimestamps.current = [];
+    batchRef.current = [];
+    connectedAt.current = 0;
+    setStats({
+      totalReceived: 0,
+      eventsPerSecond: 0,
+      ruleBreakdown: {},
+      lastEventTime: null,
+      connectionUptime: 0,
+    });
+
     const streamUrl = buildStreamUrl(baseUrl, ruleFilter);
     let eventSource: EventSource | null = null;
     let disposed = false;
