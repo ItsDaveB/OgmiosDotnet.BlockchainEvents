@@ -1,6 +1,6 @@
 # UI Consumer Guide
 
-This guide explains how to run, extend, and deploy the **Blockchain Event Viewer** — a React-based consumer that subscribes to the event delivery layer and visualises filtered Cardano transactions in real time.
+This guide explains how to run, extend, and deploy the **Blockchain Event Viewer**, a React-based consumer that subscribes to the event delivery layer and visualises filtered Cardano transactions in real time.
 
 ## Architecture Overview
 
@@ -9,7 +9,7 @@ The project separates backend and frontend into independently deployable layers:
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │  Backend (src/)                                                 │
-│  BlockchainEvents.Worker — rule engine, HTTP/gRPC/SSE delivery  │
+│  BlockchainEvents.Worker, rule engine, HTTP/gRPC/SSE delivery   │
 │  Port 4000 (HTTP/SSE) · Port 4010 (gRPC)                      │
 └────────────────────────────┬────────────────────────────────────┘
                              │  GET /events/stream (SSE)
@@ -17,12 +17,12 @@ The project separates backend and frontend into independently deployable layers:
                              ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │  Frontend (tools/event-viewer/)                                 │
-│  React 19 + Vite — real-time dashboard, rule filter selector    │
+│  React 19 + Vite, real-time dashboard, rule filter selector     │
 │  Port 4020–4023 (Docker) · Port 5173 (local dev)                │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-The frontend communicates with the backend **only through exposed HTTP APIs** — no shared libraries, no direct database access, no embedded .NET runtime. This enables independent deployment: the UI can be hosted on a CDN while the worker runs in a separate cluster.
+The frontend communicates with the backend **only through exposed HTTP APIs**. No shared libraries, no direct database access, no embedded .NET runtime. This enables independent deployment: the UI can be hosted on a CDN while the worker runs in a separate cluster.
 
 ### Data Flow
 
@@ -36,8 +36,8 @@ The frontend communicates with the backend **only through exposed HTTP APIs** �
 
 | Path | Role | Deployable independently |
 | ---- | ---- | ------------------------ |
-| `src/` (backend) | .NET Worker — filtering, emission, APIs | Yes — Docker image `blockchain-events` |
-| `tools/event-viewer/` (UI) | React dashboard — SSE consumer | Yes — nginx static image |
+| `src/` (backend) | .NET Worker (filtering, emission, APIs) | Yes, Docker image `blockchain-events` |
+| `tools/event-viewer/` (UI) | React dashboard (SSE consumer) | Yes, nginx static image |
 | `docker-compose.yml` | Orchestrates both layers + infrastructure | Local development |
 
 For milestone evidence, the README maps these to `/backend` and `/ui` aliases:
@@ -74,13 +74,13 @@ info: SseEndpoints[0] SSE subscriber connected from ::ffff:172.18.0.1 (filter: m
 
 ### Local Development
 
-**Terminal 1 — Backend:**
+**Terminal 1: Backend**
 
 ```bash
 docker compose up redis placement zipkin blockchain-events
 ```
 
-**Terminal 2 — UI:**
+**Terminal 2: UI**
 
 ```bash
 cd tools/event-viewer
@@ -239,11 +239,11 @@ The dashboard supports three filtering scenarios required for milestone demonstr
 | **Governance/Treasury** | `governance-treasury` | CIP-1694 governance votes and treasury-related actions |
 | **Address Match** | `address-match` | DEX order addresses (Minswap V2) and wallet prefix matches |
 
-Switch between filters using the header buttons. Each filter produces visually distinct results — different rule chips, metadata columns, and event counts in the stats bar.
+Switch between filters using the header buttons. Each filter produces visually distinct results, with different rule chips, metadata columns, and event counts in the stats bar.
 
 ## Related Documentation
 
-- [Architecture Overview](architecture.md) — full system design
-- [Event Schema](event-schema.md) — CloudEvents payload specification
-- [Integration Guide](integration-guide.md) — building custom backend rules
-- [OpenAPI Spec](openapi.json) — HTTP API reference
+- [Architecture Overview](architecture.md), full system design
+- [Event Schema](event-schema.md), CloudEvents payload specification
+- [Integration Guide](integration-guide.md), building custom backend rules
+- [OpenAPI Spec](openapi.json), HTTP API reference

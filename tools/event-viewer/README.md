@@ -40,7 +40,7 @@ npm run preview  # preview production build
 | `VITE_RULE_FILTER` | Pre-selected rule filter ID (e.g. `metadata-key-value`) |
 | `VITE_INSTANCE_ID` | Instance label shown in header |
 
-In Docker, use `SSE_URL`, `RULE_FILTER`, and `INSTANCE_ID` — injected at runtime via `docker-entrypoint.sh`.
+In Docker, use `SSE_URL`, `RULE_FILTER`, and `INSTANCE_ID`. These are injected at runtime via `docker-entrypoint.sh`.
 
 ## Project Structure
 
