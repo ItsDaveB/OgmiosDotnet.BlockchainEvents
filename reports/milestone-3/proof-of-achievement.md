@@ -4,7 +4,7 @@
 **Repository:** [github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents)  
 **Milestone:** 3 — Interactive Consumer & Visualisation  
 **Date:** June 2026  
-**Commit:** `eb42f02` (main)
+**Commit:** `5525f81` (cursor/milestone-3-ui-consumer-ef3a)
 
 ---
 
