@@ -10,8 +10,22 @@ public static class SseEndpoints
 
     public static void MapSseEndpoints(this WebApplication app)
     {
-        app.MapGet("/events/stream", async (HttpContext context, IEventBroadcaster broadcaster, IEventMetrics metrics) =>
+        app.MapGet("/events/stream", async (
+            HttpContext context,
+            IEventBroadcaster broadcaster,
+            ILoggerFactory loggerFactory) =>
         {
+            var logger = loggerFactory.CreateLogger("SseEndpoints");
+            var ruleFilter = context.Request.Query.TryGetValue("ruleFilter", out var filterValues)
+                && !string.IsNullOrWhiteSpace(filterValues.ToString())
+                    ? filterValues.ToString()
+                    : null;
+
+            logger.LogInformation(
+                "SSE subscriber connected from {RemoteIp} (filter: {Filter})",
+                context.Connection.RemoteIpAddress,
+                ruleFilter ?? "all");
+
             context.Response.ContentType = "text/event-stream";
             context.Response.Headers.CacheControl = "no-cache";
             context.Response.Headers.Connection = "keep-alive";
@@ -30,6 +44,9 @@ public static class SseEndpoints
                     while (subscription.TryRead(out var cloudEvent))
                     {
                         if (cloudEvent is null) continue;
+
+                        if (ruleFilter is not null && cloudEvent.Data?.RuleId != ruleFilter)
+                            continue;
 
                         var payload = new
                         {
@@ -68,10 +85,13 @@ public static class SseEndpoints
                     }
                 }
             }
-            catch (OperationCanceledException) { }
+            catch (OperationCanceledException)
+            {
+                logger.LogInformation("SSE subscriber disconnected (cancelled, filter: {Filter})", ruleFilter ?? "all");
+            }
         })
         .WithName("EventStream")
         .WithTags("Streaming")
-        .WithDescription("Server-Sent Events stream of blockchain events");
+        .WithDescription("Server-Sent Events stream of blockchain events with optional ruleFilter query parameter");
     }
 }

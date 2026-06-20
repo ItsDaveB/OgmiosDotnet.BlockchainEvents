@@ -301,6 +301,10 @@ FakesAssemblies/
 .ntvs_analysis.dat
 node_modules/
 
+# Frontend build output (built in Docker/CI, not committed)
+tools/event-viewer/dist/
+tools/event-viewer/tsconfig.tsbuildinfo
+
 # Visual Studio 6 build log
 *.plg
 

@@ -15,33 +15,43 @@ Rule-based transaction filtering for Cardano. Connects to [Ogmios](https://ogmio
 - Dapr state store checkpointing with ETag concurrency
 - OpenAPI/Swagger API documentation
 - SDK-less event consumption (any language)
+- **React event viewer UI** with real-time SSE dashboard and rule filter selector
 
 ## Documentation
 
 - [Architecture Overview](docs/architecture.md) - System design and components
 - [Event Schema](docs/event-schema.md) - CloudEvents specification
 - [Integration Guide](docs/integration-guide.md) - Building custom rules
+- [UI Consumer Guide](docs/ui-consumer-guide.md) - Building and extending the React dashboard
 - [Benchmark Results](docs/benchmarks.md) - Performance and delivery guarantees
 - [OpenAPI Spec](docs/openapi.json) - API specification
 - [Contributing](CONTRIBUTING.md) - Development guidelines
 
 ## Project Structure
 
+The repository separates backend and frontend into independently deployable layers:
+
 ```
+/backend  →  src/                  # .NET event delivery layer (Worker, Engine, Domain)
+/ui       →  tools/event-viewer/  # React interactive consumer & visualisation
+
 src/
 ├── BlockchainEvents.Domain/   # Models, abstractions, events
 ├── BlockchainEvents.Engine/   # Rule engine and implementations
-└── BlockchainEvents.Worker/   # .NET Worker service (HTTP + gRPC)
+└── BlockchainEvents.Worker/   # .NET Worker service (HTTP + gRPC + SSE)
+tools/
+├── event-viewer/              # React 19 dashboard (SSE consumer)
+├── BlockchainEvents.DemoSubscriber/  # .NET pub/sub consumer demo
+└── milestone-2-demo.sh        # Milestone 2 guided demo
 protos/
 └── blockchain_events.proto    # gRPC service definitions
 tests/
 └── BlockchainEvents.Tests/    # Unit tests (76 tests)
-tools/
-└── milestone-2-demo.sh        # Guided demo (AC-1 through AC-3)
 docs/
 ├── architecture.md            # System architecture
 ├── event-schema.md            # Event schema specification
 ├── integration-guide.md       # Custom rule development
+├── ui-consumer-guide.md       # UI setup, architecture, extension guide
 ├── benchmarks.md              # Performance benchmarks
 └── openapi.json               # OpenAPI 3.0 spec
 ```
@@ -140,9 +150,21 @@ grpcurl -plaintext -import-path . -proto protos/blockchain_events.proto \
 ### Guided Demo
 
 ```bash
-# Runs five live demonstrations covering AC-1 through AC-3
+# Milestone 2: event delivery layer (AC-1 through AC-3)
 ./tools/milestone-2-demo.sh
 ```
+
+### Event Viewer UI
+
+```bash
+docker compose up --build
+# Open http://localhost:4020 (all rules)
+#      http://localhost:4021 (metadata filter)
+#      http://localhost:4022 (governance filter)
+#      http://localhost:4023 (address match filter)
+```
+
+See [docs/ui-consumer-guide.md](docs/ui-consumer-guide.md) for setup, architecture, and extension guide.
 
 ## Custom Rules
 

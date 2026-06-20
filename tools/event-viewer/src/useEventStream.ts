@@ -1,15 +1,26 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import type { BlockchainEvent } from './types';
+import { buildStreamUrl } from './ruleConfigs';
 
 const MAX_EVENTS = 500;
+const MAX_LOGS = 50;
+const RECONNECT_BASE_MS = 1000;
+const RECONNECT_MAX_MS = 15000;
 
 export type ConnectionStatus = 'connecting' | 'connected' | 'disconnected' | 'error';
+
+export interface ConnectionLogEntry {
+  time: string;
+  message: string;
+  level: 'info' | 'warn' | 'error' | 'success';
+}
 
 export interface EventStreamState {
   events: BlockchainEvent[];
   stats: StreamStats;
   status: ConnectionStatus;
   paused: boolean;
+  connectionLogs: ConnectionLogEntry[];
   togglePause: () => void;
   clearEvents: () => void;
 }
@@ -22,10 +33,15 @@ export interface StreamStats {
   connectionUptime: number;
 }
 
-export function useEventStream(url: string): EventStreamState {
+function nowIso(): string {
+  return new Date().toISOString();
+}
+
+export function useEventStream(baseUrl: string, ruleFilter: string | null): EventStreamState {
   const [events, setEvents] = useState<BlockchainEvent[]>([]);
   const [status, setStatus] = useState<ConnectionStatus>('connecting');
   const [paused, setPaused] = useState(false);
+  const [connectionLogs, setConnectionLogs] = useState<ConnectionLogEntry[]>([]);
   const [stats, setStats] = useState<StreamStats>({
     totalReceived: 0,
     eventsPerSecond: 0,
@@ -41,6 +57,16 @@ export function useEventStream(url: string): EventStreamState {
   const batchRef = useRef<BlockchainEvent[]>([]);
   const rafRef = useRef<number>(0);
   const pausedRef = useRef(false);
+  const reconnectAttempt = useRef(0);
+  const reconnectTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const addLog = useCallback((message: string, level: ConnectionLogEntry['level'] = 'info') => {
+    setConnectionLogs(prev => {
+      const entry: ConnectionLogEntry = { time: nowIso(), message, level };
+      const next = [entry, ...prev];
+      return next.length > MAX_LOGS ? next.slice(0, MAX_LOGS) : next;
+    });
+  }, []);
 
   const flushBatch = useCallback(() => {
     const batch = batchRef.current;
@@ -83,35 +109,78 @@ export function useEventStream(url: string): EventStreamState {
   }, []);
 
   useEffect(() => {
-    const eventSource = new EventSource(url);
+    // Reset buffer when filter changes so results are immediately distinct (AC-3)
+    setEvents([]);
+    totalRef.current = 0;
+    ruleBreakdownRef.current = {};
+    recentTimestamps.current = [];
+    batchRef.current = [];
+    connectedAt.current = 0;
+    setStats({
+      totalReceived: 0,
+      eventsPerSecond: 0,
+      ruleBreakdown: {},
+      lastEventTime: null,
+      connectionUptime: 0,
+    });
 
-    eventSource.onopen = () => {
-      setStatus('connected');
-      connectedAt.current = Date.now();
+    const streamUrl = buildStreamUrl(baseUrl, ruleFilter);
+    let eventSource: EventSource | null = null;
+    let disposed = false;
+
+    const connect = () => {
+      if (disposed) return;
+
+      setStatus('connecting');
+      const filterLabel = ruleFilter ?? 'all';
+      addLog(`Connecting to delivery layer (${filterLabel} filter)…`, 'info');
+
+      eventSource = new EventSource(streamUrl);
+
+      eventSource.onopen = () => {
+        if (disposed) return;
+        reconnectAttempt.current = 0;
+        setStatus('connected');
+        connectedAt.current = Date.now();
+        addLog(`Connected via SSE — streaming ${filterLabel} events`, 'success');
+      };
+
+      eventSource.onmessage = (e) => {
+        try {
+          const event: BlockchainEvent = JSON.parse(e.data);
+          totalRef.current++;
+
+          const ruleName = event.data?.ruleName ?? 'Unknown';
+          ruleBreakdownRef.current[ruleName] = (ruleBreakdownRef.current[ruleName] ?? 0) + 1;
+
+          batchRef.current.push(event);
+
+          cancelAnimationFrame(rafRef.current);
+          rafRef.current = requestAnimationFrame(flushBatch);
+        } catch {
+          addLog('Skipped malformed event payload', 'warn');
+        }
+      };
+
+      eventSource.onerror = () => {
+        if (disposed) return;
+        eventSource?.close();
+        eventSource = null;
+        connectedAt.current = 0;
+        setStatus('disconnected');
+        addLog('Connection lost — scheduling reconnect', 'warn');
+
+        reconnectAttempt.current += 1;
+        const delay = Math.min(
+          RECONNECT_BASE_MS * Math.pow(2, reconnectAttempt.current - 1),
+          RECONNECT_MAX_MS,
+        );
+        reconnectTimer.current = setTimeout(connect, delay);
+      };
     };
 
-    eventSource.onmessage = (e) => {
-      try {
-        const event: BlockchainEvent = JSON.parse(e.data);
-        totalRef.current++;
+    connect();
 
-        const ruleName = event.data?.ruleName ?? 'Unknown';
-        ruleBreakdownRef.current[ruleName] = (ruleBreakdownRef.current[ruleName] ?? 0) + 1;
-
-        batchRef.current.push(event);
-
-        cancelAnimationFrame(rafRef.current);
-        rafRef.current = requestAnimationFrame(flushBatch);
-      } catch {
-        // skip malformed events
-      }
-    };
-
-    eventSource.onerror = () => {
-      setStatus(prev => prev === 'connected' ? 'disconnected' : 'error');
-    };
-
-    // Periodic stats update for uptime
     const interval = setInterval(() => {
       if (connectedAt.current > 0) {
         const now = Date.now();
@@ -125,11 +194,13 @@ export function useEventStream(url: string): EventStreamState {
     }, 1000);
 
     return () => {
-      eventSource.close();
+      disposed = true;
+      eventSource?.close();
+      if (reconnectTimer.current) clearTimeout(reconnectTimer.current);
       cancelAnimationFrame(rafRef.current);
       clearInterval(interval);
     };
-  }, [url, flushBatch]);
+  }, [baseUrl, ruleFilter, flushBatch, addLog]);
 
-  return { events, stats, status, paused, togglePause, clearEvents };
+  return { events, stats, status, paused, connectionLogs, togglePause, clearEvents };
 }

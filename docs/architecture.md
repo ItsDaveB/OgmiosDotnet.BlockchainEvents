@@ -264,6 +264,7 @@ See [event-schema.md](event-schema.md) for complete specification.
 | gRPC Streaming   | Grpc.AspNetCore 2.71.0 (HTTP/2)         |
 | State Store      | Dapr State (Redis)                      |
 | Serialization    | System.Text.Json / Protobuf 3.32.0      |
+| UI Consumer      | React 19, Vite 6, TanStack Table        |
 | API Documentation| OpenAPI 3.0 / Swagger (Swashbuckle)     |
 | Testing          | xUnit, FluentAssertions, Moq            |
 | Containerization | Docker, Docker Compose                  |
@@ -297,6 +298,28 @@ grpcurl -plaintext -import-path . -proto protos/blockchain_events.proto \
 ```
 
 The `EventBroadcaster` uses bounded `System.Threading.Channels` (capacity 1,000) with `DropOldest` back-pressure to protect the pipeline from slow consumers.
+
+### SSE (Server-Sent Events)
+
+Browser-based consumers connect via `GET /events/stream` on port 4000. The endpoint streams JSON CloudEvents as Server-Sent Events, with optional `ruleFilter` query parameter for rule-specific filtering (parity with gRPC).
+
+```
+GET /events/stream
+GET /events/stream?ruleFilter=metadata-key-value
+```
+
+The React event viewer (`tools/event-viewer/`) is the reference SSE consumer. It demonstrates real-time visualisation, selectable rule filters, and connection status logging. See [docs/ui-consumer-guide.md](ui-consumer-guide.md) for setup and extension instructions.
+
+### React Event Viewer (UI Consumer)
+
+The UI layer (`tools/event-viewer/`) is a standalone React 19 application that communicates with the backend exclusively via the SSE API. It can be deployed independently (static nginx container) while the .NET worker runs separately.
+
+| Component | Technology | Port |
+| --------- | ---------- | ---- |
+| Event Viewer | React 19, Vite, TanStack Table | 4020–4023 |
+| Backend Worker | .NET 10, SSE + gRPC | 4000, 4010 |
+
+Four Docker Compose instances demonstrate different rule filter configurations side-by-side, proving that consumers can be built independently with distinct filtering scenarios.
 
 ### API Documentation
 

@@ -161,7 +161,8 @@ services:
       - '4020:80'
     environment:
       - SSE_URL=http://localhost:4000/events/stream
-      - INSTANCE_ID=Consumer 1
+      - INSTANCE_ID=All Rules
+      - RULE_FILTER=
     networks:
       - blockchain-events-network
     depends_on:
@@ -175,7 +176,8 @@ services:
       - '4021:80'
     environment:
       - SSE_URL=http://localhost:4000/events/stream
-      - INSTANCE_ID=Consumer 2
+      - INSTANCE_ID=Metadata Filter
+      - RULE_FILTER=metadata-key-value
     networks:
       - blockchain-events-network
     depends_on:
@@ -189,7 +191,8 @@ services:
       - '4022:80'
     environment:
       - SSE_URL=http://localhost:4000/events/stream
-      - INSTANCE_ID=Consumer 3
+      - INSTANCE_ID=Governance Filter
+      - RULE_FILTER=governance-treasury
     networks:
       - blockchain-events-network
     depends_on:
@@ -203,7 +206,8 @@ services:
       - '4023:80'
     environment:
       - SSE_URL=http://localhost:4000/events/stream
-      - INSTANCE_ID=Consumer 4
+      - INSTANCE_ID=Address Filter
+      - RULE_FILTER=address-match
     networks:
       - blockchain-events-network
     depends_on:
