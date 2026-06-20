@@ -11,11 +11,16 @@ import {
 import { useEventStream } from './useEventStream';
 import type { BlockchainEvent } from './types';
 import { EventDetailDrawer } from './EventDetailDrawer';
+import { DEMO_RULE_CONFIGS, formatMetadataSummary } from './ruleConfigs';
 import './App.css';
 
-const SSE_URL = (window as unknown as Record<string, unknown>).__SSE_URL__ as string
+const SSE_BASE_URL = (window as unknown as Record<string, unknown>).__SSE_URL__ as string
   || import.meta.env.VITE_SSE_URL
   || 'http://localhost:4000/events/stream';
+
+const DEFAULT_RULE_FILTER = (window as unknown as Record<string, unknown>).__RULE_FILTER__ as string
+  || import.meta.env.VITE_RULE_FILTER
+  || null;
 
 const INSTANCE_ID = (window as unknown as Record<string, unknown>).__INSTANCE_ID__ as string
   || import.meta.env.VITE_INSTANCE_ID
@@ -138,6 +143,16 @@ const columns: ColumnDef<BlockchainEvent>[] = [
     size: 170,
   },
   {
+    id: 'metadata',
+    header: 'Metadata',
+    accessorFn: (row) => formatMetadataSummary(row.data?.matchedCriteria),
+    cell: ({ getValue }) => {
+      const summary = getValue() as string;
+      return <span className="cell-metadata" title={summary}>{summary}</span>;
+    },
+    size: 220,
+  },
+  {
     id: 'slot',
     header: 'Slot',
     accessorFn: (row) => row.cardanoSlot,
@@ -182,10 +197,19 @@ const columns: ColumnDef<BlockchainEvent>[] = [
 
 /* ─── App Component ──────────────────────────── */
 export default function App() {
-  const { events, stats, status, paused, togglePause, clearEvents } = useEventStream(SSE_URL);
+  const initialConfig = DEMO_RULE_CONFIGS.find(c => c.ruleFilter === DEFAULT_RULE_FILTER)
+    ?? DEMO_RULE_CONFIGS[0];
+  const [selectedConfigId, setSelectedConfigId] = useState(initialConfig.id);
+  const selectedConfig = DEMO_RULE_CONFIGS.find(c => c.id === selectedConfigId) ?? DEMO_RULE_CONFIGS[0];
+
+  const { events, stats, status, paused, connectionLogs, togglePause, clearEvents } =
+    useEventStream(SSE_BASE_URL, selectedConfig.ruleFilter);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [selectedEvent, setSelectedEvent] = useState<BlockchainEvent | null>(null);
   const [globalFilter, setGlobalFilter] = useState('');
+  const [logsExpanded, setLogsExpanded] = useState(true);
+
+  const network = events[0]?.cardanoNetwork ?? 'mainnet';
 
   // Track EPS history for sparkline
   const epsHistory = useRef<number[]>([]);
@@ -214,6 +238,11 @@ export default function App() {
     return Object.entries(stats.ruleBreakdown)
       .sort((a, b) => b[1] - a[1]);
   }, [stats.ruleBreakdown]);
+
+  const handleRuleConfigChange = useCallback((configId: string) => {
+    setSelectedConfigId(configId);
+    setSelectedEvent(null);
+  }, []);
 
   const handleRowClick = useCallback((event: BlockchainEvent) => {
     setSelectedEvent(event);
@@ -250,10 +279,22 @@ export default function App() {
             </div>
             <div className="network-badge">
               <span className="network-dot" />
-              Mainnet
+              {network.charAt(0).toUpperCase() + network.slice(1)}
             </div>
           </div>
           <div className="header-right">
+            <div className="rule-filter-selector">
+              {DEMO_RULE_CONFIGS.map(config => (
+                <button
+                  key={config.id}
+                  className={`rule-filter-btn ${getRuleClass(config.label)} ${selectedConfigId === config.id ? 'active' : ''}`}
+                  onClick={() => handleRuleConfigChange(config.id)}
+                  title={config.description}
+                >
+                  {config.label}
+                </button>
+              ))}
+            </div>
             <div className="search-container">
               <input
                 type="text"
@@ -279,6 +320,33 @@ export default function App() {
               {status === 'connected' ? 'Live' : status === 'connecting' ? 'Connecting…' : 'Disconnected'}
             </div>
           </div>
+        </div>
+
+        {/* ─── Connection Log ──────────────────── */}
+        <div className={`connection-log-panel ${logsExpanded ? 'expanded' : 'collapsed'}`}>
+          <button
+            className="connection-log-toggle"
+            onClick={() => setLogsExpanded(e => !e)}
+            type="button"
+          >
+            <span>Connection Log</span>
+            <span className="log-count">{connectionLogs.length}</span>
+            <span className="log-chevron">{logsExpanded ? '▾' : '▸'}</span>
+          </button>
+          {logsExpanded && (
+            <div className="connection-log-list">
+              {connectionLogs.length === 0 ? (
+                <div className="connection-log-empty">No connection activity yet</div>
+              ) : (
+                connectionLogs.map((log, i) => (
+                  <div key={`${log.time}-${i}`} className={`connection-log-entry ${log.level}`}>
+                    <span className="log-time">{formatTime(log.time)}</span>
+                    <span className="log-message">{log.message}</span>
+                  </div>
+                ))
+              )}
+            </div>
+          )}
         </div>
 
         {/* ─── Stats Grid ───────────────────────── */}
@@ -331,7 +399,9 @@ export default function App() {
                 </div>
                 <div className="empty-state-text">
                   <div className="title">Waiting for blockchain events</div>
-                  <div className="subtitle">Events will appear here in real time as they are matched by your configured rules</div>
+                  <div className="subtitle">
+                    Filter: <strong>{selectedConfig.label}</strong> — {selectedConfig.description}
+                  </div>
                 </div>
                 <div className="empty-state-pulse">
                   <div className="dot" />

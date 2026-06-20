@@ -16,7 +16,7 @@ export interface BlockchainEvent {
     blockHash: string;
     ruleId: string;
     ruleName: string;
-    matchedCriteria: Record<string, string>;
+    matchedCriteria: Record<string, unknown>;
     transaction: {
       id: string;
       fee: number;

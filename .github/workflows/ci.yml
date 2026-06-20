@@ -79,3 +79,24 @@ jobs:
           tags: blockchain-events:ci
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  ui:
+    name: UI Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: tools/event-viewer/package-lock.json
+
+      - name: Install and build UI
+        working-directory: tools/event-viewer
+        run: |
+          npm ci
+          npm run build

@@ -2,7 +2,7 @@
   "openapi": "3.0.1",
   "info": {
     "title": "OgmiosDotnet.BlockchainEvents API",
-    "description": "Real-time Cardano blockchain event filtering and delivery via CloudEvents 1.0. Supports HTTP (Dapr pub/sub) and gRPC streaming consumption.",
+    "description": "Real-time Cardano blockchain event filtering and delivery via CloudEvents 1.0. Supports HTTP (Dapr pub/sub), gRPC streaming, and SSE for browser consumers.",
     "contact": {
       "name": "Dave",
       "url": "https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents"
@@ -101,6 +101,39 @@
                       }
                     }
                   }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/events/stream": {
+      "get": {
+        "tags": ["Streaming"],
+        "summary": "SSE Event Stream",
+        "description": "Server-Sent Events stream of blockchain events for browser-based real-time consumption. Optional ruleFilter query parameter restricts events to a single rule type (parity with gRPC Subscribe rule_filter).",
+        "operationId": "EventStream",
+        "parameters": [
+          {
+            "name": "ruleFilter",
+            "in": "query",
+            "required": false,
+            "description": "Filter by rule ID (e.g. metadata-key-value, governance-treasury, address-match). Omit for all events.",
+            "schema": {
+              "type": "string",
+              "example": "metadata-key-value"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "SSE stream of CloudEvents JSON payloads",
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "type": "string",
+                  "description": "Server-Sent Events with data: {CloudEvent JSON}\\n\\n"
                 }
               }
             }
