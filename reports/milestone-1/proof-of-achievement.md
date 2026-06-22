@@ -4,7 +4,7 @@
 **Repository:** [github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents)  
 **Milestone:** 1 — Core Filtering Engine & Event Emission  
 **Date:** February 2026  
-**Commit:** `6438f2b` (main)
+**Commit:** `fc1a55e` (main)
 
 ---
 
