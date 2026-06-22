@@ -27,6 +27,12 @@ Rule-based transaction filtering for Cardano. Connects to [Ogmios](https://ogmio
 - [OpenAPI Spec](docs/openapi.json) - API specification
 - [Contributing](CONTRIBUTING.md) - Development guidelines
 
+## Proof of Achievement
+
+- [Milestone 1 — Core Filtering Engine & Event Emission](reports/milestone-1/proof-of-achievement.md)
+- [Milestone 2 — Event Delivery Layer](reports/milestone-2/proof-of-achievement.md)
+- [Milestone 3 — Interactive Consumer & Visualisation](reports/milestone-3/proof-of-achievement.md)
+
 ## Project Structure
 
 The repository separates backend and frontend into independently deployable layers:
