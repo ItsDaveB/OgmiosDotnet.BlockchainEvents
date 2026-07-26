@@ -16,14 +16,24 @@ public sealed class BlockchainEventsWorker(
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         var skipDapr = Environment.GetEnvironmentVariable("SKIP_DAPR") == "true";
+        var demoEvents = Environment.GetEnvironmentVariable("DEMO_EVENTS") == "true";
 
         if (!skipDapr)
             await WaitForDaprSidecarAsync(stoppingToken);
 
+        metrics.SetEnabledRules(ruleEngine.EnabledRuleCount, ruleEngine.EnabledRuleNames);
+
+        if (demoEvents)
+        {
+            logger.LogWarning(
+                "DEMO_EVENTS=true — skipping Ogmios chain sync (synthetic events via DemoEventSeeder). Rules: {Rules}",
+                string.Join(", ", ruleEngine.EnabledRuleNames));
+            await Task.Delay(Timeout.Infinite, stoppingToken);
+            return;
+        }
+
         logger.LogInformation("Starting chain sync - Network: {Network}, Enabled rules: {Rules}",
             options.Value.Network, string.Join(", ", ruleEngine.EnabledRuleNames));
-
-        metrics.SetEnabledRules(ruleEngine.EnabledRuleCount, ruleEngine.EnabledRuleNames);
 
         try
         {

@@ -2,6 +2,7 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
 COPY OgmiosDotnet.BlockchainEvents.sln ./
+COPY Directory.Build.props ./
 COPY src/BlockchainEvents.Domain/BlockchainEvents.Domain.csproj src/BlockchainEvents.Domain/
 COPY src/BlockchainEvents.Engine/BlockchainEvents.Engine.csproj src/BlockchainEvents.Engine/
 COPY src/BlockchainEvents.Worker/BlockchainEvents.Worker.csproj src/BlockchainEvents.Worker/
@@ -9,6 +10,7 @@ COPY src/BlockchainEvents.Worker/BlockchainEvents.Worker.csproj src/BlockchainEv
 RUN dotnet restore src/BlockchainEvents.Worker/BlockchainEvents.Worker.csproj
 
 COPY protos/ protos/
+COPY README.md ./
 COPY src/ src/
 
 RUN dotnet publish src/BlockchainEvents.Worker/BlockchainEvents.Worker.csproj \

@@ -19,12 +19,14 @@ Rule-based transaction filtering for Cardano. Connects to [Ogmios](https://ogmio
 
 ## Documentation
 
+- [Getting Started](docs/getting-started.md) - Community onboarding (run, extend, adopt)
 - [Architecture Overview](docs/architecture.md) - System design and components
 - [Event Schema](docs/event-schema.md) - CloudEvents specification
 - [Integration Guide](docs/integration-guide.md) - Building custom rules
 - [UI Consumer Guide](docs/ui-consumer-guide.md) - Building and extending the React dashboard
 - [Benchmark Results](docs/benchmarks.md) - Performance and delivery guarantees
 - [OpenAPI Spec](docs/openapi.json) - API specification
+- [Example Configurations](examples/README.md) - Governance, treasury, and metadata filters
 - [Contributing](CONTRIBUTING.md) - Development guidelines
 
 ## Proof of Achievement
@@ -32,6 +34,9 @@ Rule-based transaction filtering for Cardano. Connects to [Ogmios](https://ogmio
 - [Milestone 1 — Core Filtering Engine & Event Emission](reports/milestone-1/proof-of-achievement.md)
 - [Milestone 2 — Event Delivery Layer](reports/milestone-2/proof-of-achievement.md)
 - [Milestone 3 — Interactive Consumer & Visualisation](reports/milestone-3/proof-of-achievement.md)
+- [Milestone 4 — Finalisation, Documentation & Community Release](reports/milestone-4/proof-of-achievement.md)
+- [Close-out Report](reports/milestone-4/close-out-report.md)
+- [Test Report](reports/milestone-4/test-report.md)
 
 ## Project Structure
 
@@ -42,9 +47,14 @@ The repository separates backend and frontend into independently deployable laye
 /ui       →  tools/event-viewer/  # React interactive consumer & visualisation
 
 src/
-├── BlockchainEvents.Domain/   # Models, abstractions, events
-├── BlockchainEvents.Engine/   # Rule engine and implementations
+├── BlockchainEvents.Domain/   # Models, abstractions, events (NuGet)
+├── BlockchainEvents.Engine/   # Rule engine and implementations (NuGet)
 └── BlockchainEvents.Worker/   # .NET Worker service (HTTP + gRPC + SSE)
+examples/
+├── governance/                # CIP-1694 governance filter profile
+├── treasury/                  # Treasury withdrawal filter profile
+├── metadata/                  # CIP-20 metadata filter profile
+└── run-example.sh             # Launch stack with an example config
 tools/
 ├── event-viewer/              # React 19 dashboard (SSE consumer)
 ├── BlockchainEvents.DemoSubscriber/  # .NET pub/sub consumer demo
@@ -52,8 +62,9 @@ tools/
 protos/
 └── blockchain_events.proto    # gRPC service definitions
 tests/
-└── BlockchainEvents.Tests/    # Unit tests (76 tests)
+└── BlockchainEvents.Tests/    # Unit tests
 docs/
+├── getting-started.md         # Community onboarding
 ├── architecture.md            # System architecture
 ├── event-schema.md            # Event schema specification
 ├── integration-guide.md       # Custom rule development
@@ -117,6 +128,26 @@ docker compose up --build
 
 # View traces at http://localhost:4004
 ```
+
+### Example filter profiles
+
+```bash
+./examples/run-example.sh governance
+./examples/run-example.sh treasury
+./examples/run-example.sh metadata
+```
+
+Or: `WORKER_APPSETTINGS=./examples/metadata/appsettings.json docker compose up --build`
+
+### Published packages & images
+
+On each `v*` tag release:
+
+| Artifact | Location |
+| -------- | -------- |
+| Worker image | `ghcr.io/itsdaveb/ogmiosdotnet.blockchainevents:<version>` |
+| Event viewer image | `ghcr.io/itsdaveb/ogmiosdotnet.blockchainevents/event-viewer:<version>` |
+| NuGet (Domain / Engine) | nuget.org via [Trusted Publishing](https://learn.microsoft.com/nuget/nuget-org/trusted-publishing) (+ GitHub Packages) |
 
 ### Local Development
 

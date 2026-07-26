@@ -22,6 +22,17 @@ export interface BlockchainEvent {
       fee: number;
       inputAddresses: string[];
       outputAddresses: string[];
+      minswapSwap?: {
+        dex?: string;
+        direction?: string;
+        orderType?: string;
+        swapInTicker?: string;
+        swapOutTicker?: string;
+        amountIn?: string;
+        minReceive?: string;
+        batcherFeeAda?: string;
+        datumSource?: string;
+      } | null;
     } | null;
   } | null;
 }

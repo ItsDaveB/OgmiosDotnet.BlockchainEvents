@@ -9,8 +9,10 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:4000
+      # Set DEMO_EVENTS=true to preview the UI with synthetic blocks (no Ogmios required).
+      - DEMO_EVENTS=${DEMO_EVENTS:-false}
     volumes:
-      - ./src/BlockchainEvents.Worker/appsettings.json:/app/appsettings.json:ro
+      - ${WORKER_APPSETTINGS:-./src/BlockchainEvents.Worker/appsettings.json}:/app/appsettings.json:ro
     networks:
       - blockchain-events-network
     depends_on:

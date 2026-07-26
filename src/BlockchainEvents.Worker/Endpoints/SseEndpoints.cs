@@ -74,7 +74,19 @@ public static class SseEndpoints
                                     id = cloudEvent.Data.Transaction.Id,
                                     fee = cloudEvent.Data.Transaction.Fee,
                                     inputAddresses = cloudEvent.Data.Transaction.InputAddresses,
-                                    outputAddresses = cloudEvent.Data.Transaction.OutputAddresses
+                                    outputAddresses = cloudEvent.Data.Transaction.OutputAddresses,
+                                    minswapSwap = cloudEvent.Data.Transaction.MinswapSwap is null ? null : new
+                                    {
+                                        dex = cloudEvent.Data.Transaction.MinswapSwap.Dex,
+                                        direction = cloudEvent.Data.Transaction.MinswapSwap.Direction,
+                                        orderType = cloudEvent.Data.Transaction.MinswapSwap.OrderType,
+                                        swapInTicker = cloudEvent.Data.Transaction.MinswapSwap.SwapInTicker,
+                                        swapOutTicker = cloudEvent.Data.Transaction.MinswapSwap.SwapOutTicker,
+                                        amountIn = cloudEvent.Data.Transaction.MinswapSwap.AmountInDisplay,
+                                        minReceive = cloudEvent.Data.Transaction.MinswapSwap.MinReceiveDisplay,
+                                        batcherFeeAda = cloudEvent.Data.Transaction.MinswapSwap.BatcherFeeAda,
+                                        datumSource = cloudEvent.Data.Transaction.MinswapSwap.DatumSource
+                                    }
                                 }
                             }
                         };
