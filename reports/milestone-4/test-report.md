@@ -4,6 +4,7 @@
 **Repository:** [github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents)  
 **Milestone:** 4 — Finalisation, Documentation & Community Release  
 **Date:** July 2026  
+**Release:** [`v1.0.0`](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/releases/tag/v1.0.0) (`badd71e`)  
 **Command:** `dotnet test --configuration Release`
 
 ---
@@ -51,7 +52,7 @@ Total tests: 76
 | -------- | ---- |
 | [`ci.yml`](../../.github/workflows/ci.yml) | Build → Test (TRX artifact) → Format → Docker (worker + UI) |
 | [`codeql.yml`](../../.github/workflows/codeql.yml) | Security-extended + security-and-quality |
-| [`release.yml`](../../.github/workflows/release.yml) | Tag `v*`: test → pack NuGet → publish GHCR images → GitHub Release |
+| [`release.yml`](../../.github/workflows/release.yml) | Tag `v*`: test → pack NuGet → publish GHCR images → GitHub Release — [`v1.0.0` run](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/actions/runs/30199956555) successful |
 
 CI uploads TRX results as the `test-results` artifact on every push/PR to `main` and on release builds.
 
