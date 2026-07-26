@@ -99,7 +99,8 @@ jobs:
         with:
           context: .
           file: ./src/BlockchainEvents.Worker/Dockerfile
-          platforms: linux/amd64,linux/arm64
+          # amd64 only: arm64 via QEMU segfaults during Grpc.Tools/protoc publish
+          platforms: linux/amd64
           push: true
           tags: ${{ steps.meta-worker.outputs.tags }}
           labels: ${{ steps.meta-worker.outputs.labels }}
@@ -122,7 +123,7 @@ jobs:
         with:
           context: tools/event-viewer
           file: tools/event-viewer/Dockerfile
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           push: true
           tags: ${{ steps.meta-viewer.outputs.tags }}
           labels: ${{ steps.meta-viewer.outputs.labels }}
@@ -159,13 +160,34 @@ jobs:
               --skip-duplicate
           done
 
+      # NuGet.org Trusted Publishing (OIDC): requires secret NUGET_USER + nuget.org policy
+      # for this repo / workflow file `release.yml`. Skip when unset so GHCR + GitHub
+      # Packages + GitHub Release still complete.
+      # https://learn.microsoft.com/nuget/nuget-org/trusted-publishing
+      - name: Check NuGet.org Trusted Publishing config
+        id: nuget-org
+        env:
+          NUGET_USER: ${{ secrets.NUGET_USER }}
+        run: |
+          if [ -z "${NUGET_USER}" ]; then
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "NUGET_USER secret not set — skipping nuget.org (GitHub Packages already published)."
+            echo "To enable: set repo secret NUGET_USER and add a Trusted Publishing policy for release.yml."
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: NuGet.org login (OIDC → temporary API key)
+        if: steps.nuget-org.outputs.configured == 'true'
+        continue-on-error: true
         uses: NuGet/login@v1
         id: nuget-login
         with:
+          # Must be the nuget.org username of the Trusted Publishing policy *creator*
           user: ${{ secrets.NUGET_USER }}
 
       - name: Publish to NuGet.org
+        if: steps.nuget-org.outputs.configured == 'true' && steps.nuget-login.outcome == 'success'
         run: |
           for pkg in artifacts/nuget/*.nupkg; do
             dotnet nuget push "$pkg" \
@@ -173,6 +195,13 @@ jobs:
               --api-key "${{ steps.nuget-login.outputs.NUGET_API_KEY }}" \
               --skip-duplicate
           done
+
+      - name: Warn if nuget.org publish was skipped or failed
+        if: steps.nuget-org.outputs.configured != 'true' || steps.nuget-login.outcome != 'success'
+        run: |
+          echo "::warning::nuget.org publish skipped/failed. GitHub Packages still published."
+          echo "Ensure nuget.org Trusted Publishing policy exists for ItsDaveB/OgmiosDotnet.BlockchainEvents + release.yml,"
+          echo "and NUGET_USER is the policy creator's nuget.org profile name (not email)."
 
   release:
     name: Create GitHub Release
