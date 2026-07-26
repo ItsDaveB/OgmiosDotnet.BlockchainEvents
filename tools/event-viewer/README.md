@@ -5,6 +5,8 @@ React-based interactive consumer for the OgmiosDotnet.BlockchainEvents delivery 
 ## Features
 
 - Real-time SSE consumption with auto-reconnect
+- Live **block stream** rail with tip height/slot ticker and per-block matched tx counts
+- Click a block card to filter the event table to that height
 - Selectable rule filter configurations (metadata, governance, address match)
 - Sortable/filterable event table with metadata, timestamp, and rule type columns
 - Connection log panel showing delivery layer connection status
@@ -48,6 +50,7 @@ In Docker, use `SSE_URL`, `RULE_FILTER`, and `INSTANCE_ID`. These are injected a
 tools/event-viewer/
 ├── src/
 │   ├── App.tsx              # Main dashboard
+│   ├── BlockStream.tsx      # Live block rail + chain tip ticker
 │   ├── useEventStream.ts    # SSE consumer hook with reconnect
 │   ├── ruleConfigs.ts       # Demo rule filter configurations
 │   ├── EventDetailDrawer.tsx

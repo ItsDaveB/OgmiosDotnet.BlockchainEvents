@@ -1,0 +1,78 @@
+# Milestone 4 — Test Report
+
+**Project:** OgmiosDotnet.BlockchainEvents  
+**Repository:** [github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents)  
+**Milestone:** 4 — Finalisation, Documentation & Community Release  
+**Date:** July 2026  
+**Command:** `dotnet test --configuration Release`
+
+---
+
+## Summary
+
+| Metric | Value |
+| ------ | ----- |
+| Result | **Successful** |
+| Total tests | **76** |
+| Passed | **76** |
+| Failed | **0** |
+| Skipped | **0** |
+| Pass rate | **100%** |
+| Duration | ~1.2 seconds |
+
+```
+Test Run Successful.
+Total tests: 76
+     Passed: 76
+ Total time: 1.1893 Seconds
+```
+
+---
+
+## Coverage by Area
+
+| Area | Test class(es) | Focus |
+| ---- | -------------- | ----- |
+| Address filtering | `AddressMatchRuleTests` | Exact address + prefix match, disabled state, evaluate criteria |
+| Policy / asset | `PolicyIdAssetRuleTests` | Policy ID and asset name matching |
+| Metadata | `MetadataKeyValueRuleTests` | Labels, key/value patterns, MatchAny mode |
+| Governance / treasury | `GovernanceTreasuryRuleTests` | Actions, treasury, votes, delegation, registration |
+| Catch-all | `AllTransactionsRuleTests` | Always-match behaviour and defaults |
+| Rule engine | `RuleEngineTests` | Multi-rule evaluation, disabled rules, empty set |
+| CloudEvents | `BlockchainEventFactoryTests` | Schema, Cardano extensions, unique IDs |
+| Checkpoints | `SyncCheckpointTests`, `DaprCheckpointServiceTests` | Serialization, ETag concurrency |
+| Broadcast / gRPC | `EventBroadcasterTests`, `BlockchainEventGrpcServiceTests` | Channel capacity, filtering, field mapping |
+
+---
+
+## Continuous Integration
+
+| Workflow | Gate |
+| -------- | ---- |
+| [`ci.yml`](../../.github/workflows/ci.yml) | Build → Test (TRX artifact) → Format → Docker (worker + UI) |
+| [`codeql.yml`](../../.github/workflows/codeql.yml) | Security-extended + security-and-quality |
+| [`release.yml`](../../.github/workflows/release.yml) | Tag `v*`: test → pack NuGet → publish GHCR images → GitHub Release |
+
+CI uploads TRX results as the `test-results` artifact on every push/PR to `main` and on release builds.
+
+---
+
+## How to Reproduce
+
+```bash
+git clone https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents.git
+cd OgmiosDotnet.BlockchainEvents
+dotnet test --configuration Release
+```
+
+Optional TRX output (matches CI):
+
+```bash
+dotnet test --configuration Release --logger trx --results-directory TestResults
+```
+
+---
+
+## Conclusion
+
+All **76** unit tests pass with a **100%** pass rate. The suite covers built-in rules (including governance, treasury, and metadata scenarios used by the example configurations), CloudEvents emission, checkpoint persistence, and gRPC/SSE delivery primitives required for enterprise adoption.

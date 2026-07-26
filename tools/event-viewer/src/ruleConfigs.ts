@@ -47,10 +47,16 @@ export function buildStreamUrl(baseUrl: string, ruleFilter: string | null): stri
 
 export function formatMetadataSummary(criteria: Record<string, unknown> | undefined): string {
   if (!criteria || Object.keys(criteria).length === 0) return '—';
-  const parts = Object.entries(criteria).slice(0, 2).map(([k, v]) => {
-    const val = typeof v === 'object' ? JSON.stringify(v) : String(v);
-    return `${k}: ${val.length > 24 ? val.slice(0, 24) + '…' : val}`;
-  });
+  if (typeof criteria.swap_summary === 'string' && criteria.swap_summary.length > 0) {
+    return criteria.swap_summary;
+  }
+  const parts = Object.entries(criteria)
+    .filter(([k]) => k !== 'minswap_swap')
+    .slice(0, 2)
+    .map(([k, v]) => {
+      const val = typeof v === 'object' ? JSON.stringify(v) : String(v);
+      return `${k}: ${val.length > 24 ? val.slice(0, 24) + '…' : val}`;
+    });
   const extra = Object.keys(criteria).length > 2 ? ` +${Object.keys(criteria).length - 2}` : '';
   return parts.join(', ') + extra;
 }

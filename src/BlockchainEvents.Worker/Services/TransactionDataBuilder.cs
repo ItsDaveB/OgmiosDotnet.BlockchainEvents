@@ -17,6 +17,7 @@ public sealed class TransactionDataBuilder
     private IReadOnlyDictionary<int, object?> _metadata = new Dictionary<int, object?>();
     private CertificateFlags _certificateFlags;
     private GovernanceFlags _governanceFlags;
+    private MinswapSwapDetails? _minswapSwap;
 
     private TransactionDataBuilder(Transaction tx, string blockHash, long blockHeight, long slot, int index)
     {
@@ -68,13 +69,20 @@ public sealed class TransactionDataBuilder
         return this;
     }
 
+    public TransactionDataBuilder WithMinswapSwap()
+    {
+        _minswapSwap = MinswapOutgoingSwapExtractor.Instance.Extract(_tx);
+        return this;
+    }
+
     public TransactionDataBuilder WithAllPraosData() =>
         WithIdentity()
         .WithAddresses()
         .WithAssets()
         .WithMetadata()
         .WithCertificates()
-        .WithGovernance();
+        .WithGovernance()
+        .WithMinswapSwap();
 
     public TransactionDataBuilder WithByronData() =>
         WithIdentity()
@@ -98,6 +106,7 @@ public sealed class TransactionDataBuilder
         HasTreasuryWithdrawal = false,
         HasStakeDelegation = _certificateFlags.HasStakeDelegation,
         HasStakeRegistration = _certificateFlags.HasStakeRegistration,
-        HasVote = _governanceFlags.HasVotes
+        HasVote = _governanceFlags.HasVotes,
+        MinswapSwap = _minswapSwap
     };
 }

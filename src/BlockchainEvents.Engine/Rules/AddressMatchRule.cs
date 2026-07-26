@@ -35,6 +35,29 @@ public sealed class AddressMatchRule(IOptions<AddressMatchRuleOptions> options) 
         if (matchedAddresses.Count > 0) criteria["matched_addresses"] = matchedAddresses;
         if (matchedPrefixes.Count > 0) criteria["matched_prefixes"] = matchedPrefixes;
 
+        if (transaction.MinswapSwap is { } swap)
+        {
+            criteria["minswap_swap"] = new Dictionary<string, object?>
+            {
+                ["dex"] = swap.Dex,
+                ["direction"] = swap.Direction,
+                ["orderType"] = swap.OrderType,
+                ["swapInTicker"] = swap.SwapInTicker,
+                ["swapOutTicker"] = swap.SwapOutTicker,
+                ["swapInSubject"] = swap.SwapInSubject,
+                ["swapOutSubject"] = swap.SwapOutSubject,
+                ["amountIn"] = swap.AmountInDisplay,
+                ["amountInRaw"] = swap.AmountInRaw,
+                ["minReceive"] = swap.MinReceiveDisplay,
+                ["minReceiveRaw"] = swap.MinReceiveRaw,
+                ["batcherFeeAda"] = swap.BatcherFeeAda,
+                ["lpTokenSubject"] = swap.LpTokenSubject,
+                ["datumSource"] = swap.DatumSource
+            };
+            criteria["swap_summary"] =
+                $"{swap.Direction} {swap.AmountInDisplay} {swap.SwapInTicker} → {swap.MinReceiveDisplay} {swap.SwapOutTicker}";
+        }
+
         return new RuleMatchResult(Id, Name, criteria);
     }
 }

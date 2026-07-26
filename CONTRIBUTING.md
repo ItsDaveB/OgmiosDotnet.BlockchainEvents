@@ -40,20 +40,25 @@ src/
 tests/
 └── BlockchainEvents.Tests/    # Unit tests
 docs/
+├── getting-started.md         # Community onboarding
 ├── architecture.md            # System architecture
 ├── event-schema.md            # Event schema specification
 └── integration-guide.md       # Custom rule development guide
+examples/
+├── governance/                # Example: governance actions + votes
+├── treasury/                  # Example: treasury withdrawals
+└── metadata/                  # Example: metadata label filtering
 ```
 
 ## Adding a New Rule
 
 1. Create a new class in `src/BlockchainEvents.Engine/Rules/`
 2. Inherit from `TransactionRuleBase` or implement `ITransactionRule`
-3. Add configuration options if needed
-4. Register the rule in `Program.cs`
+3. Add configuration options under `Rules:<Name>` in `appsettings.json` (and optionally an `examples/` profile)
+4. Bind and register the rule in `Program.cs` via `Configure<TOptions>(GetSection(...))`
 5. Add unit tests in `tests/BlockchainEvents.Tests/Rules/`
 
-See [docs/integration-guide.md](docs/integration-guide.md) for detailed examples.
+See [docs/integration-guide.md](docs/integration-guide.md) for detailed examples and [docs/getting-started.md](docs/getting-started.md) for onboarding.
 
 ## Testing
 

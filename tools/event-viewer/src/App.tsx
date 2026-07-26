@@ -11,6 +11,8 @@ import {
 import { useEventStream } from './useEventStream';
 import type { BlockchainEvent } from './types';
 import { EventDetailDrawer } from './EventDetailDrawer';
+import { BlockStream } from './BlockStream';
+import { extractMinswapSwap, MinswapSwapFeed } from './MinswapSwapCard';
 import { DEMO_RULE_CONFIGS, formatMetadataSummary } from './ruleConfigs';
 import './App.css';
 
@@ -144,13 +146,24 @@ const columns: ColumnDef<BlockchainEvent>[] = [
   },
   {
     id: 'metadata',
-    header: 'Metadata',
+    header: 'Swap / Metadata',
     accessorFn: (row) => formatMetadataSummary(row.data?.matchedCriteria),
-    cell: ({ getValue }) => {
+    cell: ({ row: r, getValue }) => {
+      const swap = extractMinswapSwap(r.original);
+      if (swap) {
+        return (
+          <span className={`cell-swap dir-${(swap.direction ?? 'swap').toLowerCase()}`} title={getValue() as string}>
+            <span className="cell-swap-dir">{swap.direction}</span>
+            {swap.amountIn} {swap.swapInTicker}
+            <span className="cell-swap-arrow">→</span>
+            {swap.minReceive} {swap.swapOutTicker}
+          </span>
+        );
+      }
       const summary = getValue() as string;
       return <span className="cell-metadata" title={summary}>{summary}</span>;
     },
-    size: 220,
+    size: 260,
   },
   {
     id: 'slot',
@@ -206,10 +219,54 @@ export default function App() {
     useEventStream(SSE_BASE_URL, selectedConfig.ruleFilter);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [selectedEvent, setSelectedEvent] = useState<BlockchainEvent | null>(null);
+  const [selectedBlockHeight, setSelectedBlockHeight] = useState<number | null>(null);
   const [globalFilter, setGlobalFilter] = useState('');
-  const [logsExpanded, setLogsExpanded] = useState(true);
+  const [logsExpanded, setLogsExpanded] = useState(false);
 
   const network = events[0]?.cardanoNetwork ?? 'mainnet';
+  const tipHeight = events[0]?.cardanoBlockHeight;
+  const tipSlot = events[0]?.cardanoSlot;
+
+  const filteredEvents = useMemo(() => {
+    if (selectedBlockHeight == null) return events;
+    return events.filter(e => e.cardanoBlockHeight === selectedBlockHeight);
+  }, [events, selectedBlockHeight]);
+
+  const swapTrucks = useMemo(() => {
+    type Cargo = { eventId: string; swap: NonNullable<ReturnType<typeof extractMinswapSwap>> };
+    const byBlock = new Map<number, {
+      blockHeight: number;
+      blockHash?: string;
+      slot?: number;
+      swaps: Cargo[];
+    }>();
+
+    // Convoy always shows recent blocks from the full stream (not table filter).
+    for (const event of events) {
+      const swap = extractMinswapSwap(event);
+      if (!swap || event.cardanoBlockHeight == null) continue;
+      const height = event.cardanoBlockHeight;
+      let bucket = byBlock.get(height);
+      if (!bucket) {
+        bucket = {
+          blockHeight: height,
+          blockHash: event.cardanoBlock,
+          slot: event.cardanoSlot,
+          swaps: [],
+        };
+        byBlock.set(height, bucket);
+      }
+      bucket.swaps.push({ eventId: event.id, swap });
+    }
+
+    return [...byBlock.values()]
+      .sort((a, b) => b.blockHeight - a.blockHeight)
+      .slice(0, 8)
+      .map((truck, index) => ({
+        ...truck,
+        fresh: index === 0 && !paused,
+      }));
+  }, [events, paused]);
 
   // Track EPS history for sparkline
   const epsHistory = useRef<number[]>([]);
@@ -222,8 +279,12 @@ export default function App() {
     }
   }, [stats.connectionUptime, stats.eventsPerSecond]);
 
+  useEffect(() => {
+    setSelectedBlockHeight(null);
+  }, [selectedConfigId]);
+
   const table = useReactTable({
-    data: events,
+    data: filteredEvents,
     columns,
     state: { sorting, globalFilter },
     onSortingChange: setSorting,
@@ -242,10 +303,15 @@ export default function App() {
   const handleRuleConfigChange = useCallback((configId: string) => {
     setSelectedConfigId(configId);
     setSelectedEvent(null);
+    setSelectedBlockHeight(null);
   }, []);
 
   const handleRowClick = useCallback((event: BlockchainEvent) => {
     setSelectedEvent(event);
+  }, []);
+
+  const handleSelectBlock = useCallback((height: number | null) => {
+    setSelectedBlockHeight(height);
   }, []);
 
   const rowCount = table.getRowModel().rows.length;
@@ -360,13 +426,18 @@ export default function App() {
             <div className="stat-value cyan">{stats.eventsPerSecond.toFixed(1)}</div>
             <Sparkline data={epsHistory.current} color="rgba(34, 211, 238, 0.7)" />
           </div>
+          <div className="stat-card amber tip-stat">
+            <div className="stat-label">Chain Tip</div>
+            <div className="stat-value amber">
+              {tipHeight ? tipHeight.toLocaleString() : '—'}
+            </div>
+            <div className="stat-footnote">
+              {tipSlot ? `slot ${tipSlot.toLocaleString()}` : 'awaiting tip'}
+            </div>
+          </div>
           <div className="stat-card green">
             <div className="stat-label">Uptime</div>
             <div className="stat-value green">{formatUptime(stats.connectionUptime)}</div>
-          </div>
-          <div className="stat-card purple">
-            <div className="stat-label">Active Rules</div>
-            <div className="stat-value purple">{Object.keys(stats.ruleBreakdown).length}</div>
           </div>
           <div className="stat-card rules">
             <div className="stat-label">Rule Breakdown</div>
@@ -385,9 +456,27 @@ export default function App() {
           </div>
         </div>
 
+        {/* ─── Live Block Stream ────────────────── */}
+        <BlockStream
+          events={events}
+          selectedHeight={selectedBlockHeight}
+          onSelectBlock={handleSelectBlock}
+          live={status === 'connected' && !paused}
+        />
+
+        {/* ─── Minswap outgoing swap feed ───────── */}
+        <MinswapSwapFeed
+          trucks={swapTrucks}
+          onSelectBlock={handleSelectBlock}
+          onSelectSwap={(id) => {
+            const event = events.find(e => e.id === id);
+            if (event) setSelectedEvent(event);
+          }}
+        />
+
         {/* ─── Event Table ─────────────────────── */}
         <div className="table-wrapper">
-          {events.length === 0 ? (
+          {filteredEvents.length === 0 ? (
             <div className="table-container">
               <div className="empty-state">
                 <div className="empty-state-icon">
@@ -398,9 +487,17 @@ export default function App() {
                   </svg>
                 </div>
                 <div className="empty-state-text">
-                  <div className="title">Waiting for blockchain events</div>
+                  <div className="title">
+                    {events.length === 0
+                      ? 'Waiting for blockchain events'
+                      : `No events in block ${selectedBlockHeight?.toLocaleString()}`}
+                  </div>
                   <div className="subtitle">
-                    Filter: <strong>{selectedConfig.label}</strong> — {selectedConfig.description}
+                    {events.length === 0 ? (
+                      <>Filter: <strong>{selectedConfig.label}</strong> — {selectedConfig.description}</>
+                    ) : (
+                      <>Select another block in the stream, or clear the block filter.</>
+                    )}
                   </div>
                 </div>
                 <div className="empty-state-pulse">
@@ -433,10 +530,17 @@ export default function App() {
                     ))}
                   </thead>
                   <tbody>
-                    {table.getRowModel().rows.map((row, i) => (
+                    {table.getRowModel().rows.map((row, i) => {
+                      const height = row.original.cardanoBlockHeight;
+                      const inSelectedBlock = selectedBlockHeight != null && height === selectedBlockHeight;
+                      const rowClass = [
+                        i < 3 && sorting.length === 0 && !paused ? 'new-row' : '',
+                        inSelectedBlock ? 'block-focus' : '',
+                      ].filter(Boolean).join(' ');
+                      return (
                       <tr
                         key={row.id}
-                        className={i < 3 && sorting.length === 0 && !paused ? 'new-row' : ''}
+                        className={rowClass}
                         onClick={() => handleRowClick(row.original)}
                       >
                         {row.getVisibleCells().map(cell => (
@@ -445,7 +549,8 @@ export default function App() {
                           </td>
                         ))}
                       </tr>
-                    ))}
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
@@ -453,6 +558,9 @@ export default function App() {
                 <div className="row-count">
                   {status === 'connected' && !paused && <span className="live-dot" />}
                   {rowCount.toLocaleString()} event{rowCount !== 1 ? 's' : ''} displayed
+                  {selectedBlockHeight != null && (
+                    <span className="footer-block-filter"> · block {selectedBlockHeight.toLocaleString()}</span>
+                  )}
                   {paused && <span style={{ color: 'var(--accent-amber)' }}> — paused</span>}
                 </div>
                 <span>Buffer: {events.length} / 500</span>

@@ -66,7 +66,7 @@ Open the event viewers:
 | Governance | http://localhost:4022 | `governance-treasury` |
 | Address Match | http://localhost:4023 | `address-match` |
 
-The **Connection Log** panel at the top of each viewer shows SSE connection status. Worker logs also record subscriber connections:
+The **Block stream** panel groups matched events by block height, with a live tip ticker (height / slot / era). Click a block card to filter the event table to that height. The **Connection Log** panel (collapsed by default) shows SSE connection status. Worker logs also record subscriber connections:
 
 ```
 info: SseEndpoints[0] SSE subscriber connected from ::ffff:172.18.0.1 (filter: metadata-key-value)

@@ -24,48 +24,27 @@ builder.Services.AddOpenApi("v1", options =>
     });
 });
 
-// Rule 1: Minswap V2 DEX — match batched swap orders by contract address prefix.
-// The order script hash c3e28c36c3447315ba5a56f33da6a6ddc1770a876a8d9f0cb3a97c4c
-// produces bech32 prefixes addr1z (script+key staking), addr1x (script+script staking),
-// and addr1w (enterprise / no staking). Derived from the official order enterprise address:
-// addr1w8p79rpkcdz8x9d6tft0x0dx5mwuzac2sa4gm8cvkw5hcnqst2ctf
-builder.Services.Configure<AddressMatchRuleOptions>(opts =>
-{
-    opts.Enabled = true;
-    opts.Prefixes =
-    [
-        "addr1z8p79rpkcdz8x9d6tft0x0dx5mwuzac2sa4gm8cvkw5hc",
-        "addr1x8p79rpkcdz8x9d6tft0x0dx5mwuzac2sa4gm8cvkw5hc",
-        "addr1w8p79rpkcdz8x9d6tft0x0dx5mwuzac2sa4gm8cvkw5hc"
-    ];
-});
+// Built-in rules bind from the Rules:* sections in appsettings.json (or example overlays).
+// Defaults match the Minswap / governance-votes / metadata / all-transactions demo stack.
+// See examples/ for governance, treasury, and metadata-focused configurations.
+builder.Services.Configure<AddressMatchRuleOptions>(
+    builder.Configuration.GetSection(AddressMatchRuleOptions.SectionName));
 builder.Services.AddSingleton<ITransactionRule, AddressMatchRule>();
 
-// Rule 2: Governance votes — match only on-chain voting transactions.
-builder.Services.Configure<GovernanceTreasuryRuleOptions>(opts =>
-{
-    opts.Enabled = true;
-    opts.IncludeGovernanceActions = false;
-    opts.IncludeTreasuryWithdrawals = false;
-    opts.IncludeDelegations = false;
-    opts.IncludeStakeRegistrations = false;
-    opts.IncludeVotes = true;
-});
+builder.Services.Configure<GovernanceTreasuryRuleOptions>(
+    builder.Configuration.GetSection(GovernanceTreasuryRuleOptions.SectionName));
 builder.Services.AddSingleton<ITransactionRule, GovernanceTreasuryRule>();
 
-// Rule 3: Any transaction with metadata — match all metadata regardless of label.
-builder.Services.Configure<MetadataKeyValueRuleOptions>(opts =>
-{
-    opts.Enabled = true;
-    opts.MatchAny = true;
-});
+builder.Services.Configure<MetadataKeyValueRuleOptions>(
+    builder.Configuration.GetSection(MetadataKeyValueRuleOptions.SectionName));
 builder.Services.AddSingleton<ITransactionRule, MetadataKeyValueRule>();
 
-// Rule 4: All transactions — emit an event for every transaction (demo/benchmarking).
-builder.Services.Configure<AllTransactionsRuleOptions>(opts =>
-{
-    opts.Enabled = true;
-});
+builder.Services.Configure<PolicyIdAssetRuleOptions>(
+    builder.Configuration.GetSection(PolicyIdAssetRuleOptions.SectionName));
+builder.Services.AddSingleton<ITransactionRule, PolicyIdAssetRule>();
+
+builder.Services.Configure<AllTransactionsRuleOptions>(
+    builder.Configuration.GetSection(AllTransactionsRuleOptions.SectionName));
 builder.Services.AddSingleton<ITransactionRule, AllTransactionsRule>();
 
 builder.Services.AddSingleton<IRuleEngine, RuleEngine>();
@@ -96,6 +75,9 @@ builder.Services.AddSingleton<Ogmios.Services.ChainSynchronization.IChainSynchro
     sp => sp.GetRequiredService<OgmiosChainSyncAdapter>());
 
 builder.Services.AddHostedService<BlockchainEventsWorker>();
+if (Environment.GetEnvironmentVariable("DEMO_EVENTS") == "true")
+    builder.Services.AddHostedService<DemoEventSeeder>();
+
 builder.Services.AddCors(options =>
     options.AddPolicy("AllowAll", policy =>
         policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));

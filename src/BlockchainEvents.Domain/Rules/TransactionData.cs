@@ -29,4 +29,7 @@ public sealed class TransactionData
     public bool HasStakeDelegation { get; init; }
     public bool HasStakeRegistration { get; init; }
     public bool HasVote { get; init; }
+
+    /// <summary>Parsed Minswap V2 outgoing swap when the tx posts an order UTxO.</summary>
+    public MinswapSwapDetails? MinswapSwap { get; init; }
 }

@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import type { BlockchainEvent } from './types';
+import { extractMinswapSwap, MinswapSwapCard } from './MinswapSwapCard';
 
 interface Props {
   event: BlockchainEvent;
@@ -75,6 +76,7 @@ export function EventDetailDrawer({ event, onClose }: Props) {
   const data = event.data;
   const tx = data?.transaction;
   const ruleClass = getRuleClass(data?.ruleName);
+  const minswap = extractMinswapSwap(event);
 
   return (
     <>
@@ -92,6 +94,12 @@ export function EventDetailDrawer({ event, onClose }: Props) {
           <button className="drawer-close" onClick={onClose}>✕</button>
         </div>
         <div className="drawer-body">
+          {minswap && (
+            <div className="detail-section" style={{ padding: 0, border: 'none', background: 'transparent' }}>
+              <MinswapSwapCard swap={minswap} />
+            </div>
+          )}
+
           {/* CloudEvent Envelope */}
           <div className="detail-section">
             <div className="detail-section-header">
