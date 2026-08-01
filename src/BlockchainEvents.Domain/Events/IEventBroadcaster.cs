@@ -13,6 +13,9 @@ public interface IEventBroadcaster
 
     /// <summary>Number of currently connected subscribers.</summary>
     int SubscriberCount { get; }
+
+    /// <summary>Return the most recent broadcast events (newest last), for polling / Swagger demos.</summary>
+    IReadOnlyList<BlockchainEvent<TransactionMatchedData>> GetRecent(int count = 20, string? ruleFilter = null);
 }
 
 /// <summary>

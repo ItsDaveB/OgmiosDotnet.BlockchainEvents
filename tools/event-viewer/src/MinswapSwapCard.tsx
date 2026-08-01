@@ -126,14 +126,6 @@ function fleetSizeFor(swapCount: number): FleetSize {
   return 'van';
 }
 
-function fleetLabel(size: FleetSize): string {
-  switch (size) {
-    case 'artic': return 'Heavy lorry';
-    case 'lorry': return 'Lorry';
-    default: return 'Van';
-  }
-}
-
 const FLEET: Record<FleetSize, {
   viewW: number;
   trailerX: number;
@@ -182,19 +174,68 @@ const FLEET: Record<FleetSize, {
 
 const CRATE_COLORS = ['#f8fafc', '#fde68a', '#a7f3d0', '#c4b5fd', '#fda4af'];
 
-/** Keep in sync with `.journey-shell` animation duration in App.css */
+/** Keep in sync with `.journey-shell` / `@keyframes journeyRtl` in App.css */
 const JOURNEY_MS = 18000;
-const CARGO_OPEN_AT = 5000;
+/** Open cargo once the truck has eased into center (~34%). */
+const CARGO_OPEN_AT = 6200;
 const CARGO_CLOSE_AT = 11800;
 const MAX_QUEUE = 5;
+
+function MinswapMark({ size = 28, className }: { size?: number; className?: string }) {
+  const gid = `minMark-${size}`;
+  return (
+    <svg className={className} width={size} height={size} viewBox="0 0 32 32" aria-hidden="true">
+      <defs>
+        <linearGradient id={gid} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#2dd4bf" />
+          <stop offset="100%" stopColor="#0f766e" />
+        </linearGradient>
+      </defs>
+      <circle cx="16" cy="16" r="16" fill={`url(#${gid})`} />
+      <path
+        d="M7.5 22.5V9.5L16 18.2 24.5 9.5v13"
+        fill="none"
+        stroke="#ffffff"
+        strokeWidth="2.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
 
 function Wheel({ x, y = 108, r = 14 }: { x: number; y?: number; r?: number }) {
   return (
     <g transform={`translate(${x} ${y})`}>
       <g className="truck-wheel">
-        <circle r={r} fill="#1e293b" stroke="#0f172a" strokeWidth="3" />
-        <circle r={r * 0.5} fill="#94a3b8" stroke="#0f172a" strokeWidth="2" />
-        <path d={`M0-${r * 0.5}v${r}M-${r * 0.5} 0h${r}`} stroke="#0f172a" strokeWidth="2" />
+        <circle r={r} fill="#0f172a" stroke="#020617" strokeWidth="2.5" />
+        {[0, 60, 120, 180, 240, 300].map(a => (
+          <rect
+            key={`tread-${a}`}
+            x="-1.4"
+            y={-r + 1}
+            width="2.8"
+            height="3.2"
+            rx="1"
+            fill="#334155"
+            transform={`rotate(${a})`}
+          />
+        ))}
+        <circle r={r * 0.55} fill="#64748b" stroke="#1e293b" strokeWidth="1.5" />
+        {[0, 72, 144, 216, 288].map(a => (
+          <line
+            key={`spoke-${a}`}
+            x1="0"
+            y1="0"
+            x2="0"
+            y2={-r * 0.5}
+            stroke="#1e293b"
+            strokeWidth="2.2"
+            strokeLinecap="round"
+            transform={`rotate(${a})`}
+          />
+        ))}
+        <circle r={r * 0.22} fill="#cbd5e1" />
       </g>
     </g>
   );
@@ -202,57 +243,65 @@ function Wheel({ x, y = 108, r = 14 }: { x: number; y?: number; r?: number }) {
 
 function CartoonTruckArt({
   open,
-  blockHeight,
   swapCount,
   lane,
   size,
 }: {
   open: boolean;
-  blockHeight: number;
   swapCount: number;
   lane: TruckLane;
   size: FleetSize;
 }) {
   const fleet = FLEET[size];
   const colors = lane === 'buy'
-    ? { body: '#2dd4bf', cabin: '#0f766e', cabinDark: '#115e59', accent: '#fbbf24', door: '#134e4a', badge: '#ecfdf5' }
-    : { body: '#fb7185', cabin: '#e11d48', cabinDark: '#9f1239', accent: '#fde047', door: '#881337', badge: '#fff1f2' };
+    ? { body: '#14b8a6', cabin: '#0f766e', cabinDark: '#115e59', accent: '#5eead4', door: '#134e4a', panel: '#042f2e' }
+    : { body: '#f43f5e', cabin: '#e11d48', cabinDark: '#9f1239', accent: '#fda4af', door: '#881337', panel: '#4c0519' };
   const facingWest = lane === 'sell';
-  const laneWord = lane === 'buy' ? 'BUY' : 'SELL';
   const midX = fleet.viewW / 2;
-  const trailerY = size === 'artic' ? 28 : 36;
+  const trailerY = size === 'artic' ? 30 : 38;
   const doorW = fleet.trailerW / 2;
-  const badgeX = fleet.trailerX + fleet.trailerW - 18;
   const wheelR = size === 'van' ? 12 : size === 'artic' ? 15 : 14;
+  const logoX = fleet.trailerX + fleet.trailerW * 0.42;
+  const logoY = trailerY + fleet.trailerH * 0.38;
+  const logoR = size === 'artic' ? 18 : size === 'lorry' ? 16 : 14;
 
   return (
     <svg
       className={`cartoon-truck-svg lane-${lane} size-${size} ${open ? 'doors-open' : ''}`}
       viewBox={`0 0 ${fleet.viewW} 140`}
       role="img"
-      aria-label={`Block ${blockHeight} ${laneWord} ${fleetLabel(size).toLowerCase()} with ${swapCount} Minswap swaps`}
+      aria-label={`Minswap ${lane === 'buy' ? 'buy' : 'sell'} haul · ${swapCount} swaps`}
     >
       <defs>
         <linearGradient id={`body-${lane}-${size}`} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor={colors.body} />
-          <stop offset="100%" stopColor={lane === 'buy' ? '#0d9488' : '#e11d48'} />
+          <stop offset="100%" stopColor={lane === 'buy' ? '#0f766e' : '#be123c'} />
         </linearGradient>
         <linearGradient id={`cabin-${lane}-${size}`} x1="0" y1="0" x2="1" y2="1">
           <stop offset="0%" stopColor={colors.cabin} />
           <stop offset="100%" stopColor={colors.cabinDark} />
         </linearGradient>
-        <filter id="truckSoftShadow" x="-20%" y="-20%" width="140%" height="140%">
-          <feDropShadow dx="0" dy="3" stdDeviation="2" floodOpacity="0.35" />
+        <linearGradient id={`glass-${lane}-${size}`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="rgba(224,242,254,0.85)" />
+          <stop offset="100%" stopColor="rgba(56,189,248,0.35)" />
+        </linearGradient>
+        <linearGradient id={`beam-${lane}-${size}`} x1="1" y1="0" x2="0" y2="0">
+          <stop offset="0%" stopColor="rgba(254,240,138,0.55)" />
+          <stop offset="100%" stopColor="rgba(254,240,138,0)" />
+        </linearGradient>
+        <filter id={`truckSoftShadow-${lane}-${size}`} x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="4" stdDeviation="2.5" floodOpacity="0.4" />
         </filter>
       </defs>
 
-      <text x={midX} y="14" textAnchor="middle" className="truck-svg-block-label">
-        #{blockHeight} · {laneWord}
-        {size === 'artic' ? ' · HEAVY HAUL' : size === 'van' ? ' · EXPRESS' : ''}
-      </text>
+      <g transform={facingWest ? `translate(${fleet.viewW},0) scale(-1,1)` : undefined} filter={`url(#truckSoftShadow-${lane}-${size})`}>
+        <ellipse className="truck-ground-shadow" cx={midX} cy="128" rx={fleet.shadowRx} ry="6" fill="rgba(15,23,42,0.4)" />
 
-      <g transform={facingWest ? `translate(${fleet.viewW},0) scale(-1,1)` : undefined} filter="url(#truckSoftShadow)">
-        <ellipse className="truck-ground-shadow" cx={midX} cy="128" rx={fleet.shadowRx} ry="7" fill="rgba(15,23,42,0.35)" />
+        <g className="truck-speedlines" aria-hidden="true">
+          <line className="speedline s1" x1={fleet.viewW + 4} y1="52" x2={fleet.viewW + 46} y2="52" />
+          <line className="speedline s2" x1={fleet.viewW + 12} y1="76" x2={fleet.viewW + 60} y2="76" />
+          <line className="speedline s3" x1={fleet.viewW + 4} y1="98" x2={fleet.viewW + 44} y2="98" />
+        </g>
 
         <g className="truck-bounce-group">
           <rect
@@ -260,115 +309,184 @@ function CartoonTruckArt({
             y={trailerY}
             width={fleet.trailerW}
             height={fleet.trailerH}
-            rx="14"
+            rx="12"
             fill={`url(#body-${lane}-${size})`}
             stroke="#0f172a"
-            strokeWidth="3"
+            strokeWidth="2.5"
           />
           <rect
-            x={fleet.trailerX + 8}
-            y={trailerY + 8}
-            width={fleet.trailerW - 16}
-            height={fleet.trailerH - 28}
+            x={fleet.trailerX + 6}
+            y={trailerY + 6}
+            width={fleet.trailerW - 12}
+            height={fleet.trailerH - 22}
             rx="8"
-            fill="rgba(255,255,255,0.28)"
+            fill="rgba(255,255,255,0.12)"
           />
 
           <g className={`truck-svg-cargo ${open ? 'is-open' : ''}`}>
             {Array.from({ length: fleet.crates }, (_, i) => {
-              const cx = fleet.trailerX + 22 + i * 34;
-              const cy = trailerY + (size === 'artic' && i % 2 === 1 ? 16 : 20);
+              const cx = fleet.trailerX + 20 + i * 34;
+              const cy = trailerY + (size === 'artic' && i % 2 === 1 ? 14 : 18);
               return (
                 <g key={i} className="truck-crate-pop" style={{ animationDelay: `${i * 70}ms` }}>
                   <rect
                     x={cx}
                     y={cy}
-                    width="28"
-                    height={size === 'artic' ? 30 : 26}
-                    rx="5"
+                    width="26"
+                    height={size === 'artic' ? 28 : 24}
+                    rx="4"
                     fill={CRATE_COLORS[i % CRATE_COLORS.length]}
                     stroke="#0f172a"
-                    strokeWidth="2"
+                    strokeWidth="1.5"
                   />
-                  <text x={cx + 14} y={cy + 18} textAnchor="middle" fontSize="9" fontWeight="800" fill="#0f172a">
-                    {i === 0 ? '₳' : '◆'}
-                  </text>
+                  <rect x={cx + 4} y={cy + 4} width="18" height="3" rx="1" fill="rgba(15,23,42,0.12)" />
                 </g>
               );
             })}
           </g>
 
           <g className={`truck-svg-door left ${open ? 'open' : ''}`}>
-            <rect x={fleet.trailerX} y={trailerY} width={doorW} height={fleet.doorH} rx="12" fill={colors.door} stroke="#0f172a" strokeWidth="3" />
-            <rect x={fleet.trailerX + 10} y={trailerY + 12} width={doorW - 22} height={fleet.doorH - 24} rx="6" fill="rgba(255,255,255,0.08)" />
-            <circle cx={fleet.trailerX + doorW - 10} cy={trailerY + fleet.doorH / 2} r="4" fill={colors.accent} stroke="#0f172a" strokeWidth="1.5" />
+            <rect x={fleet.trailerX} y={trailerY} width={doorW} height={fleet.doorH} rx="11" fill={colors.door} stroke="#0f172a" strokeWidth="2.5" />
+            <rect x={fleet.trailerX + 10} y={trailerY + 12} width={doorW - 22} height={fleet.doorH - 24} rx="5" fill="rgba(255,255,255,0.06)" />
+            <circle cx={fleet.trailerX + doorW - 10} cy={trailerY + fleet.doorH / 2} r="3.5" fill={colors.accent} />
           </g>
           <g className={`truck-svg-door right ${open ? 'open' : ''}`}>
-            <rect x={fleet.trailerX + doorW} y={trailerY} width={doorW} height={fleet.doorH} rx="12" fill={colors.door} stroke="#0f172a" strokeWidth="3" />
-            <rect x={fleet.trailerX + doorW + 12} y={trailerY + 12} width={doorW - 22} height={fleet.doorH - 24} rx="6" fill="rgba(255,255,255,0.08)" />
-            <circle cx={fleet.trailerX + doorW + 10} cy={trailerY + fleet.doorH / 2} r="4" fill={colors.accent} stroke="#0f172a" strokeWidth="1.5" />
+            <rect x={fleet.trailerX + doorW} y={trailerY} width={doorW} height={fleet.doorH} rx="11" fill={colors.door} stroke="#0f172a" strokeWidth="2.5" />
+            <rect x={fleet.trailerX + doorW + 12} y={trailerY + 12} width={doorW - 22} height={fleet.doorH - 24} rx="5" fill="rgba(255,255,255,0.06)" />
+            <circle cx={fleet.trailerX + doorW + 10} cy={trailerY + fleet.doorH / 2} r="3.5" fill={colors.accent} />
+          </g>
+
+          {/* Counter-flip so Minswap mark stays readable on both lanes */}
+          <g
+            className={`truck-brand-badge ${open ? 'is-dim' : ''}`}
+            transform={`translate(${logoX} ${logoY})${facingWest ? ' scale(-1,1)' : ''}`}
+          >
+            <circle r={logoR + 2} fill={colors.panel} opacity="0.35" />
+            <circle r={logoR} fill="#042f2e" stroke="#5eead4" strokeWidth="1.5" />
+            <path
+              d={`M${-logoR * 0.45} ${logoR * 0.35} V${-logoR * 0.4} L0 ${logoR * 0.15} L${logoR * 0.45} ${-logoR * 0.4} V${logoR * 0.35}`}
+              fill="none"
+              stroke="#5eead4"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
           </g>
 
           <rect
-            x={fleet.trailerX + 18}
-            y={trailerY + fleet.trailerH - 14}
-            width={fleet.trailerW - 36}
-            height="8"
-            rx="3"
+            x={fleet.trailerX + 16}
+            y={trailerY + fleet.trailerH - 12}
+            width={fleet.trailerW - 32}
+            height="6"
+            rx="2"
             fill={colors.accent}
-            stroke="#0f172a"
-            strokeWidth="1.5"
+            opacity="0.85"
           />
 
           {size === 'artic' && (
-            <>
-              <rect x={fleet.trailerX + 18} y={trailerY + 4} width={fleet.trailerW - 36} height="5" rx="2" fill={colors.accent} stroke="#0f172a" strokeWidth="1" />
+            <g>
               {[0, 1, 2, 3, 4].map(i => (
-                <circle key={i} className="roof-light" cx={fleet.trailerX + 40 + i * 50} cy={trailerY - 4} r="3.5" fill="#fde047" stroke="#0f172a" strokeWidth="1.5" style={{ animationDelay: `${i * 120}ms` }} />
+                <circle
+                  key={i}
+                  className="roof-light"
+                  cx={fleet.trailerX + 36 + i * 52}
+                  cy={trailerY - 3}
+                  r="2.8"
+                  fill="#fde047"
+                  stroke="#0f172a"
+                  strokeWidth="1"
+                  style={{ animationDelay: `${i * 120}ms` }}
+                />
               ))}
-            </>
+            </g>
           )}
 
           <path
-            d="M18 56h54c6 0 10 4 12 10l8 28c1 4-2 8-6 8H18c-5 0-8-4-8-8V64c0-5 3-8 8-8z"
+            className="truck-beam"
+            d="M15 73 L-56 57 L-56 103 L15 89 Z"
+            fill={`url(#beam-${lane}-${size})`}
+          />
+          <path
+            d="M18 58h52c6 0 10 4 12 10l8 26c1 4-2 8-6 8H18c-5 0-8-4-8-8V66c0-5 3-8 8-8z"
             fill={`url(#cabin-${lane}-${size})`}
             stroke="#0f172a"
-            strokeWidth="3"
+            strokeWidth="2.5"
           />
-          <path d="M34 62h30c3 0 5 2 6 5l4 14H30l2-14c1-3 2-5 4-5z" fill="#7dd3fc" stroke="#0f172a" strokeWidth="2.5" />
-          <path d="M36 66h18" stroke="rgba(255,255,255,0.7)" strokeWidth="2" strokeLinecap="round" />
-          {/* cute driver eyes */}
-          <circle cx="42" cy="76" r="2.4" fill="#0f172a" />
-          <circle cx="52" cy="76" r="2.4" fill="#0f172a" />
-          <circle cx="42.6" cy="75.4" r="0.7" fill="#fff" />
-          <circle cx="52.6" cy="75.4" r="0.7" fill="#fff" />
-          <rect x="12" y="94" width="40" height="10" rx="4" fill="#e2e8f0" stroke="#0f172a" strokeWidth="2" />
-          <path d="M20 98c4 3 12 3 16 0" fill="none" stroke="#0f172a" strokeWidth="2" strokeLinecap="round" />
-          <ellipse cx="16" cy="78" rx="5" ry="4" fill="#fde047" stroke="#0f172a" strokeWidth="2" className="truck-headlight" />
+          <path
+            d="M34 64h28c3 0 5 2 6 5l3 12H32l2-12c1-3 2-5 4-5z"
+            fill={`url(#glass-${lane}-${size})`}
+            stroke="#0f172a"
+            strokeWidth="1.8"
+          />
+          <g className="truck-driver" aria-hidden="true">
+            <circle cx="47" cy="73.5" r="6.2" fill="#fcd34d" stroke="#0f172a" strokeWidth="1.4" />
+            <path d="M40.9 72.5 a6.2 6.2 0 0 1 12.2 0 z" fill="#0ea5e9" stroke="#0f172a" strokeWidth="1.1" />
+            <path d="M39 72.2 h5.5" stroke="#0f172a" strokeWidth="1.6" strokeLinecap="round" />
+            <g className="driver-eyes">
+              <circle cx="44.7" cy="74.4" r="1.05" fill="#0f172a" />
+              <circle cx="49.3" cy="74.4" r="1.05" fill="#0f172a" />
+            </g>
+            <path d="M45 77.2 q2 1.7 4 0" stroke="#0f172a" strokeWidth="1.1" fill="none" strokeLinecap="round" />
+          </g>
+          <path d="M36 68h16" stroke="rgba(255,255,255,0.55)" strokeWidth="1.5" strokeLinecap="round" />
+          <rect x="14" y="96" width="36" height="6" rx="2" fill="#1e293b" opacity="0.55" />
+          <ellipse cx="16" cy="80" rx="4.5" ry="3.5" fill="#fef08a" stroke="#0f172a" strokeWidth="1.5" className="truck-headlight" />
           <g className="truck-exhaust" aria-hidden="true">
-            <circle className="puff p1" cx="10" cy="88" r="3" fill="rgba(226,232,240,0.5)" />
-            <circle className="puff p2" cx="4" cy="82" r="4" fill="rgba(226,232,240,0.35)" />
-            <circle className="puff p3" cx="0" cy="74" r="5" fill="rgba(226,232,240,0.2)" />
+            <circle className="puff p1" cx="10" cy="88" r="2.5" fill="rgba(226,232,240,0.45)" />
+            <circle className="puff p2" cx="5" cy="82" r="3.5" fill="rgba(226,232,240,0.28)" />
+            <circle className="puff p3" cx="1" cy="75" r="4.5" fill="rgba(226,232,240,0.16)" />
           </g>
 
           {fleet.wheels.map(x => (
             <Wheel key={x} x={x} r={wheelR} />
           ))}
 
-          <circle cx={badgeX} cy="42" r={size === 'artic' ? 18 : 16} fill={colors.badge} stroke="#0f172a" strokeWidth="2.5" />
+          {open && (
+            <g
+              className="cargo-burst"
+              aria-hidden="true"
+              transform={`translate(${fleet.trailerX + fleet.trailerW / 2} ${trailerY + 8})`}
+            >
+              {[0, 1, 2, 3, 4, 5].map(i => (
+                <g key={i} className={`burst-coin bc${i + 1}`}>
+                  <circle r="5.5" fill="#fde047" stroke="#a16207" strokeWidth="1.6" />
+                  <circle r="3" fill="none" stroke="#a16207" strokeWidth="1" opacity="0.7" />
+                </g>
+              ))}
+            </g>
+          )}
+
+          {open && (
+            <g className="cargo-sparkles" aria-hidden="true">
+              {[0, 1, 2].map(i => (
+                <path
+                  key={i}
+                  className={`cargo-sparkle csp${i + 1}`}
+                  d="M0 -5 L1.4 -1.4 L5 0 L1.4 1.4 L0 5 L-1.4 1.4 L-5 0 L-1.4 -1.4 Z"
+                  transform={`translate(${fleet.trailerX + 16 + i * (fleet.trailerW / 2 - 8)} ${trailerY - 8 - (i % 2) * 7})`}
+                />
+              ))}
+            </g>
+          )}
+
+          {open && (
+            <g
+              className="driver-bubble"
+              aria-hidden="true"
+              transform={`translate(46 34)${facingWest ? ' scale(-1,1)' : ''}`}
+            >
+              <g className="driver-bubble-inner">
+                <rect x="-27" y="-12" width="54" height="18" rx="9" fill="#f8fafc" stroke="#0f172a" strokeWidth="2" />
+                <path d="M2 5 L8 16 L13 5 Z" fill="#f8fafc" stroke="#0f172a" strokeWidth="2" strokeLinejoin="round" />
+                <rect x="1" y="2" width="13" height="5" fill="#f8fafc" />
+                <text x="0" y="0.5" textAnchor="middle" dominantBaseline="middle" className="bubble-text">
+                  SWAPS!
+                </text>
+              </g>
+            </g>
+          )}
         </g>
       </g>
-
-      <text
-        x={facingWest ? fleet.viewW - badgeX : badgeX}
-        y="47"
-        textAnchor="middle"
-        fontSize={size === 'artic' ? 14 : 13}
-        fontWeight="800"
-        fill="#0f172a"
-      >
-        {swapCount}
-      </text>
     </svg>
   );
 }
@@ -391,47 +509,50 @@ function SwapParcel({
       onClick={onClick}
       style={{ animationDelay: `${index * 80}ms` }}
     >
-      <span className="swap-parcel-dir">{directionLabel(swap.direction ?? 'SWAP')}</span>
       <span className="swap-parcel-leg">
-        <span className="swap-parcel-mark" style={{ background: inTheme.bg, color: inTheme.fg }}>
-          {(swap.swapInTicker ?? '?').slice(0, 3)}
-        </span>
         <span className="swap-parcel-amt">{swap.amountIn}</span>
+        <span
+          className="swap-parcel-ticker"
+          style={{ background: inTheme.bg, color: inTheme.fg }}
+        >
+          {swap.swapInTicker}
+        </span>
       </span>
       <span className="swap-parcel-arrow" aria-hidden="true">→</span>
       <span className="swap-parcel-leg">
-        <span className="swap-parcel-mark" style={{ background: outTheme.bg, color: outTheme.fg }}>
-          {(swap.swapOutTicker ?? '?').slice(0, 3)}
-        </span>
         <span className="swap-parcel-amt receive">{swap.minReceive}</span>
+        <span
+          className="swap-parcel-ticker"
+          style={{ background: outTheme.bg, color: outTheme.fg }}
+        >
+          {swap.swapOutTicker}
+        </span>
       </span>
     </button>
   );
 }
 
+const CARGO_VISIBLE = 3;
+
 function InspectManifest({
   truck,
-  onSelectBlock,
   onSelectSwap,
 }: {
   truck: LaneTruck;
-  onSelectBlock?: (height: number) => void;
   onSelectSwap?: (eventId: string) => void;
 }) {
   const size = fleetSizeFor(truck.swaps.length);
-  const laneLabel = truck.lane === 'buy' ? 'Buy' : 'Sell';
+  const visible = truck.swaps.slice(0, CARGO_VISIBLE);
+  const more = truck.swaps.length - visible.length;
 
   return (
-    <div className={`inspect-manifest lane-${truck.lane} size-${size}`}>
+    <aside className={`inspect-manifest lane-${truck.lane} size-${size}`} aria-label="Haul cargo">
       <div className="inspect-manifest-head">
-        <button type="button" className="inspect-block-btn" onClick={() => onSelectBlock?.(truck.blockHeight)}>
-          Block #{truck.blockHeight.toLocaleString()}
-        </button>
-        <span className={`inspect-fleet-chip size-${size}`}>{fleetLabel(size)}</span>
-        <span className="inspect-lane-chip">{laneLabel} haul · {truck.swaps.length}</span>
+        <span className="inspect-manifest-title">Cargo manifest</span>
+        <span className="inspect-manifest-count">{truck.swaps.length}</span>
       </div>
       <div className="inspect-manifest-body">
-        {truck.swaps.map((item, index) => (
+        {visible.map((item, index) => (
           <SwapParcel
             key={item.eventId}
             swap={item.swap}
@@ -439,9 +560,11 @@ function InspectManifest({
             onClick={() => onSelectSwap?.(item.eventId)}
           />
         ))}
+        {more > 0 && (
+          <div className="inspect-manifest-more">+{more} more</div>
+        )}
       </div>
-      <div className="inspect-manifest-hint">Tap a parcel for full event details</div>
-    </div>
+    </aside>
   );
 }
 
@@ -456,7 +579,6 @@ function BlockTruck({
   phase: JourneyPhase;
   onSelectBlock?: (height: number) => void;
 }) {
-  const laneLabel = truck.lane === 'buy' ? 'Buys' : 'Sells';
   const size = fleetSizeFor(truck.swaps.length);
   const shellW = FLEET[size].shellCssW;
 
@@ -477,23 +599,14 @@ function BlockTruck({
         className="block-truck-hit"
         onClick={() => onSelectBlock?.(truck.blockHeight)}
         aria-expanded={open}
-        title={`${fleetLabel(size)} · ${laneLabel} in block ${truck.blockHeight}`}
+        aria-label={`${truck.lane} haul · ${truck.swaps.length} swaps`}
       >
         <CartoonTruckArt
           open={open}
-          blockHeight={truck.blockHeight}
           swapCount={truck.swaps.length}
           lane={truck.lane}
           size={size}
         />
-        <div className="block-truck-caption">
-          <span className="block-truck-height">#{truck.blockHeight.toLocaleString()}</span>
-          <span className={`block-truck-meta size-${size}`}>
-            {phase === 'inspecting' ? 'Cargo open' : phase === 'approaching' ? 'Incoming' : 'Departing'}
-            {' · '}
-            {fleetLabel(size)}
-          </span>
-        </div>
       </button>
     </article>
   );
@@ -609,54 +722,107 @@ interface FeedProps {
 function LaneStage({
   lane,
   incoming,
-  orderCount,
   onSelectBlock,
   onSelectSwap,
 }: {
   lane: TruckLane;
   incoming: LaneTruck[];
-  orderCount: number;
   onSelectBlock?: (height: number) => void;
   onSelectSwap?: (eventId: string) => void;
 }) {
-  const { current, cargoOpen, phase, queued, lastPassed } = useLaneJourney(incoming);
+  const { current, cargoOpen, phase } = useLaneJourney(incoming);
   const isBuy = lane === 'buy';
   const size = current ? fleetSizeFor(current.swaps.length) : 'lorry';
   const shellW = FLEET[size].shellCssW;
 
   return (
     <div className={`highway-lane lane-${lane} phase-${current ? phase : 'idle'}`}>
-      <div className="lane-banner">
-        <span className="lane-arrow" aria-hidden="true">{isBuy ? '←' : '→'}</span>
-        <span className="lane-name">
-          {isBuy ? 'Buy lane' : 'Sell lane'}
-        </span>
-        <span className={`lane-phase-chip ${current ? phase : 'idle'}`}>
-          {!current ? 'Standby' : phase === 'approaching' ? 'Incoming' : phase === 'inspecting' ? 'Inspecting' : 'Clearing'}
-        </span>
-        <span className="lane-count">
-          {orderCount} orders{queued > 0 ? ` · ${queued} queued` : ''}
-        </span>
-      </div>
-
       <div className="lane-stage">
         <div className="lane-scenery" aria-hidden="true">
-          <span className="hill h1" />
-          <span className="hill h2" />
-          <span className="mile-marker m1">km</span>
-          <span className="mile-marker m2">km</span>
-          <span className="bird b1" />
-          <span className="bird b2" />
+          <span className="lane-sky">
+            <span className="lane-sun" />
+            <span className="lane-cloud lc1" />
+            <span className="lane-cloud lc2" />
+            <span className="lane-cloud lc3" />
+            <span className="bird b1" />
+            <span className="bird b2" />
+            <span className="lane-balloon">
+              <span className="balloon-envelope" />
+              <span className="balloon-basket" />
+            </span>
+          </span>
+          <span className="lane-hills">
+            <span className="hill h1" />
+            <span className="hill h2" />
+            <span className="hill h3" />
+          </span>
+          <span className="lane-meadow">
+            <span className="meadow-scroll">
+              <span className="meadow-band" />
+              <span className="meadow-band" />
+            </span>
+          </span>
+          <span className="lane-asphalt" />
+          <span className="scenery-layer far">
+            <span className="tree-strip">
+              <span className="tree t1 size-sm" />
+              <span className="tree t2 size-md" />
+              <span className="tree t3 size-sm" />
+              <span className="tree t1b size-sm" />
+              <span className="tree t2b size-md" />
+              <span className="tree t3b size-sm" />
+            </span>
+          </span>
+          <span className="scenery-layer mid">
+            <span className="tree-strip">
+              <span className="tree t4 size-lg" />
+              <span className="tree t5 size-md" />
+              <span className="windmill wm1">
+                <span className="wm-pole" />
+                <span className="wm-blades">
+                  <span className="wm-blade" />
+                  <span className="wm-blade" />
+                  <span className="wm-blade" />
+                </span>
+                <span className="wm-cap" />
+              </span>
+              <span className="tree t4b size-lg" />
+              <span className="tree t5b size-md" />
+              <span className="windmill wm1b">
+                <span className="wm-pole" />
+                <span className="wm-blades">
+                  <span className="wm-blade" />
+                  <span className="wm-blade" />
+                  <span className="wm-blade" />
+                </span>
+                <span className="wm-cap" />
+              </span>
+            </span>
+          </span>
+          <span className="scenery-layer near">
+            <span className="tree-strip">
+              <span className="tree t6 size-lg" />
+              <span className="tree t7 size-md" />
+              <span className="tree t6b size-lg" />
+              <span className="tree t7b size-md" />
+            </span>
+          </span>
+        </div>
+
+        <div className="lane-watermark" aria-hidden="true">
+          {isBuy ? 'BUYS' : 'SELLS'}
         </div>
 
         <div className="swap-road-dashes" aria-hidden="true" />
-        <div className={`lane-spotlight ${cargoOpen ? 'is-hot' : ''}`} aria-hidden="true">
-          <span className="spotlight-arch">CHECKPOINT</span>
+        <div className={`lane-glow ${cargoOpen ? 'is-hot' : ''}`} aria-hidden="true" />
+        <div className="inspect-spotlight" aria-hidden="true" />
+        <div className={`checkpoint-sign ${cargoOpen ? 'is-lit' : ''}`} aria-hidden="true">
+          <span className="checkpoint-chains">
+            <span />
+            <span />
+          </span>
+          <span className="checkpoint-board">Cargo check</span>
         </div>
-
-        {current && (phase === 'approaching' || phase === 'departing') && (
-          <div className={`speed-lines journey-${isBuy ? 'rtl' : 'ltr'}`} aria-hidden="true" />
-        )}
 
         {current ? (
           <div
@@ -665,28 +831,27 @@ function LaneStage({
             style={{ width: shellW, marginLeft: -shellW / 2 }}
           >
             <div className="dust-cloud" aria-hidden="true" />
-            <BlockTruck
-              truck={current}
-              open={cargoOpen}
-              phase={phase}
-              onSelectBlock={onSelectBlock}
-            />
+            <div className="truck-lean">
+              <BlockTruck
+                truck={current}
+                open={cargoOpen}
+                phase={phase}
+                onSelectBlock={onSelectBlock}
+              />
+            </div>
           </div>
         ) : (
-          <div className="lane-idle">
-            <span className="lane-idle-title">Lane clear</span>
-            <span className="lane-idle-sub">
-              {lastPassed
-                ? `Last haul · block #${lastPassed.blockHeight.toLocaleString()}`
-                : `Waiting for the next ${isBuy ? 'buy' : 'sell'} block…`}
+          <div className="lane-idle-pro">
+            <span className="lane-idle-pro-title">
+              Awaiting {isBuy ? 'buy' : 'sell'} hauls
             </span>
+            <span className="lane-idle-pro-sub">Filtered Minswap V2 swaps stream here live</span>
           </div>
         )}
 
         {cargoOpen && current && (
           <InspectManifest
             truck={current}
-            onSelectBlock={onSelectBlock}
             onSelectSwap={onSelectSwap}
           />
         )}
@@ -699,80 +864,59 @@ export function MinswapSwapFeed({ trucks, onSelectBlock, onSelectSwap }: FeedPro
   const { buys, sells } = useMemo(() => splitIntoLanes(trucks), [trucks]);
   const buyCount = buys.reduce((n, t) => n + t.swaps.length, 0);
   const sellCount = sells.reduce((n, t) => n + t.swaps.length, 0);
-  const latestPair = useMemo(() => {
-    const newest = trucks[0]?.swaps[0]?.swap;
-    if (!newest) return null;
-    return `${newest.swapInTicker} → ${newest.swapOutTicker}`;
-  }, [trucks]);
-
-  if (buys.length === 0 && sells.length === 0) return null;
+  const total = buyCount + sellCount;
 
   return (
-    <section className="swap-convoy" aria-label="Minswap buy and sell delivery lanes">
+    <section className="swap-convoy" aria-label="Minswap filtered swap hauls">
       <div className="swap-convoy-header">
         <div className="swap-convoy-brand">
-          <span className="swap-convoy-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M1 16V8h11v8" />
-              <path d="M12 11h4l3 3v2h-7" />
-              <circle cx="5.5" cy="17.5" r="1.8" />
-              <circle cx="16.5" cy="17.5" r="1.8" />
-              <path d="M1 13h11" />
-            </svg>
+          <span className="swap-convoy-mark" aria-hidden="true">
+            <MinswapMark size={34} />
           </span>
           <div>
-            <div className="swap-convoy-title">Minswap block haul</div>
+            <div className="swap-convoy-title">Minswap filtered swaps</div>
             <div className="swap-convoy-sub">
-              Lorries roll through the checkpoint — doors open, cargo inspect, then they clear the lane
+              Live address-match hauls · doors open to inspect cargo
             </div>
           </div>
         </div>
         <div className="swap-convoy-stats">
           <span className="swap-feed-live">
             <span className="swap-feed-pulse" />
-            Live haul
+            Live
           </span>
-          {latestPair && <span className="swap-feed-ticker">{latestPair}</span>}
-          <span className="swap-feed-count buy">{buyCount} buys</span>
-          <span className="swap-feed-count sell">{sellCount} sells</span>
+          <span className="swap-feed-count buy" title="Buy-side swaps">
+            <span className="swap-feed-count-label">Buys</span>
+            {buyCount}
+          </span>
+          <span className="swap-feed-count sell" title="Sell-side swaps">
+            <span className="swap-feed-count-label">Sells</span>
+            {sellCount}
+          </span>
+          <span className="swap-feed-count total" title="Total filtered swaps">
+            {total}
+          </span>
         </div>
       </div>
 
       <div className="swap-road cartoon-road dual-highway">
-        <div className="swap-road-sky" aria-hidden="true">
-          <span className="road-sun" />
-          <span className="road-cloud c1" />
-          <span className="road-cloud c2" />
-          <span className="road-cloud c3" />
-          <span className="road-cloud c4" />
-          <span className="road-sign">MINSWAP · CHECKPOINT</span>
-        </div>
-
         <LaneStage
           lane="buy"
           incoming={buys}
-          orderCount={buyCount}
           onSelectBlock={onSelectBlock}
           onSelectSwap={onSelectSwap}
         />
 
         <div className="highway-median" aria-hidden="true">
-          <span>← BUYS</span>
           <span className="median-line" />
-          <span className="median-beacon" />
-          <span className="median-line" />
-          <span>SELLS →</span>
         </div>
 
         <LaneStage
           lane="sell"
           incoming={sells}
-          orderCount={sellCount}
           onSelectBlock={onSelectBlock}
           onSelectSwap={onSelectSwap}
         />
-
-        <div className="swap-road-edge" aria-hidden="true" />
       </div>
     </section>
   );

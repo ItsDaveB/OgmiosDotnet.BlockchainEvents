@@ -125,6 +125,7 @@ Minimal config (`appsettings.json`):
 
 ```bash
 docker compose up --build
+# Multi-stage Dockerfiles publish in-container — no host publish/ directory required.
 
 # View traces at http://localhost:4004
 ```

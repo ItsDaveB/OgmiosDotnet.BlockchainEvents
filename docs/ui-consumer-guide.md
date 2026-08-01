@@ -88,7 +88,7 @@ npm install
 VITE_SSE_URL=http://localhost:4000/events/stream npm run dev
 ```
 
-Open http://localhost:5173. Use the rule filter buttons in the header to switch between filter configurations.
+Open http://localhost:5173. Use the rule filter buttons in the header to switch between filter configurations, then use the **consumer demo tabs** (Overview · Minswap Demo · Live Feed · Consumers) for close-out walkthroughs. Deep links: `#minswap`, `#feed`, `#consumers`. Address Match compose instance: `http://localhost:4023/#minswap`.
 
 ## API Reference (Consumer Endpoints)
 

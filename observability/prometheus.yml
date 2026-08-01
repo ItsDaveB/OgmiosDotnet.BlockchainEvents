@@ -8,10 +8,13 @@ scrape_configs:
       - targets: ['blockchain-events:4000']
     metrics_path: /metrics
 
-  - job_name: 'dapr-sidecar'
-    static_configs:
-      - targets: ['blockchain-events:9090']
-    metrics_path: /metrics
+  # Dapr metrics are optional; daprd does not expose :9090 in this compose layout
+  # (network_mode: service:blockchain-events). Leave disabled to avoid a permanent
+  # "down" target that makes Grafana/Prometheus look unhealthy during demos.
+  # - job_name: 'dapr-sidecar'
+  #   static_configs:
+  #     - targets: ['blockchain-events:9090']
+  #   metrics_path: /metrics
 
   - job_name: 'prometheus'
     static_configs:

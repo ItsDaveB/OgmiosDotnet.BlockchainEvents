@@ -8,10 +8,12 @@ namespace BlockchainEvents.Worker.Services;
 /// </summary>
 public sealed class EventBroadcaster(
     ILogger<EventBroadcaster> logger,
-    int channelCapacity = 1_000) : IEventBroadcaster
+    int channelCapacity = 1_000,
+    int recentBufferCapacity = 100) : IEventBroadcaster
 {
     private readonly object _lock = new();
     private readonly List<ChannelSubscription> _subscriptions = [];
+    private readonly Queue<BlockchainEvent<TransactionMatchedData>> _recent = new();
 
     public int SubscriberCount
     {
@@ -21,7 +23,13 @@ public sealed class EventBroadcaster(
     public async Task BroadcastAsync(BlockchainEvent<TransactionMatchedData> cloudEvent, CancellationToken ct = default)
     {
         List<ChannelSubscription> snapshot;
-        lock (_lock) snapshot = [.. _subscriptions];
+        lock (_lock)
+        {
+            _recent.Enqueue(cloudEvent);
+            while (_recent.Count > recentBufferCapacity)
+                _recent.Dequeue();
+            snapshot = [.. _subscriptions];
+        }
 
         foreach (var sub in snapshot)
         {
@@ -33,6 +41,21 @@ public sealed class EventBroadcaster(
         }
 
         await Task.CompletedTask;
+    }
+
+    public IReadOnlyList<BlockchainEvent<TransactionMatchedData>> GetRecent(int count = 20, string? ruleFilter = null)
+    {
+        if (count < 1) count = 1;
+        if (count > recentBufferCapacity) count = recentBufferCapacity;
+
+        lock (_lock)
+        {
+            IEnumerable<BlockchainEvent<TransactionMatchedData>> query = _recent;
+            if (!string.IsNullOrWhiteSpace(ruleFilter))
+                query = query.Where(e => e.Data?.RuleId == ruleFilter);
+
+            return query.TakeLast(count).ToList();
+        }
     }
 
     public IEventSubscription Subscribe()

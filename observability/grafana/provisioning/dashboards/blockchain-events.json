@@ -277,9 +277,9 @@
       "id": 20,
       "options": { "legend": { "calcs": ["mean", "max", "lastNotNull"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
       "targets": [
-        { "expr": "histogram_quantile(0.50, rate(blockchain_events_processing_latency_seconds_bucket[5m]))", "legendFormat": "p50", "refId": "A" },
-        { "expr": "histogram_quantile(0.90, rate(blockchain_events_processing_latency_seconds_bucket[5m]))", "legendFormat": "p90", "refId": "B" },
-        { "expr": "histogram_quantile(0.99, rate(blockchain_events_processing_latency_seconds_bucket[5m]))", "legendFormat": "p99", "refId": "C" }
+        { "expr": "histogram_quantile(0.50, sum by (le) (rate(blockchain_events_processing_latency_seconds_bucket[5m])))", "legendFormat": "p50", "refId": "A" },
+        { "expr": "histogram_quantile(0.90, sum by (le) (rate(blockchain_events_processing_latency_seconds_bucket[5m])))", "legendFormat": "p90", "refId": "B" },
+        { "expr": "histogram_quantile(0.99, sum by (le) (rate(blockchain_events_processing_latency_seconds_bucket[5m])))", "legendFormat": "p99", "refId": "C" }
       ],
       "title": "Event Processing Latency (p50 / p90 / p99)",
       "type": "timeseries"
@@ -348,14 +348,13 @@
           "mappings": [],
           "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
           "unit": "percent",
-          "min": 0,
-          "max": 100
+          "min": 0
         }
       },
       "gridPos": { "h": 7, "w": 6, "x": 0, "y": 30 },
       "id": 30,
       "options": { "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "single", "sort": "none" } },
-      "targets": [{ "expr": "system_runtime_cpu_usage{job=\"blockchain-events\"}", "legendFormat": "CPU %", "refId": "A" }],
+      "targets": [{ "expr": "rate(process_cpu_seconds_total{job=\"blockchain-events\"}[1m]) * 100", "legendFormat": "CPU %", "refId": "A" }],
       "title": "CPU Usage",
       "type": "timeseries"
     },
@@ -367,7 +366,7 @@
           "custom": { "axisCenteredZero": false, "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "drawStyle": "line", "fillOpacity": 20, "gradientMode": "scheme", "hideFrom": { "legend": false, "tooltip": false, "viz": false }, "lineInterpolation": "smooth", "lineWidth": 2, "pointSize": 5, "scaleDistribution": { "type": "linear" }, "showPoints": "never", "spanNulls": true, "stacking": { "group": "A", "mode": "none" }, "thresholdsStyle": { "mode": "off" } },
           "mappings": [],
           "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
-          "unit": "decmbytes",
+          "unit": "bytes",
           "min": 0
         }
       },
@@ -375,11 +374,11 @@
       "id": 31,
       "options": { "legend": { "calcs": ["mean", "max", "lastNotNull"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
       "targets": [
-        { "expr": "system_runtime_working_set{job=\"blockchain-events\"}", "legendFormat": "Working Set", "refId": "A" },
-        { "expr": "system_runtime_gc_heap_size{job=\"blockchain-events\"}", "legendFormat": "GC Heap", "refId": "B" },
-        { "expr": "system_runtime_gc_committed{job=\"blockchain-events\"}", "legendFormat": "GC Committed", "refId": "C" }
+        { "expr": "process_working_set_bytes{job=\"blockchain-events\"}", "legendFormat": "Working Set", "refId": "A" },
+        { "expr": "process_private_memory_bytes{job=\"blockchain-events\"}", "legendFormat": "Private Memory", "refId": "B" },
+        { "expr": "dotnet_total_memory_bytes{job=\"blockchain-events\"}", "legendFormat": "GC Heap", "refId": "C" }
       ],
-      "title": "Memory Usage (MB)",
+      "title": "Memory Usage",
       "type": "timeseries"
     },
     {
@@ -398,11 +397,11 @@
       "id": 32,
       "options": { "legend": { "calcs": ["lastNotNull"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
       "targets": [
-        { "expr": "rate(system_runtime_gen_0_gc_count_total{job=\"blockchain-events\"}[1m])", "legendFormat": "Gen 0", "refId": "A" },
-        { "expr": "rate(system_runtime_gen_1_gc_count_total{job=\"blockchain-events\"}[1m])", "legendFormat": "Gen 1", "refId": "B" },
-        { "expr": "rate(system_runtime_gen_2_gc_count_total{job=\"blockchain-events\"}[1m])", "legendFormat": "Gen 2", "refId": "C" }
+        { "expr": "dotnet_collection_count_total{job=\"blockchain-events\",generation=\"0\"}", "legendFormat": "Gen 0", "refId": "A" },
+        { "expr": "dotnet_collection_count_total{job=\"blockchain-events\",generation=\"1\"}", "legendFormat": "Gen 1", "refId": "B" },
+        { "expr": "dotnet_collection_count_total{job=\"blockchain-events\",generation=\"2\"}", "legendFormat": "Gen 2", "refId": "C" }
       ],
-      "title": "GC Collections / min",
+      "title": "GC Collections (total)",
       "type": "timeseries"
     },
     {
@@ -421,11 +420,11 @@
       "id": 33,
       "options": { "legend": { "calcs": ["mean", "lastNotNull"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
       "targets": [
-        { "expr": "system_runtime_threadpool_thread_count{job=\"blockchain-events\"}", "legendFormat": "ThreadPool Threads", "refId": "A" },
-        { "expr": "system_runtime_threadpool_queue_length{job=\"blockchain-events\"}", "legendFormat": "Queue Length", "refId": "B" },
-        { "expr": "system_runtime_active_timer_count{job=\"blockchain-events\"}", "legendFormat": "Active Timers", "refId": "C" }
+        { "expr": "process_num_threads{job=\"blockchain-events\"}", "legendFormat": "Threads", "refId": "A" },
+        { "expr": "process_open_handles{job=\"blockchain-events\"}", "legendFormat": "Open Handles", "refId": "B" },
+        { "expr": "blockchain_events_in_flight{job=\"blockchain-events\"}", "legendFormat": "Events In-Flight", "refId": "C" }
       ],
-      "title": "ThreadPool & Timers",
+      "title": "Threads & Handles",
       "type": "timeseries"
     },
 
@@ -433,7 +432,7 @@
       "collapsed": false,
       "gridPos": { "h": 1, "w": 24, "x": 0, "y": 37 },
       "id": 104,
-      "title": "🌐 Network & Connections",
+      "title": "📡 Throughput & Health",
       "type": "row"
     },
     {
@@ -451,10 +450,11 @@
       "id": 40,
       "options": { "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
       "targets": [
-        { "expr": "rate(system_net_sockets_bytes_received{job=\"blockchain-events\"}[1m])", "legendFormat": "Received", "refId": "A" },
-        { "expr": "rate(system_net_sockets_bytes_sent{job=\"blockchain-events\"}[1m])", "legendFormat": "Sent", "refId": "B" }
+        { "expr": "rate(blockchain_blocks_processed_total{job=\"blockchain-events\"}[1m])", "legendFormat": "Blocks / sec", "refId": "A" },
+        { "expr": "rate(blockchain_transactions_processed_total{job=\"blockchain-events\"}[1m])", "legendFormat": "Tx / sec", "refId": "B" },
+        { "expr": "rate(blockchain_events_emitted_total{job=\"blockchain-events\"}[1m])", "legendFormat": "Events / sec", "refId": "C" }
       ],
-      "title": "Network I/O (bytes/sec)",
+      "title": "Processing throughput",
       "type": "timeseries"
     },
     {
@@ -473,11 +473,11 @@
       "id": 41,
       "options": { "legend": { "calcs": ["mean", "lastNotNull"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
       "targets": [
-        { "expr": "system_net_http_current_requests{job=\"blockchain-events\"}", "legendFormat": "Active HTTP Requests", "refId": "A" },
-        { "expr": "microsoft_aspnetcore_server_kestrel_current_connections{job=\"blockchain-events\"}", "legendFormat": "Kestrel Connections", "refId": "B" },
-        { "expr": "microsoft_aspnetcore_server_kestrel_current_upgraded_requests{job=\"blockchain-events\"}", "legendFormat": "WebSocket Upgrades", "refId": "C" }
+        { "expr": "up{job=\"blockchain-events\"}", "legendFormat": "Worker up", "refId": "A" },
+        { "expr": "blockchain_enabled_rules_total{job=\"blockchain-events\"}", "legendFormat": "Enabled rules", "refId": "B" },
+        { "expr": "blockchain_events_in_flight{job=\"blockchain-events\"}", "legendFormat": "In-flight", "refId": "C" }
       ],
-      "title": "Active Connections",
+      "title": "Worker health",
       "type": "timeseries"
     },
     {
@@ -495,10 +495,10 @@
       "id": 42,
       "options": { "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
       "targets": [
-        { "expr": "histogram_quantile(0.50, rate(system_net_http_http_client_request_duration_bucket{job=\"blockchain-events\"}[5m]))", "legendFormat": "p50", "refId": "A" },
-        { "expr": "histogram_quantile(0.95, rate(system_net_http_http_client_request_duration_bucket{job=\"blockchain-events\"}[5m]))", "legendFormat": "p95", "refId": "B" }
+        { "expr": "histogram_quantile(0.50, sum by (le) (rate(blockchain_events_processing_latency_seconds_bucket{job=\"blockchain-events\"}[5m])))", "legendFormat": "p50", "refId": "A" },
+        { "expr": "histogram_quantile(0.95, sum by (le) (rate(blockchain_events_processing_latency_seconds_bucket{job=\"blockchain-events\"}[5m])))", "legendFormat": "p95", "refId": "B" }
       ],
-      "title": "Outbound HTTP Latency (Dapr Calls)",
+      "title": "Event processing latency",
       "type": "timeseries"
     },
 

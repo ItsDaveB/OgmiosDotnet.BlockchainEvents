@@ -12,9 +12,9 @@
 
 ## Overview
 
-Milestone 4 packages the complete system for public adoption: versioned Docker images on GHCR, a GitHub Release with configuration templates and setup instructions, NuGet libraries for the Domain and Engine layers (nuget.org + GitHub Packages), example filter profiles (governance, treasury, metadata), enterprise-oriented quality gates, community onboarding documentation, a full test report, and close-out media (report; YouTube video and social post pending).
+Milestone 4 packages the complete system for public adoption: versioned Docker images on GHCR, a GitHub Release with configuration templates and setup instructions, NuGet libraries for the Domain and Engine layers (nuget.org + GitHub Packages), example filter profiles (governance, treasury, metadata), enterprise-oriented quality gates, community onboarding documentation, a full test report, a tabbed consumer close-out demo (including the Minswap haul visualisation), and close-out media (YouTube demo published; X/social post left as a placeholder below).
 
-Prior milestones established filtering ([M1](../milestone-1/proof-of-achievement.md)), delivery ([M2](../milestone-2/proof-of-achievement.md)), and visualisation ([M3](../milestone-3/proof-of-achievement.md)). This milestone makes those components releasable and adoptable.
+Prior milestones established filtering ([M1](../milestone-1/proof-of-achievement.md)), delivery ([M2](../milestone-2/proof-of-achievement.md)), and visualisation ([M3](../milestone-3/proof-of-achievement.md)). This milestone makes those components releasable, demo-ready for reviewers, and adoptable.
 
 ---
 
@@ -70,10 +70,10 @@ Implementation detail: rules bind from `Rules:*` configuration sections (technic
 | PolicyIdAsset registration | Rule wired and configurable (disabled by default) |
 | Packaging metadata | `Directory.Build.props` + packable Domain/Engine projects |
 | CI quality gates | Format verify, CodeQL (`security-extended` + `security-and-quality`), Docker builds, TRX upload |
-| Tests | 76 unit tests, 100% pass — see [`test-report.md`](test-report.md) |
+| Tests | 77 unit tests, 100% pass — see [`test-report.md`](test-report.md) |
 | Release pipeline | Tag-driven GHCR + NuGet.org Trusted Publishing + GitHub Packages + GitHub Release |
 
-### Output 5 — Community Onboarding Materials
+### Output 5 — Community Onboarding Materials & Close-out Consumer Demo
 
 | Document | Purpose |
 | -------- | ------- |
@@ -83,6 +83,17 @@ Implementation detail: rules bind from `Rules:*` configuration sections (technic
 | [`docs/ui-consumer-guide.md`](../../docs/ui-consumer-guide.md) | UI extension |
 | [`CONTRIBUTING.md`](../../CONTRIBUTING.md) | Contributor workflow |
 | [`README.md`](../../README.md) | Quick start + package/image references |
+
+The React event viewer (`tools/event-viewer`) ships a **tabbed close-out consumer showcase** for final demo narration:
+
+| Tab | Purpose |
+| --- | ------- |
+| **Overview** | Tip/stats, block stream, and launch cards into the other demos |
+| **Minswap Demo** | Interactive dual-lane haul visualisation for `address-match` DEX swaps (buy ← / sell →), with optional demo convoy |
+| **Live Feed** | Sortable CloudEvents table + block focus (M3 consumer table) |
+| **Consumers** | SSE / gRPC / HTTP surfaces with copy-ready endpoints |
+
+Deep links: `#overview`, `#minswap`, `#feed`, `#consumers`. Address Match viewer: `http://localhost:4023/#minswap`.
 
 ### Output 6 — NuGet Packages
 
@@ -100,23 +111,26 @@ dotnet add package OgmiosDotnet.BlockchainEvents.Engine --version 1.0.0
 
 ### Output 7 — Test Report
 
-[`test-report.md`](test-report.md) — **76/76 tests passing** (`dotnet test --configuration Release`).
+[`test-report.md`](test-report.md) — **77/77 tests passing** (`dotnet test --configuration Release`).
 
 ### Output 8 — Close-out Report
 
 [`close-out-report.md`](close-out-report.md) — deliverables, successes, learnings, and future improvements.
 
-### Output 9 — Close-out Video (YouTube)
+### Output 9 — Close-out Video (YouTube / Demo Link)
 
-Narrated walkthrough: setup → example filters → live visualisation → monitoring.
+Narrated walkthrough: setup → example filters → tabbed consumer UI (Overview → Minswap haul → Live Feed → Consumers) → monitoring.
 
-> **Video link:** `TBD` — add YouTube URL after upload
+> **Demo / YouTube link:** [https://youtu.be/-UUB0f4Dwfg](https://youtu.be/-UUB0f4Dwfg)
 
-### Output 10 — Social Media Demo Post
+Suggested video beats: `docker compose up` → rule filter chips → **Launch Minswap Demo** → cargo inspect → Live Feed payload drawer → Consumers tab copy URL → Grafana.
+
+### Output 10 — Social Media Demo Post (X)
 
 Public post from [@ItsDave_ADA](https://x.com/ItsDave_ADA) showcasing functioning filters, developer details, and transaction visualisation, with view/engagement metrics.
 
-> **Post link / metrics:** `TBD` — add after publishing
+> **X / social post link:** `TBD` — *(placeholder — paste URL after publishing)*  
+> **Engagement metrics:** `TBD` — views / likes / reposts / replies
 
 ---
 
@@ -136,7 +150,7 @@ Governance, treasury, and metadata examples under [`examples/`](../../examples/)
 
 ### AC-4: Enterprise standards for quality, security, maintainability; technical debt resolved — **Met**
 
-Config-bound rules, CI format + CodeQL + tests, packable libraries, 76/76 tests passing. Evidence: [`test-report.md`](test-report.md), [Actions](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/actions).
+Config-bound rules, CI format + CodeQL + tests, packable libraries, 77/77 tests passing. Evidence: [`test-report.md`](test-report.md), [Actions](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/actions).
 
 ### AC-5: Onboarding documentation enables independent adoption — **Met**
 
@@ -148,15 +162,15 @@ Config-bound rules, CI format + CodeQL + tests, packable libraries, 76/76 tests 
 
 ### AC-7: Test report exists; all tests passing — **Met**
 
-[`test-report.md`](test-report.md) — 76 passed, 0 failed.
+[`test-report.md`](test-report.md) — 77 passed, 0 failed.
 
 ### AC-8: Close-out report summarises outcomes, learnings, improvements — **Met**
 
 [`close-out-report.md`](close-out-report.md).
 
-### AC-9: Close-out video summarises work, setup, custom filters, live visualisation — **Pending**
+### AC-9: Close-out video summarises work, setup, custom filters, live visualisation — **Met**
 
-YouTube link in [Demo Video](#demo-video) section (fill after upload).
+YouTube link in [Demo Video](#demo-video) section: [https://youtu.be/-UUB0f4Dwfg](https://youtu.be/-UUB0f4Dwfg).
 
 ### AC-10: Social media demo post with metrics — **Pending**
 
@@ -176,8 +190,10 @@ Linked in evidence table (fill after posting from [@ItsDave_ADA](https://x.com/I
 | 6 | NuGet package | [Domain 1.0.0](https://www.nuget.org/packages/OgmiosDotnet.BlockchainEvents.Domain/1.0.0), [Engine 1.0.0](https://www.nuget.org/packages/OgmiosDotnet.BlockchainEvents.Engine/1.0.0) | Done |
 | 7 | Test report (all passing) | [`test-report.md`](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/blob/main/reports/milestone-4/test-report.md) | Done |
 | 8 | Close-out report | [`close-out-report.md`](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/blob/main/reports/milestone-4/close-out-report.md) | Done |
-| 9 | Close-out video | `TBD` YouTube URL | Pending |
+| 9 | Close-out video | [https://youtu.be/-UUB0f4Dwfg](https://youtu.be/-UUB0f4Dwfg) | Done |
 | 10 | Social media post + metrics | `TBD` — [@ItsDave_ADA](https://x.com/ItsDave_ADA) | Pending |
+| — | Tabbed consumer demo (UI) | [`tools/event-viewer`](../../tools/event-viewer/) — tabs `#overview` `#minswap` `#feed` `#consumers` | Done |
+| — | Minswap haul screenshots | [`screenshots/`](screenshots/) | Done |
 
 ---
 
@@ -189,7 +205,7 @@ cd OgmiosDotnet.BlockchainEvents
 git checkout v1.0.0
 docker compose up --build          # default demo rules
 ./examples/run-example.sh metadata # or governance | treasury
-dotnet test                        # 76 tests — 100% pass rate
+dotnet test                        # 77 tests — 100% pass rate
 ```
 
 | Service | URL |
@@ -210,20 +226,11 @@ docker pull ghcr.io/itsdaveb/ogmiosdotnet.blockchainevents/event-viewer:1.0.0
 
 ## Demo Video
 
-> **Video link:** `TBD`
+> **Demo / YouTube link:** [https://youtu.be/-UUB0f4Dwfg](https://youtu.be/-UUB0f4Dwfg)
 
-Close-out walkthrough covering setup, custom transaction filters (governance / treasury / metadata examples), live visualisation in the React event viewer, and monitoring via Grafana.
+Close-out walkthrough covering setup, custom transaction filters (governance / treasury / metadata examples), the tabbed consumer demo (including Minswap haul), live CloudEvents feed, consumer API surfaces, and monitoring via Grafana.
 
----
+## Social Media Post
 
-## Publication Checklist (operator)
-
-1. [x] Merge PR / commit Milestone 4 changes to `main`
-2. [x] Update **Commit** field in this file to the release SHA (`badd71e`)
-3. [x] nuget.org → Trusted Publishing policy for `ItsDaveB` / `OgmiosDotnet.BlockchainEvents` / `release.yml`
-4. [x] Set repo secret `NUGET_USER` to nuget.org **profile name** (policy creator)
-5. [x] Tag and push `v1.0.0`
-6. [x] Confirm GHCR images, GitHub Release, and NuGet packages (nuget.org + GitHub Packages)
-7. [ ] Record & upload YouTube close-out video; paste URL above
-8. [ ] Publish social demo post from [@ItsDave_ADA](https://x.com/ItsDave_ADA); paste URL + metrics
-9. [ ] Submit Milestone 4 evidence links on the proposal portal
+> **X post link:** `TBD`  
+> **Metrics:** `TBD`

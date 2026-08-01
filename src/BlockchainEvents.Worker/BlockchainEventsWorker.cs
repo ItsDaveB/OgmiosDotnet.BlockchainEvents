@@ -18,7 +18,8 @@ public sealed class BlockchainEventsWorker(
         var skipDapr = Environment.GetEnvironmentVariable("SKIP_DAPR") == "true";
         var demoEvents = Environment.GetEnvironmentVariable("DEMO_EVENTS") == "true";
 
-        if (!skipDapr)
+        // Demo seeding only needs the local SSE/gRPC broadcaster — don't die if the sidecar is slow.
+        if (!skipDapr && !demoEvents)
             await WaitForDaprSidecarAsync(stoppingToken);
 
         metrics.SetEnabledRules(ruleEngine.EnabledRuleCount, ruleEngine.EnabledRuleNames);

@@ -18,7 +18,10 @@ public static class SubscriptionEndpoints
         app.MapGet("/dapr/subscribe", () => Results.Json(new[]
         {
             new { pubsubname = "pubsub", topic = "blockchain-events", route = "/events/blockchain" }
-        }));
+        }))
+        .WithName("DaprSubscribe")
+        .WithTags("Dapr")
+        .WithDescription("Dapr pub/sub subscription discovery document.");
 
         app.MapPost("/events/blockchain", async (HttpContext context) =>
         {
@@ -54,17 +57,36 @@ public static class SubscriptionEndpoints
                 logger.LogError(ex, "Error processing event");
                 return Results.StatusCode(500);
             }
-        });
+        })
+        .WithName("ReceiveBlockchainEvent")
+        .WithTags("Dapr")
+        .WithDescription("Dapr pub/sub delivery endpoint for blockchain CloudEvents.");
 
-        app.MapGet("/subscriptions/status", () =>
+        app.MapGet("/subscriptions/status", (IEventBroadcaster broadcaster) =>
         {
             var ticks = Interlocked.Read(ref _lastEventTimeTicks);
-            var lastTime = ticks == DateTimeOffset.MinValue.Ticks ? null : new DateTimeOffset(ticks, TimeSpan.Zero).ToString("o");
+            var lastTime = ticks == DateTimeOffset.MinValue.Ticks
+                ? null
+                : new DateTimeOffset(ticks, TimeSpan.Zero).ToString("o");
+            var recent = broadcaster.GetRecent(100);
+            var demoMode = Environment.GetEnvironmentVariable("DEMO_EVENTS") == "true";
+
             return new
             {
                 eventsReceived = Interlocked.Read(ref _eventsReceived),
-                lastEventTime = lastTime
+                lastEventTime = lastTime,
+                daprDeliveryPath = "/events/blockchain",
+                activeStreamSubscribers = broadcaster.SubscriberCount,
+                recentBroadcastCount = recent.Count,
+                demoEvents = demoMode,
+                note = "eventsReceived counts CloudEvents delivered by Dapr to POST /events/blockchain. " +
+                       "recentBroadcastCount is the in-process fan-out buffer used by SSE/gRPC."
             };
-        });
+        })
+        .WithName("SubscriptionStatus")
+        .WithTags("Subscriptions")
+        .WithDescription(
+            "Subscription activity: Dapr HTTP deliveries (eventsReceived) plus in-process broadcast buffer size. " +
+            "With DEMO_EVENTS=true, events are published to Dapr so this counter should increase.");
     }
 }

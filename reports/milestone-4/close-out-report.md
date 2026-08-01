@@ -18,7 +18,7 @@ Across four milestones the project delivered a production-oriented Cardano trans
 | **1** | Core filtering & event emission | Rule engine, 5 built-in rules, CloudEvents 1.0, Docker Compose, observability, CI |
 | **2** | Event delivery layer | Redis Streams / Dapr pub-sub, HTTP + gRPC, retry/DLQ, OpenAPI, Postman, benchmarks |
 | **3** | Interactive consumer & visualisation | React SSE dashboard, rule filter UI, modular backend/frontend split |
-| **4** | Finalisation & community release | Versioned packaging (GHCR + NuGet.org), example configs, onboarding docs, test & close-out reports |
+| **4** | Finalisation & community release | Versioned packaging (GHCR + NuGet.org), example configs, onboarding docs, tabbed consumer close-out demo (Minswap haul), test & close-out reports |
 
 ### Milestone 4 deliverables
 
@@ -26,12 +26,12 @@ Across four milestones the project delivered a production-oriented Cardano trans
 2. **Versioned GitHub release** — [`v1.0.0`](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/releases/tag/v1.0.0) with source tag, NuGet artifacts, configuration templates, and setup instructions.
 3. **Example configurations** — Governance, treasury, and metadata profiles under [`examples/`](../../examples/) with `run-example.sh` and `WORKER_APPSETTINGS` support.
 4. **Code quality / technical debt** — Rules bound from configuration (no hardcoded demo options in `Program.cs`); PolicyIdAsset rule registered; packaging metadata via `Directory.Build.props`; CI format + CodeQL + test TRX artifacts retained.
-5. **Community onboarding** — [`docs/getting-started.md`](../../docs/getting-started.md), expanded README/CONTRIBUTING, example docs.
+5. **Community onboarding** — [`docs/getting-started.md`](../../docs/getting-started.md), expanded README/CONTRIBUTING, example docs, and a **tabbed close-out consumer UI** (Overview / Minswap Demo / Live Feed / Consumers) including the interactive Minswap haul for address-match DEX filtering.
 6. **NuGet packages** — [`OgmiosDotnet.BlockchainEvents.Domain`](https://www.nuget.org/packages/OgmiosDotnet.BlockchainEvents.Domain/1.0.0) and [`OgmiosDotnet.BlockchainEvents.Engine`](https://www.nuget.org/packages/OgmiosDotnet.BlockchainEvents.Engine/1.0.0) v1.0.0 on nuget.org (Trusted Publishing) and GitHub Packages.
-7. **Test report** — [`test-report.md`](test-report.md) — 76/76 passing.
+7. **Test report** — [`test-report.md`](test-report.md) — 77/77 passing.
 8. **Close-out report** — this document.
-9. **Close-out video** — YouTube walkthrough (setup → filters → visualisation → monitoring) — *pending*.
-10. **Social media demo** — public post from [@ItsDave_ADA](https://x.com/ItsDave_ADA) with engagement metrics — *pending*.
+9. **Close-out video / demo link** — [https://youtu.be/-UUB0f4Dwfg](https://youtu.be/-UUB0f4Dwfg) — YouTube walkthrough (setup → filters → Minswap haul → consumers → monitoring).
+10. **Social media demo** — public post from [@ItsDave_ADA](https://x.com/ItsDave_ADA) with engagement metrics — *placeholder: `TBD`*.
 
 ---
 
@@ -103,5 +103,7 @@ Licence: MIT.
 | Examples | https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/tree/main/examples |
 | Getting started | https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/blob/main/docs/getting-started.md |
 | Prior milestones | [`reports/milestone-1`](../milestone-1/), [`milestone-2`](../milestone-2/), [`milestone-3`](../milestone-3/) |
-| Close-out video | `TBD` |
-| Social media post | `TBD` — [@ItsDave_ADA](https://x.com/ItsDave_ADA) |
+| Close-out video / demo link | [https://youtu.be/-UUB0f4Dwfg](https://youtu.be/-UUB0f4Dwfg) |
+| X / social media post | `TBD` — [@ItsDave_ADA](https://x.com/ItsDave_ADA) |
+| Social engagement metrics | `TBD` — views / likes / reposts / replies |
+| Minswap consumer demo (local) | `http://localhost:4023/#minswap` |

@@ -1,9 +1,37 @@
+# Multi-stage local build — `docker compose up --build` works on a fresh clone
+# (no host-side `dotnet publish` / publish/worker required).
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+WORKDIR /src
+
+# Grpc.Tools' bundled linux_arm64 protoc can SIGSEGV (exit 139) in Docker on
+# Apple Silicon. Use the distro protoc for codegen instead.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends protobuf-compiler \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY OgmiosDotnet.BlockchainEvents.sln ./
+COPY Directory.Build.props ./
+COPY src/BlockchainEvents.Domain/BlockchainEvents.Domain.csproj src/BlockchainEvents.Domain/
+COPY src/BlockchainEvents.Engine/BlockchainEvents.Engine.csproj src/BlockchainEvents.Engine/
+COPY src/BlockchainEvents.Worker/BlockchainEvents.Worker.csproj src/BlockchainEvents.Worker/
+
+RUN dotnet restore src/BlockchainEvents.Worker/BlockchainEvents.Worker.csproj
+
+COPY protos/ protos/
+COPY README.md ./
+COPY src/ src/
+
+RUN dotnet publish src/BlockchainEvents.Worker/BlockchainEvents.Worker.csproj \
+    -c Release \
+    -o /app/publish \
+    -p:Protobuf_ProtocFullPath=/usr/bin/protoc
+
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
 
 RUN groupadd -r appgroup && useradd -r -g appgroup appuser
 
-COPY publish/worker/ .
+COPY --from=build /app/publish .
 
 RUN chown -R appuser:appgroup /app
 

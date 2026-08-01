@@ -27,8 +27,12 @@ git clone https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents.git
 cd OgmiosDotnet.BlockchainEvents
 ./setup.sh                  # optional: adds blockchain.local hostname
 # Edit src/BlockchainEvents.Worker/appsettings.json → Ogmios.Connection
-docker compose up --build
+docker compose up --build   # multi-stage Dockerfiles compile inside the build — no host publish/ needed
 ```
+
+Worker and DemoSubscriber `Dockerfile.local` files run `dotnet restore` / `dotnet publish` in-container, so a fresh clone does not need a host `publish/` directory. After pulling code changes, re-run `docker compose up --build` (add `--force-recreate` if an old container is still running stale bits).
+
+On Apple Silicon, the Worker image install uses the distro `protoc` during the Docker build to avoid a known Grpc.Tools `linux_arm64` crash.
 
 | Service | URL |
 | ------- | --- |

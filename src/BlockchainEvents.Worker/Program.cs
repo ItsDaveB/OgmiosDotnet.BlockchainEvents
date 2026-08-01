@@ -18,8 +18,18 @@ builder.Services.AddOpenApi("v1", options =>
     {
         document.Info.Title = "OgmiosDotnet.BlockchainEvents API";
         document.Info.Version = "v1";
-        document.Info.Description = "Real-time Cardano blockchain event filtering and delivery via CloudEvents 1.0. " +
-                      "Supports HTTP (Dapr pub/sub) and gRPC streaming consumption.";
+        document.Info.Description =
+            "Real-time Cardano blockchain event filtering and delivery via CloudEvents 1.0. " +
+            "Supports HTTP (Dapr pub/sub), gRPC streaming, and SSE.\n\n" +
+            "**Try it out tips:** use server `http://localhost:4000`. " +
+            "`GET /events/stream` is a long-lived SSE connection — prefer " +
+            "`curl -N http://localhost:4000/events/stream` instead of Swagger Execute.";
+
+        // Kestrel advertises http://[::]:4000 / :4010 which browsers cannot call from Swagger UI.
+        document.Servers =
+        [
+            new() { Url = "http://localhost:4000", Description = "HTTP / SSE (local Docker Compose)" }
+        ];
         return Task.CompletedTask;
     });
 });
@@ -86,7 +96,14 @@ var app = builder.Build();
 
 app.UseCors("AllowAll");
 app.MapOpenApi();
-app.UseSwaggerUI(c => c.SwaggerEndpoint("/openapi/v1.json", "BlockchainEvents API v1"));
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/openapi/v1.json", "BlockchainEvents API v1");
+    c.RoutePrefix = "swagger";
+    c.DocumentTitle = "BlockchainEvents API";
+    c.EnableTryItOutByDefault();
+    c.DisplayRequestDuration();
+});
 
 app.MapGrpcService<BlockchainEventGrpcService>();
 app.MapSubscriptionEndpoints();

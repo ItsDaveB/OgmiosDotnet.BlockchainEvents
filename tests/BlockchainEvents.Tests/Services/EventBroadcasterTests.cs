@@ -232,4 +232,20 @@ public class EventBroadcasterTests
 
         count.Should().Be(50);
     }
+
+    [Fact]
+    public async Task GetRecent_ReturnsNewestEvents_WithOptionalRuleFilter()
+    {
+        var broadcaster = CreateBroadcaster();
+        await broadcaster.BroadcastAsync(CreateTestEvent("address-match"));
+        await broadcaster.BroadcastAsync(CreateTestEvent("metadata-key-value"));
+        await broadcaster.BroadcastAsync(CreateTestEvent("address-match"));
+
+        var all = broadcaster.GetRecent(10);
+        all.Should().HaveCount(3);
+
+        var addressOnly = broadcaster.GetRecent(10, "address-match");
+        addressOnly.Should().HaveCount(2);
+        addressOnly.Should().OnlyContain(e => e.Data.RuleId == "address-match");
+    }
 }

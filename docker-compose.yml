@@ -15,6 +15,7 @@ services:
       - ${WORKER_APPSETTINGS:-./src/BlockchainEvents.Worker/appsettings.json}:/app/appsettings.json:ro
     networks:
       - blockchain-events-network
+    restart: unless-stopped
     depends_on:
       redis:
         condition: service_healthy
@@ -29,6 +30,7 @@ services:
       - ./dapr/config:/config:ro
       - ./dapr/secrets:/secrets:ro
     network_mode: 'service:blockchain-events'
+    restart: unless-stopped
     depends_on:
       blockchain-events:
         condition: service_started
@@ -48,6 +50,7 @@ services:
       - ASPNETCORE_URLS=http://+:4001
     networks:
       - blockchain-events-network
+    restart: unless-stopped
     depends_on:
       redis:
         condition: service_healthy
@@ -62,6 +65,7 @@ services:
       - ./dapr/config:/config:ro
       - ./dapr/secrets:/secrets:ro
     network_mode: 'service:demo-subscriber'
+    restart: unless-stopped
     depends_on:
       demo-subscriber:
         condition: service_started
@@ -87,12 +91,13 @@ services:
     command: ['redis-server', '--appendonly', 'yes', '--stop-writes-on-bgsave-error', 'no']
     networks:
       - blockchain-events-network
+    # Wait until Redis has finished loading AOF (PING alone can race with LOADING).
     healthcheck:
-      test: ['CMD', 'redis-cli', 'ping']
+      test: ['CMD-SHELL', 'redis-cli ping | grep -q PONG && redis-cli info persistence | grep -q "loading:0"']
       interval: 5s
-      timeout: 3s
-      retries: 5
-      start_period: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
 
   zipkin:
     image: 'openzipkin/zipkin:latest'
@@ -145,15 +150,30 @@ services:
       - placement
 
   redis-commander:
+    # Official image is linux/amd64-only; on Apple Silicon Docker runs it via emulation.
+    platform: linux/amd64
     image: 'rediscommander/redis-commander:latest'
     ports:
       - '4006:8081'
     environment:
+      # label:host:port — UI at http://localhost:4006
       - REDIS_HOSTS=local:redis:6379
+      - HTTP_USER=
+      - HTTP_PASSWORD=
     networks:
       - blockchain-events-network
     depends_on:
-      - redis
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    # Image healthcheck.js often exceeds the default 2s timeout and marks the
+    # container unhealthy even while the UI is serving fine — override it.
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://127.0.0.1:8081/']
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
 
   event-viewer-1:
     build:

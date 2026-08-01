@@ -1,6 +1,11 @@
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
+# Distro protoc avoids Grpc.Tools bundled linux_arm64 protoc SIGSEGV in some environments.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends protobuf-compiler \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY OgmiosDotnet.BlockchainEvents.sln ./
 COPY Directory.Build.props ./
 COPY src/BlockchainEvents.Domain/BlockchainEvents.Domain.csproj src/BlockchainEvents.Domain/
@@ -15,12 +20,14 @@ COPY src/ src/
 
 RUN dotnet publish src/BlockchainEvents.Worker/BlockchainEvents.Worker.csproj \
     -c Release \
-    -o /app/publish
+    -o /app/publish \
+    -p:Protobuf_ProtocFullPath=/usr/bin/protoc
 
 FROM build AS debug
 RUN dotnet publish src/BlockchainEvents.Worker/BlockchainEvents.Worker.csproj \
     -c Debug \
-    -o /app/debug-publish
+    -o /app/debug-publish \
+    -p:Protobuf_ProtocFullPath=/usr/bin/protoc
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app

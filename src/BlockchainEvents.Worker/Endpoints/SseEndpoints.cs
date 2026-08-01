@@ -10,6 +10,27 @@ public static class SseEndpoints
 
     public static void MapSseEndpoints(this WebApplication app)
     {
+        // Fast JSON snapshot for Swagger / curl demos (SSE stream is long-lived).
+        app.MapGet("/events/recent", (
+            IEventBroadcaster broadcaster,
+            int? limit,
+            string? ruleFilter) =>
+        {
+            var take = Math.Clamp(limit ?? 20, 1, 100);
+            var events = broadcaster.GetRecent(take, ruleFilter);
+            return Results.Ok(new
+            {
+                count = events.Count,
+                ruleFilter = ruleFilter,
+                events
+            });
+        })
+        .WithName("RecentEvents")
+        .WithTags("Streaming")
+        .WithDescription(
+            "Returns the most recent matched CloudEvents as JSON (default 20). " +
+            "Optional: limit, ruleFilter. Use this in Swagger — not /events/stream.");
+
         app.MapGet("/events/stream", async (
             HttpContext context,
             IEventBroadcaster broadcaster,
@@ -104,6 +125,10 @@ public static class SseEndpoints
         })
         .WithName("EventStream")
         .WithTags("Streaming")
-        .WithDescription("Server-Sent Events stream of blockchain events with optional ruleFilter query parameter");
+        .WithDescription(
+            "Long-lived SSE stream — does not return until the client disconnects. " +
+            "For Swagger use GET /events/recent. Live demos: Event Viewer or " +
+            "curl -N \"http://localhost:4000/events/stream\".")
+        .ExcludeFromDescription();
     }
 }

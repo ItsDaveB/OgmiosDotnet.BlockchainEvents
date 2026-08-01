@@ -6,6 +6,8 @@ namespace BlockchainEvents.Worker.Services;
 /// </summary>
 public sealed class DemoEventSeeder(
     IEventBroadcaster broadcaster,
+    DaprClient daprClient,
+    IEventMetrics metrics,
     IOptions<BlockchainEventsOptions> options,
     ILogger<DemoEventSeeder> logger) : BackgroundService
 {
@@ -67,9 +69,31 @@ public sealed class DemoEventSeeder(
                                       CreateAllTx(context, i);
                 }
 
+                var sw = metrics.StartTimer();
+                var ruleName = cloudEvent.Data.RuleName;
+
+                // Publish through Dapr so Redis Streams + /events/blockchain delivery
+                // (and /subscriptions/status) light up during DEMO_EVENTS demos.
+                try
+                {
+                    await daprClient.PublishEventAsync(
+                        options.Value.PubSubName,
+                        options.Value.TopicName,
+                        cloudEvent,
+                        stoppingToken);
+                }
+                catch (Exception ex)
+                {
+                    logger.LogWarning(ex, "Demo Dapr publish failed for {Rule}; continuing with in-process broadcast", ruleName);
+                }
+
                 await broadcaster.BroadcastAsync(cloudEvent, stoppingToken);
+                metrics.RecordEventEmitted(ruleName);
+                metrics.RecordProcessingLatency(sw.Elapsed.TotalMilliseconds, ruleName);
+                EventMetrics.CompleteProcessing();
             }
 
+            metrics.RecordBlockProcessed(_slot, txCount);
             logger.LogInformation("Demo block {Height} emitted ({TxCount} matched events)", _height, txCount);
             await Task.Delay(_rng.Next(1200, 2200), stoppingToken);
         }

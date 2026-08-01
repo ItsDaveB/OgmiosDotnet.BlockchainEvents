@@ -3,7 +3,7 @@
 **Project:** OgmiosDotnet.BlockchainEvents  
 **Repository:** [github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents)  
 **Milestone:** 4 — Finalisation, Documentation & Community Release  
-**Date:** July 2026  
+**Date:** July 2026 (re-verified 1 August 2026)  
 **Release:** [`v1.0.0`](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/releases/tag/v1.0.0) (`badd71e`)  
 **Command:** `dotnet test --configuration Release`
 
@@ -14,18 +14,18 @@
 | Metric | Value |
 | ------ | ----- |
 | Result | **Successful** |
-| Total tests | **76** |
-| Passed | **76** |
+| Total tests | **77** |
+| Passed | **77** |
 | Failed | **0** |
 | Skipped | **0** |
 | Pass rate | **100%** |
-| Duration | ~1.2 seconds |
+| Duration | ~0.1 seconds |
 
 ```
 Test Run Successful.
-Total tests: 76
-     Passed: 76
- Total time: 1.1893 Seconds
+Total tests: 77
+     Passed: 77
+ Total time: 0.112 Seconds
 ```
 
 ---
@@ -42,7 +42,7 @@ Total tests: 76
 | Rule engine | `RuleEngineTests` | Multi-rule evaluation, disabled rules, empty set |
 | CloudEvents | `BlockchainEventFactoryTests` | Schema, Cardano extensions, unique IDs |
 | Checkpoints | `SyncCheckpointTests`, `DaprCheckpointServiceTests` | Serialization, ETag concurrency |
-| Broadcast / gRPC | `EventBroadcasterTests`, `BlockchainEventGrpcServiceTests` | Channel capacity, filtering, field mapping |
+| Broadcast / gRPC | `EventBroadcasterTests`, `BlockchainEventGrpcServiceTests` | Channel capacity, filtering, `GetRecent` buffer, field mapping |
 
 ---
 
@@ -76,4 +76,4 @@ dotnet test --configuration Release --logger trx --results-directory TestResults
 
 ## Conclusion
 
-All **76** unit tests pass with a **100%** pass rate. The suite covers built-in rules (including governance, treasury, and metadata scenarios used by the example configurations), CloudEvents emission, checkpoint persistence, and gRPC/SSE delivery primitives required for enterprise adoption.
+All **77** unit tests pass with a **100%** pass rate. The suite covers built-in rules (including governance, treasury, and metadata scenarios used by the example configurations), CloudEvents emission, checkpoint persistence, and gRPC/SSE delivery primitives required for enterprise adoption.
