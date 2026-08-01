@@ -12,7 +12,7 @@
 
 ## Overview
 
-Milestone 4 packages the complete system for public adoption: versioned Docker images on GHCR, a GitHub Release with configuration templates and setup instructions, NuGet libraries for the Domain and Engine layers (nuget.org + GitHub Packages), example filter profiles (governance, treasury, metadata), enterprise-oriented quality gates, community onboarding documentation, a full test report, a tabbed consumer close-out demo (including the Minswap haul visualisation), and close-out media (YouTube demo published; X/social post left as a placeholder below).
+Milestone 4 packages the complete system for public adoption: versioned Docker images on GHCR, a GitHub Release with configuration templates and setup instructions, NuGet libraries for the Domain and Engine layers (nuget.org + GitHub Packages), example filter profiles (governance, treasury, metadata), enterprise-oriented quality gates, community onboarding documentation, a full test report, a tabbed consumer close-out demo (including the Minswap haul visualisation), and close-out media (YouTube demo and X/social post published).
 
 Prior milestones established filtering ([M1](../milestone-1/proof-of-achievement.md)), delivery ([M2](../milestone-2/proof-of-achievement.md)), and visualisation ([M3](../milestone-3/proof-of-achievement.md)). This milestone makes those components releasable, demo-ready for reviewers, and adoptable.
 
@@ -129,8 +129,8 @@ Suggested video beats: `docker compose up` → rule filter chips → **Launch Mi
 
 Public post from [@ItsDave_ADA](https://x.com/ItsDave_ADA) showcasing functioning filters, developer details, and transaction visualisation, with view/engagement metrics.
 
-> **X / social post link:** `TBD` — *(placeholder — paste URL after publishing)*  
-> **Engagement metrics:** `TBD` — views / likes / reposts / replies
+> **X / social post link:** [https://x.com/ItsDave_ADA/status/2083529870584226143](https://x.com/ItsDave_ADA/status/2083529870584226143?s=20)  
+> **Engagement metrics:** See live views / likes / reposts / replies on the post.
 
 ---
 
@@ -172,9 +172,9 @@ Config-bound rules, CI format + CodeQL + tests, packable libraries, 77/77 tests 
 
 YouTube link in [Demo Video](#demo-video) section: [https://youtu.be/-UUB0f4Dwfg](https://youtu.be/-UUB0f4Dwfg).
 
-### AC-10: Social media demo post with metrics — **Pending**
+### AC-10: Social media demo post with metrics — **Met**
 
-Linked in evidence table (fill after posting from [@ItsDave_ADA](https://x.com/ItsDave_ADA)).
+Public post from [@ItsDave_ADA](https://x.com/ItsDave_ADA): [https://x.com/ItsDave_ADA/status/2083529870584226143](https://x.com/ItsDave_ADA/status/2083529870584226143?s=20).
 
 ---
 
@@ -191,7 +191,7 @@ Linked in evidence table (fill after posting from [@ItsDave_ADA](https://x.com/I
 | 7 | Test report (all passing) | [`test-report.md`](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/blob/main/reports/milestone-4/test-report.md) | Done |
 | 8 | Close-out report | [`close-out-report.md`](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/blob/main/reports/milestone-4/close-out-report.md) | Done |
 | 9 | Close-out video | [https://youtu.be/-UUB0f4Dwfg](https://youtu.be/-UUB0f4Dwfg) | Done |
-| 10 | Social media post + metrics | `TBD` — [@ItsDave_ADA](https://x.com/ItsDave_ADA) | Pending |
+| 10 | Social media post + metrics | [https://x.com/ItsDave_ADA/status/2083529870584226143](https://x.com/ItsDave_ADA/status/2083529870584226143?s=20) | Done |
 | — | Tabbed consumer demo (UI) | [`tools/event-viewer`](../../tools/event-viewer/) — tabs `#overview` `#minswap` `#feed` `#consumers` | Done |
 | — | Minswap haul screenshots | [`screenshots/`](screenshots/) | Done |
 
@@ -232,5 +232,5 @@ Close-out walkthrough covering setup, custom transaction filters (governance / t
 
 ## Social Media Post
 
-> **X post link:** `TBD`  
-> **Metrics:** `TBD`
+> **X post link:** [https://x.com/ItsDave_ADA/status/2083529870584226143](https://x.com/ItsDave_ADA/status/2083529870584226143?s=20)  
+> **Metrics:** See live engagement on the post.

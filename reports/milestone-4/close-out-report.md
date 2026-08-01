@@ -31,7 +31,7 @@ Across four milestones the project delivered a production-oriented Cardano trans
 7. **Test report** — [`test-report.md`](test-report.md) — 77/77 passing.
 8. **Close-out report** — this document.
 9. **Close-out video / demo link** — [https://youtu.be/-UUB0f4Dwfg](https://youtu.be/-UUB0f4Dwfg) — YouTube walkthrough (setup → filters → Minswap haul → consumers → monitoring).
-10. **Social media demo** — public post from [@ItsDave_ADA](https://x.com/ItsDave_ADA) with engagement metrics — *placeholder: `TBD`*.
+10. **Social media demo** — [https://x.com/ItsDave_ADA/status/2083529870584226143](https://x.com/ItsDave_ADA/status/2083529870584226143?s=20) — public post from [@ItsDave_ADA](https://x.com/ItsDave_ADA).
 
 ---
 
@@ -104,6 +104,6 @@ Licence: MIT.
 | Getting started | https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/blob/main/docs/getting-started.md |
 | Prior milestones | [`reports/milestone-1`](../milestone-1/), [`milestone-2`](../milestone-2/), [`milestone-3`](../milestone-3/) |
 | Close-out video / demo link | [https://youtu.be/-UUB0f4Dwfg](https://youtu.be/-UUB0f4Dwfg) |
-| X / social media post | `TBD` — [@ItsDave_ADA](https://x.com/ItsDave_ADA) |
-| Social engagement metrics | `TBD` — views / likes / reposts / replies |
+| X / social media post | [https://x.com/ItsDave_ADA/status/2083529870584226143](https://x.com/ItsDave_ADA/status/2083529870584226143?s=20) |
+| Social engagement metrics | See live views / likes / reposts / replies on the post |
 | Minswap consumer demo (local) | `http://localhost:4023/#minswap` |

@@ -11,6 +11,14 @@ services:
       - ASPNETCORE_URLS=http://+:4000
       # Set DEMO_EVENTS=true to preview the UI with synthetic blocks (no Ogmios required).
       - DEMO_EVENTS=${DEMO_EVENTS:-false}
+      # Full-stack throughput bench (RuleEngine → Dapr → Redis). Mutually exclusive with live Ogmios.
+      - BENCH_LOAD=${BENCH_LOAD:-false}
+      - BENCH_TX_PER_BLOCK=${BENCH_TX_PER_BLOCK:-64}
+      - BENCH_DELAY_MS=${BENCH_DELAY_MS:-0}
+      - BENCH_DURATION_SEC=${BENCH_DURATION_SEC:-0}
+      - Logging__LogLevel__Default=${BENCH_LOG_LEVEL:-Information}
+      - Logging__LogLevel__BlockchainEvents=${BENCH_LOG_LEVEL:-Information}
+      - Logging__LogLevel__BlockchainEvents.Worker.Services.DaprEventEmitter=${BENCH_EMIT_LOG_LEVEL:-Information}
     volumes:
       - ${WORKER_APPSETTINGS:-./src/BlockchainEvents.Worker/appsettings.json}:/app/appsettings.json:ro
     networks:

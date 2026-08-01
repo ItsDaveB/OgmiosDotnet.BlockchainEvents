@@ -17,17 +17,19 @@ public sealed class BlockchainEventsWorker(
     {
         var skipDapr = Environment.GetEnvironmentVariable("SKIP_DAPR") == "true";
         var demoEvents = Environment.GetEnvironmentVariable("DEMO_EVENTS") == "true";
+        var benchLoad = Environment.GetEnvironmentVariable("BENCH_LOAD") == "true";
 
-        // Demo seeding only needs the local SSE/gRPC broadcaster — don't die if the sidecar is slow.
-        if (!skipDapr && !demoEvents)
+        // Demo/bench seeders only need the local SSE/gRPC broadcaster — don't die if the sidecar is slow.
+        if (!skipDapr && !demoEvents && !benchLoad)
             await WaitForDaprSidecarAsync(stoppingToken);
 
         metrics.SetEnabledRules(ruleEngine.EnabledRuleCount, ruleEngine.EnabledRuleNames);
 
-        if (demoEvents)
+        if (demoEvents || benchLoad)
         {
             logger.LogWarning(
-                "DEMO_EVENTS=true — skipping Ogmios chain sync (synthetic events via DemoEventSeeder). Rules: {Rules}",
+                "{Mode} — skipping Ogmios chain sync. Rules: {Rules}",
+                benchLoad ? "BENCH_LOAD=true" : "DEMO_EVENTS=true",
                 string.Join(", ", ruleEngine.EnabledRuleNames));
             await Task.Delay(Timeout.Infinite, stoppingToken);
             return;

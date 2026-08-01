@@ -87,6 +87,8 @@ builder.Services.AddSingleton<Ogmios.Services.ChainSynchronization.IChainSynchro
 builder.Services.AddHostedService<BlockchainEventsWorker>();
 if (Environment.GetEnvironmentVariable("DEMO_EVENTS") == "true")
     builder.Services.AddHostedService<DemoEventSeeder>();
+if (Environment.GetEnvironmentVariable("BENCH_LOAD") == "true")
+    builder.Services.AddHostedService<BenchLoadSeeder>();
 
 builder.Services.AddCors(options =>
     options.AddPolicy("AllowAll", policy =>
