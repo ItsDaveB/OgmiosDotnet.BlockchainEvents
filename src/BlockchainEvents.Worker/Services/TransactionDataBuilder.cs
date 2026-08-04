@@ -103,7 +103,7 @@ public sealed class TransactionDataBuilder
             kvp => kvp.Key,
             kvp => kvp.Value),
         HasGovernanceAction = _certificateFlags.HasGovernance || _governanceFlags.HasProposals,
-        HasTreasuryWithdrawal = false,
+        HasTreasuryWithdrawal = _governanceFlags.HasTreasuryWithdrawal,
         HasStakeDelegation = _certificateFlags.HasStakeDelegation,
         HasStakeRegistration = _certificateFlags.HasStakeRegistration,
         HasVote = _governanceFlags.HasVotes,
