@@ -70,7 +70,7 @@ Implementation detail: rules bind from `Rules:*` configuration sections (technic
 | PolicyIdAsset registration | Rule wired and configurable (disabled by default) |
 | Packaging metadata | `Directory.Build.props` + packable Domain/Engine projects |
 | CI quality gates | Format verify, CodeQL (`security-extended` + `security-and-quality`), Docker builds, TRX upload |
-| Tests | 77 unit tests, 100% pass — see [`test-report.md`](test-report.md) |
+| Tests | 80 unit tests, 100% pass — see [`test-report.md`](test-report.md) |
 | Release pipeline | Tag-driven GHCR + NuGet.org Trusted Publishing + GitHub Packages + GitHub Release |
 
 ### Output 5 — Community Onboarding Materials & Close-out Consumer Demo
@@ -111,25 +111,28 @@ dotnet add package OgmiosDotnet.BlockchainEvents.Engine --version 1.0.0
 
 ### Output 7 — Test Report
 
-[`test-report.md`](test-report.md) — **77/77 tests passing** (`dotnet test --configuration Release`).
+[`test-report.md`](test-report.md) — **80/80 tests passing** (`dotnet test --configuration Release`).
 
-### Output 8 — Close-out Report
+### Output 8 — Close-out Report (PCR)
 
-[`close-out-report.md`](close-out-report.md) — deliverables, successes, learnings, and future improvements.
+[`close-out-report.md`](close-out-report.md) — Catalyst Project Close-out Report structure (challenge/project KPIs, achievements, learnings, next steps, evidence links, PCV link).
 
-### Output 9 — Close-out Video (YouTube / Demo Link)
+### Output 9 — Close-out Video (PCV) + Technical Demo
 
-Narrated walkthrough: setup → example filters → tabbed consumer UI (Overview → Minswap haul → Live Feed → Consumers) → monitoring.
+Catalyst requires a dedicated **PCV** (2–5 minutes) covering challenge/approach, progress & KPIs, a short product demo, and next steps. Script/shot list: [`close-out-video-script.md`](close-out-video-script.md).
 
-> **Demo / YouTube link:** [https://youtu.be/-UUB0f4Dwfg](https://youtu.be/-UUB0f4Dwfg)
+| Video | Role | Link |
+| ----- | ---- | ---- |
+| **PCV** (official close-out) | 2–5 min archive video per Catalyst guidelines | [https://youtu.be/4B1VjrD4_Og](https://youtu.be/4B1VjrD4_Og) |
+| Technical demo (supplementary) | Longer end-to-end walkthrough | [https://youtu.be/-UUB0f4Dwfg](https://youtu.be/-UUB0f4Dwfg) |
 
-Suggested video beats: `docker compose up` → rule filter chips → **Launch Minswap Demo** → cargo inspect → Live Feed payload drawer → Consumers tab copy URL → Grafana.
+Suggested technical-demo beats: `docker compose up` → rule filter chips → **Launch Minswap Demo** → cargo inspect → Live Feed payload drawer → Consumers tab copy URL → Grafana.
 
 ### Output 10 — Social Media Demo Post (X)
 
-Public post from [@ItsDave_ADA](https://x.com/ItsDave_ADA) showcasing functioning filters, developer details, and transaction visualisation, with view/engagement metrics.
+Public social post showcasing functioning filters, developer details, and transaction visualisation, with view/engagement metrics.
 
-> **X / social post link:** [https://x.com/ItsDave_ADA/status/2083529870584226143](https://x.com/ItsDave_ADA/status/2083529870584226143?s=20)  
+> **Social post link:** [https://x.com/ItsDave_ADA/status/2083529870584226143](https://x.com/ItsDave_ADA/status/2083529870584226143?s=20)  
 > **Engagement metrics:** See live views / likes / reposts / replies on the post.
 
 ---
@@ -150,7 +153,7 @@ Governance, treasury, and metadata examples under [`examples/`](../../examples/)
 
 ### AC-4: Enterprise standards for quality, security, maintainability; technical debt resolved — **Met**
 
-Config-bound rules, CI format + CodeQL + tests, packable libraries, 77/77 tests passing. Evidence: [`test-report.md`](test-report.md), [Actions](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/actions).
+Config-bound rules, CI format + CodeQL + tests, packable libraries, 80/80 tests passing. Evidence: [`test-report.md`](test-report.md), [Actions](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/actions).
 
 ### AC-5: Onboarding documentation enables independent adoption — **Met**
 
@@ -162,19 +165,19 @@ Config-bound rules, CI format + CodeQL + tests, packable libraries, 77/77 tests 
 
 ### AC-7: Test report exists; all tests passing — **Met**
 
-[`test-report.md`](test-report.md) — 77 passed, 0 failed.
+[`test-report.md`](test-report.md) — 80 passed, 0 failed.
 
 ### AC-8: Close-out report summarises outcomes, learnings, improvements — **Met**
 
-[`close-out-report.md`](close-out-report.md).
+[`close-out-report.md`](close-out-report.md) structured to Catalyst PCR headings (KPIs, achievements, learnings, next steps, PCV link).
 
-### AC-9: Close-out video summarises work, setup, custom filters, live visualisation — **Met**
+### AC-9: Close-out video (PCV) summarises challenge, KPIs, demo, next steps — **Met**
 
-YouTube link in [Demo Video](#demo-video) section: [https://youtu.be/-UUB0f4Dwfg](https://youtu.be/-UUB0f4Dwfg).
+Dedicated PCV: [https://youtu.be/4B1VjrD4_Og](https://youtu.be/4B1VjrD4_Og). Script: [`close-out-video-script.md`](close-out-video-script.md). Longer technical demo: [https://youtu.be/-UUB0f4Dwfg](https://youtu.be/-UUB0f4Dwfg).
 
 ### AC-10: Social media demo post with metrics — **Met**
 
-Public post from [@ItsDave_ADA](https://x.com/ItsDave_ADA): [https://x.com/ItsDave_ADA/status/2083529870584226143](https://x.com/ItsDave_ADA/status/2083529870584226143?s=20).
+Public social post: [https://x.com/ItsDave_ADA/status/2083529870584226143](https://x.com/ItsDave_ADA/status/2083529870584226143?s=20).
 
 ---
 
@@ -189,8 +192,8 @@ Public post from [@ItsDave_ADA](https://x.com/ItsDave_ADA): [https://x.com/ItsDa
 | 5 | README + onboarding docs | [`README.md`](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/blob/main/README.md), [`docs/getting-started.md`](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/blob/main/docs/getting-started.md) | Done |
 | 6 | NuGet package | [Domain 1.0.0](https://www.nuget.org/packages/OgmiosDotnet.BlockchainEvents.Domain/1.0.0), [Engine 1.0.0](https://www.nuget.org/packages/OgmiosDotnet.BlockchainEvents.Engine/1.0.0) | Done |
 | 7 | Test report (all passing) | [`test-report.md`](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/blob/main/reports/milestone-4/test-report.md) | Done |
-| 8 | Close-out report | [`close-out-report.md`](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/blob/main/reports/milestone-4/close-out-report.md) | Done |
-| 9 | Close-out video | [https://youtu.be/-UUB0f4Dwfg](https://youtu.be/-UUB0f4Dwfg) | Done |
+| 8 | Close-out report (PCR) | [`close-out-report.md`](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/blob/main/reports/milestone-4/close-out-report.md) | Done |
+| 9 | Close-out video (PCV) | [https://youtu.be/4B1VjrD4_Og](https://youtu.be/4B1VjrD4_Og); technical demo: [https://youtu.be/-UUB0f4Dwfg](https://youtu.be/-UUB0f4Dwfg) | Done |
 | 10 | Social media post + metrics | [https://x.com/ItsDave_ADA/status/2083529870584226143](https://x.com/ItsDave_ADA/status/2083529870584226143?s=20) | Done |
 | — | Tabbed consumer demo (UI) | [`tools/event-viewer`](../../tools/event-viewer/) — tabs `#overview` `#minswap` `#feed` `#consumers` | Done |
 | — | Minswap haul screenshots | [`screenshots/`](screenshots/) | Done |
@@ -205,7 +208,7 @@ cd OgmiosDotnet.BlockchainEvents
 git checkout v1.0.0
 docker compose up --build          # default demo rules
 ./examples/run-example.sh metadata # or governance | treasury
-dotnet test                        # 77 tests — 100% pass rate
+dotnet test                        # 80 tests — 100% pass rate
 ```
 
 | Service | URL |
@@ -224,13 +227,14 @@ docker pull ghcr.io/itsdaveb/ogmiosdotnet.blockchainevents/event-viewer:1.0.0
 
 ---
 
-## Demo Video
+## Demo Video / PCV
 
-> **Demo / YouTube link:** [https://youtu.be/-UUB0f4Dwfg](https://youtu.be/-UUB0f4Dwfg)
+> **PCV (2–5 min official close-out):** [https://youtu.be/4B1VjrD4_Og](https://youtu.be/4B1VjrD4_Og)  
+> **Technical demo (supplementary):** [https://youtu.be/-UUB0f4Dwfg](https://youtu.be/-UUB0f4Dwfg)
 
-Close-out walkthrough covering setup, custom transaction filters (governance / treasury / metadata examples), the tabbed consumer demo (including Minswap haul), live CloudEvents feed, consumer API surfaces, and monitoring via Grafana.
+The PCV is the Catalyst close-out archive video. The longer walkthrough covers setup, custom filters, the tabbed consumer demo (including Minswap haul), live CloudEvents feed, consumer APIs, and Grafana.
 
 ## Social Media Post
 
-> **X post link:** [https://x.com/ItsDave_ADA/status/2083529870584226143](https://x.com/ItsDave_ADA/status/2083529870584226143?s=20)  
+> **Social post link:** [https://x.com/ItsDave_ADA/status/2083529870584226143](https://x.com/ItsDave_ADA/status/2083529870584226143?s=20)  
 > **Metrics:** See live engagement on the post.

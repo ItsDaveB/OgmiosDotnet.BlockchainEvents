@@ -1,109 +1,168 @@
-# Close-out Report
+# Project Close-out Report (PCR)
 
-**Project:** OgmiosDotnet.BlockchainEvents  
-**Repository:** [github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents)  
-**Programme:** Finalisation, Documentation & Community Release (Milestone 4)  
-**Date:** July 2026  
-**Release:** [`v1.0.0`](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/releases/tag/v1.0.0) (`badd71e`)  
-**Author:** [@ItsDave_ADA](https://x.com/ItsDave_ADA) / [ItsDaveB](https://github.com/ItsDaveB)
+## Project identity
 
----
-
-## 1. What Was Completed
-
-Across four milestones the project delivered a production-oriented Cardano transaction filtering and event emission platform:
-
-| Milestone | Theme | Outcome |
-| --------- | ----- | ------- |
-| **1** | Core filtering & event emission | Rule engine, 5 built-in rules, CloudEvents 1.0, Docker Compose, observability, CI |
-| **2** | Event delivery layer | Redis Streams / Dapr pub-sub, HTTP + gRPC, retry/DLQ, OpenAPI, Postman, benchmarks |
-| **3** | Interactive consumer & visualisation | React SSE dashboard, rule filter UI, modular backend/frontend split |
-| **4** | Finalisation & community release | Versioned packaging (GHCR + NuGet.org), example configs, onboarding docs, tabbed consumer close-out demo (Minswap haul), test & close-out reports |
-
-### Milestone 4 deliverables
-
-1. **Containerisation** — Worker and event-viewer images published to GHCR as `1.0.0` (`linux/amd64`) via the release workflow.
-2. **Versioned GitHub release** — [`v1.0.0`](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/releases/tag/v1.0.0) with source tag, NuGet artifacts, configuration templates, and setup instructions.
-3. **Example configurations** — Governance, treasury, and metadata profiles under [`examples/`](../../examples/) with `run-example.sh` and `WORKER_APPSETTINGS` support.
-4. **Code quality / technical debt** — Rules bound from configuration (no hardcoded demo options in `Program.cs`); PolicyIdAsset rule registered; packaging metadata via `Directory.Build.props`; CI format + CodeQL + test TRX artifacts retained.
-5. **Community onboarding** — [`docs/getting-started.md`](../../docs/getting-started.md), expanded README/CONTRIBUTING, example docs, and a **tabbed close-out consumer UI** (Overview / Minswap Demo / Live Feed / Consumers) including the interactive Minswap haul for address-match DEX filtering.
-6. **NuGet packages** — [`OgmiosDotnet.BlockchainEvents.Domain`](https://www.nuget.org/packages/OgmiosDotnet.BlockchainEvents.Domain/1.0.0) and [`OgmiosDotnet.BlockchainEvents.Engine`](https://www.nuget.org/packages/OgmiosDotnet.BlockchainEvents.Engine/1.0.0) v1.0.0 on nuget.org (Trusted Publishing) and GitHub Packages.
-7. **Test report** — [`test-report.md`](test-report.md) — 77/77 passing.
-8. **Close-out report** — this document.
-9. **Close-out video / demo link** — [https://youtu.be/-UUB0f4Dwfg](https://youtu.be/-UUB0f4Dwfg) — YouTube walkthrough (setup → filters → Minswap haul → consumers → monitoring).
-10. **Social media demo** — [https://x.com/ItsDave_ADA/status/2083529870584226143](https://x.com/ItsDave_ADA/status/2083529870584226143?s=20) — public post from [@ItsDave_ADA](https://x.com/ItsDave_ADA).
+| Field | Value |
+| ----- | ----- |
+| **Full proposal / project name** | OgmiosDotnet: Cardano Blockchain Events & Visualisation |
+| **Software / repository name** | OgmiosDotnet.BlockchainEvents |
+| **Fund & challenge** | Catalyst Fund 14 — Cardano Open: Developers (Developer Tools) |
+| **Project number** | `1400091` |
+| **Project URL (Catalyst)** | [OgmiosDotnet: Cardano Blockchain Events & Visualisation](https://projectcatalyst.io/funds/14/cardano-open-developers/ogmiosdotnet-cardano-blockchain-events-and-visualisation) |
+| **Project manager** | Dave ([ItsDaveB](https://github.com/ItsDaveB)) |
+| **Date project started** | January 2026 |
+| **Date project completed** | July 2026 |
+| **Repository** | [github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents) |
+| **Community release** | [`v1.0.0`](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/releases/tag/v1.0.0) (`badd71e`) |
+| **Open source** | Yes — MIT Licence |
 
 ---
 
-## 2. What Went Well
+## Project description
 
-- **Clean architecture held up** — Domain / Engine / Worker separation made NuGet packaging and UI independence straightforward.
-- **Dual delivery (HTTP + gRPC + SSE)** — Same CloudEvents payload across protocols simplified demos and consumer docs.
-- **Demo-friendly stack** — One `docker compose up --build` brings worker, Redis, Dapr, Grafana, and four event viewers.
-- **Milestone proofs as living evidence** — Consistent proof documents under `reports/` made Catalyst review and community hand-off clearer.
-- **Config-driven rules** — Moving rule options into `appsettings.json` unlocked reusable example profiles without code changes.
-- **Keyless NuGet publishing** — nuget.org [Trusted Publishing](https://learn.microsoft.com/nuget/nuget-org/trusted-publishing) removed long-lived API keys from CI.
+**OgmiosDotnet: Cardano Blockchain Events & Visualisation** (repository: **OgmiosDotnet.BlockchainEvents**) is an open-source, production-oriented platform that turns live Cardano chain data into **filtered, reliable application events**.
+
+### Problem
+
+Many Cardano applications only need a subset of on-chain activity—specific addresses, assets, metadata labels, or CIP-1694 governance/treasury transactions. Without shared infrastructure, each team must:
+
+- Run or connect to chain sync (typically via [Ogmios](https://ogmios.dev/))
+- Parse every block and transaction
+- Maintain language-specific Ogmios clients or WebSocket integrations
+- Re-implement filtering, delivery, retry, and observability
+
+That duplicates cost and raises the barrier for developers who simply want “the transactions that matter” over ordinary HTTP or gRPC APIs.
+
+### Solution
+
+The project delivers a **rule-based filtering and event-emission engine** built on the [OgmiosDotnet](https://github.com/ItsDaveB/OgmiosDotnet) ecosystem:
+
+1. **Chain sync** — A .NET Worker connects to Ogmios and processes live (or catch-up) blocks.
+2. **Pluggable rules** — Configurable filters decide which transactions match. Built-in rules cover address match, policy ID / asset, metadata key/value, governance & treasury (including Conway treasury-withdrawal proposals), and an all-transactions catch-all. Custom rules can be added without rewriting the pipeline.
+3. **Standardised events** — Matches are emitted as [CloudEvents 1.0](https://cloudevents.io/) with Cardano-oriented extensions, so downstream systems share one schema.
+4. **Dual delivery** — The same events are available via **HTTP** (Dapr pub/sub over Redis Streams), **gRPC** server-streaming, and **SSE** for browsers—so consumers need no Ogmios SDK and can be written in any language.
+5. **Reliability** — At-least-once delivery with retry and dead-letter handling; Dapr state-store checkpointing with ETag concurrency for safe resume after restart.
+6. **Interactive visualisation** — A React event-viewer UI demonstrates real-time consumption (Overview, Minswap demo haul, Live Feed, Consumers), proving that independent frontends can sit on the same delivery layer.
+7. **Packaging for adoption** — Versioned Docker images on GHCR, Domain/Engine libraries on nuget.org, example configs (`governance`, `treasury`, `metadata`), Compose-based local stack (worker, Redis, Dapr, Grafana, viewers), and community docs (getting started, architecture, integration, CONTRIBUTING).
+
+### Architecture (at a glance)
+
+```
+Ogmios (Cardano) → Worker (chain sync) → Rule engine → CloudEvents
+                         ↓
+        Redis / Dapr (pub-sub + checkpoint) → HTTP / gRPC / SSE consumers
+                         ↓
+              React event viewer (example consumer)
+```
+
+Clean separation of **Domain**, **Engine**, and **Worker** keeps filtering logic reusable (NuGet) while the Worker and UI remain independently deployable.
+
+### Who it is for
+
+- .NET and polyglot Cardano builders who want filtered chain events without owning full Ogmios client stacks  
+- DApps, dashboards, monitoring, and analytics that need address-, asset-, metadata-, or governance-focused streams  
+- Operators who want a Compose-friendly local stack and containerised deployment artefacts  
+
+### Funding context
+
+Delivered under **Project Catalyst Fund 14**, challenge **Cardano Open: Developers**, as proposal **OgmiosDotnet: Cardano Blockchain Events & Visualisation** (project `#1400091`), funded at **₳100,000**, across four milestones from core filtering through delivery, visualisation, and community release.
 
 ---
 
-## 3. Learnings
+## List of challenge KPIs and how the project addressed them
 
-- **Hosted Ogmios TLS quirks** (e.g. Demeter name mismatch) need explicit HTTP handler policy; document early for adopters.
-- **Compose volume merges** append rather than replace — use `WORKER_APPSETTINGS` (or equivalent) instead of override files when swapping configs.
-- **Governance / treasury events are sparse on mainnet** — demos should pair rare rules with high-frequency ones (metadata, DEX addresses) so reviewers always see live flow.
-- **Release automation must cover all publishables** — images, NuGet, and GitHub Release notes should ship from one `v*` tag to avoid version drift.
-- **Multi-arch Docker under QEMU** — `linux/arm64` publish via QEMU segfaulted on Grpc.Tools/`protoc`; `v1.0.0` ships `linux/amd64` for reliability (native arm64 builders can restore multi-arch later).
-- **Trusted Publishing policy ownership** — `NUGET_USER` must be the nuget.org username of the **policy creator**, and the policy must target workflow file `release.yml`.
-- **Catalyst evidence wants stable URLs** — pin commits in proofs and prefer tagged releases over floating `main` links.
+Challenge: **Fund 14 — Cardano Open: Developers** (Developer Tools).
 
----
-
-## 4. Potential Improvements
-
-| Area | Opportunity |
-| ---- | ----------- |
-| Persistence | Optional PostgreSQL / Kafka backends alongside Redis Streams |
-| Rules | Hot-reload of rule config without process restart; rule marketplace samples |
-| Scale | Horizontal worker sharding by slot range or address partition |
-| Security | mTLS for gRPC, API keys for SSE, tighter CORS defaults for production compose |
-| Packaging | Native multi-arch image builds (arm64 without QEMU); meta package / `dotnet new` templates |
-| UI | Historical event search, CSV export, shared deep-link filters |
-| Testing | Contract tests against recorded Ogmios block fixtures; load tests in CI |
-| Ops | Helm chart / Kubernetes manifests for the full stack |
+| Challenge outcome                           | How this project addressed it                                                                                                                                                          |
+| ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Open-source, reusable developer tooling     | MIT-licensed public repo from day one; Domain + Engine published on [nuget.org](https://www.nuget.org/packages/OgmiosDotnet.BlockchainEvents.Domain/1.0.0); Worker + UI images on GHCR |
+| Lower barriers to building on Cardano       | Language-agnostic delivery (HTTP CloudEvents, gRPC, SSE) so consumers need no Ogmios SDK or WebSocket client                                                                           |
+| High-quality documentation & onboarding     | [`docs/getting-started.md`](../../docs/getting-started.md), architecture/event-schema/integration guides, example profiles, expanded [`CONTRIBUTING.md`](../../CONTRIBUTING.md)        |
+| Evidence of delivery & community visibility | Milestone PoAs under [`reports/`](../), tagged `v1.0.0`, public demo video, and [social launch post](https://x.com/ItsDave_ADA/status/2083529870584226143)                             |
 
 ---
 
-## 5. Adoption Notes
+## List of project KPIs and how the project addressed them
 
-Developers can start from [`docs/getting-started.md`](../../docs/getting-started.md):
-
-1. Run the stack with Docker Compose  
-2. Switch filter profiles via `./examples/run-example.sh`  
-3. Consume via SSE, gRPC, or Dapr HTTP  
-4. Embed the engine via NuGet (`1.0.0` on nuget.org)  
-5. Add custom rules following [`docs/integration-guide.md`](../../docs/integration-guide.md)
-
-Licence: MIT.
+| Project KPI (from proposal / milestones)                   | Status | Evidence                                                                                                  |
+| ---------------------------------------------------------- | ------ | --------------------------------------------------------------------------------------------------------- |
+| Core filtering engine with pluggable rules                 | Met    | 5 built-in rules; custom-rule guide — [M1 PoA](../milestone-1/proof-of-achievement.md)                    |
+| ≥3 example rules against live block data                   | Met    | Address, metadata, governance/treasury (+ PolicyIdAsset)                                                  |
+| Standardised event schema (CloudEvents)                    | Met    | [`docs/event-schema.md`](../../docs/event-schema.md)                                                      |
+| Queue-backed delivery (HTTP + gRPC), at-least-once / retry | Met    | Redis Streams + Dapr; DLQ — [M2 PoA](../milestone-2/proof-of-achievement.md)                              |
+| Docker Compose local stack                                 | Met    | Root `docker-compose.yml` (worker, Redis, Dapr, Grafana, viewers)                                         |
+| React consumer with real-time visualisation                | Met    | Tabbed UI (Overview / Minswap / Live Feed / Consumers) — [M3 PoA](../milestone-3/proof-of-achievement.md) |
+| ≥2 rule configs demonstrated visually                      | Met    | Governance/treasury + metadata examples; Minswap address-match demo                                       |
+| Public container images + versioned GitHub release         | Met    | GHCR `1.0.0`; [`v1.0.0`](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/releases/tag/v1.0.0)   |
+| Example configs (governance, treasury, metadata)           | Met    | [`examples/`](../../examples/) + `run-example.sh`                                                         |
+| Community onboarding + close-out artefacts                 | Met    | Getting started, CONTRIBUTING, this PCR, PCV link below                                                   |
+| Unit tests passing                                         | Met    | 80/80 tests — [`test-report.md`](test-report.md)                                                          |
 
 ---
 
-## 6. Evidence Index
+## Key achievements (in particular around collaboration and engagement)
 
-| Item | Link |
-| ---- | ---- |
-| Source repository | https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents |
-| GitHub Release `v1.0.0` | https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/releases/tag/v1.0.0 |
-| Release workflow run | https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/actions/runs/30199956555 |
-| Worker image (GHCR) | https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/pkgs/container/ogmiosdotnet.blockchainevents |
-| Event viewer image (GHCR) | https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/pkgs/container/ogmiosdotnet.blockchainevents%2Fevent-viewer |
-| NuGet Domain 1.0.0 | https://www.nuget.org/packages/OgmiosDotnet.BlockchainEvents.Domain/1.0.0 |
-| NuGet Engine 1.0.0 | https://www.nuget.org/packages/OgmiosDotnet.BlockchainEvents.Engine/1.0.0 |
-| Milestone 4 proof | [`proof-of-achievement.md`](proof-of-achievement.md) |
-| Test report | [`test-report.md`](test-report.md) |
-| Examples | https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/tree/main/examples |
-| Getting started | https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/blob/main/docs/getting-started.md |
-| Prior milestones | [`reports/milestone-1`](../milestone-1/), [`milestone-2`](../milestone-2/), [`milestone-3`](../milestone-3/) |
-| Close-out video / demo link | [https://youtu.be/-UUB0f4Dwfg](https://youtu.be/-UUB0f4Dwfg) |
-| X / social media post | [https://x.com/ItsDave_ADA/status/2083529870584226143](https://x.com/ItsDave_ADA/status/2083529870584226143?s=20) |
-| Social engagement metrics | See live views / likes / reposts / replies on the post |
-| Minswap consumer demo (local) | `http://localhost:4023/#minswap` |
+- Shipped a full path from **chain sync → rules → CloudEvents → UI**, so reviewers and adopters can run one Compose stack and see live filtered events.
+- Published **reusable libraries** (Domain/Engine on nuget.org via Trusted Publishing) and **versioned images** so teams can embed or operate without forking the worker.
+- Delivered a **close-out consumer showcase** (Minswap haul visualisation) that makes address-match filtering tangible for demos and social proof.
+- Maintained milestone **proof-of-achievement** docs with pinned commits/tags for Catalyst review transparency.
+- Engaged the community via public GitHub, YouTube demo material, and a [social launch post](https://x.com/ItsDave_ADA/status/2083529870584226143).
+
+---
+
+## Key learnings
+
+- Hosted Ogmios TLS/name mismatches need explicit HTTP handler policy — document early for adopters.
+- Compose volume merges append rather than replace; `WORKER_APPSETTINGS` is the reliable way to swap example configs.
+- Governance / treasury chain events are sparse on mainnet; demos should pair rare rules with high-frequency ones (metadata, DEX addresses).
+- Multi-arch Docker under QEMU failed for Grpc.Tools/`protoc`; `v1.0.0` ships `linux/amd64` for reliable CI publish.
+- Catalyst evidence works best with **stable URLs** (tags, release assets) rather than floating `main` links.
+- Treasury-withdrawal matching depends on correctly mapping Conway `treasuryWithdrawals` governance proposals from Ogmios into `HasTreasuryWithdrawal` (fixed in the post-review hardening pass).
+
+---
+
+## Next steps for the product or service developed
+
+Focus is on **adoption and continuous improvement**, not a large new feature programme:
+
+- Grow real-world adoption — onboarding, examples, and making the `v1.0.0` release easy for developers to run and embed
+- Iterate on practical improvements driven by how people actually use the stack
+- Stay in sync with **Ogmios** upgrades and related schema/client changes
+- Listen to **community feedback** (GitHub issues, discussions, and contributor PRs) and prioritise accordingly
+- Keep the MIT open-source project maintained so it remains a reliable building block for the Cardano ecosystem
+
+---
+
+## Final thoughts/comments
+
+The proposal asked for a simple way to filter Cardano blocks and receive only needed transactions over HTTP/gRPC, without Ogmios SDK lock-in. The delivered system meets that brief: open source, config-driven rules, dual delivery, observability, NuGet + containers, and a React consumer that proves the pipeline end-to-end. Remaining work is adoption and hardening, not missing core scope.
+
+---
+
+## Links to other relevant project sources or documents
+
+| Item                                | Link                                                                                                                  |
+| ----------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Source repository                   | https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents                                                             |
+| Catalyst proposal                   | https://projectcatalyst.io/funds/14/cardano-open-developers/ogmiosdotnet-cardano-blockchain-events-and-visualisation  |
+| GitHub Release `v1.0.0`             | https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/releases/tag/v1.0.0                                         |
+| Release workflow run                | https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/actions/runs/30199956555                                    |
+| Worker image (GHCR)                 | https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/pkgs/container/ogmiosdotnet.blockchainevents                |
+| Event viewer image (GHCR)           | https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/pkgs/container/ogmiosdotnet.blockchainevents%2Fevent-viewer |
+| NuGet Domain 1.0.0                  | https://www.nuget.org/packages/OgmiosDotnet.BlockchainEvents.Domain/1.0.0                                             |
+| NuGet Engine 1.0.0                  | https://www.nuget.org/packages/OgmiosDotnet.BlockchainEvents.Engine/1.0.0                                             |
+| Getting started                     | https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/blob/main/docs/getting-started.md                           |
+| Milestone PoAs                      | [M1](../milestone-1/), [M2](../milestone-2/), [M3](../milestone-3/), [M4](proof-of-achievement.md)                    |
+| Test report                         | [`test-report.md`](test-report.md)                                                                                    |
+| Examples                            | https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/tree/main/examples                                          |
+| Social media post                   | https://x.com/ItsDave_ADA/status/2083529870584226143                                                                  |
+| Close-out video (PCV)               | https://youtu.be/4B1VjrD4_Og                                                                                          |
+| Technical demo (longer walkthrough) | https://youtu.be/-UUB0f4Dwfg                                                                                          |
+
+---
+
+## Link to Close-out video (PCV)
+
+**PCV (2–5 minutes, public YouTube):** [https://youtu.be/4B1VjrD4_Og](https://youtu.be/4B1VjrD4_Og)
+
+> Dedicated Project Close-out Video covering challenge/approach, progress & KPIs, product demonstration (with pointer to the advanced technical demo), and next steps. Script: [`close-out-video-script.md`](close-out-video-script.md). The longer technical demo remains supplementary: [https://youtu.be/-UUB0f4Dwfg](https://youtu.be/-UUB0f4Dwfg).
