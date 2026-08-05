@@ -115,7 +115,7 @@ dotnet add package OgmiosDotnet.BlockchainEvents.Engine --version 1.0.0
 
 ### Output 8 — Close-out Report (PCR)
 
-[`close-out-report.md`](close-out-report.md) — Catalyst Project Close-out Report structure (challenge/project KPIs, achievements, learnings, next steps, evidence links, PCV link).
+[`close-out-report.md`](close-out-report.md) / [`close-out-report.pdf`](close-out-report.pdf) — Catalyst Project Close-out Report (challenge/project KPIs, achievements, learnings, next steps, evidence links, PCV link).
 
 ### Output 9 — Close-out Video (PCV) + Technical Demo
 

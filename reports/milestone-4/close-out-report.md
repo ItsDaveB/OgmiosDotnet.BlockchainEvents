@@ -15,6 +15,7 @@
 | **Repository** | [github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents) |
 | **Community release** | [`v1.0.0`](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/releases/tag/v1.0.0) (`badd71e`) |
 | **Open source** | Yes — MIT Licence |
+| **PCR PDF** | [`close-out-report.pdf`](close-out-report.pdf) (this document as PDF for Catalyst) |
 
 ---
 
@@ -156,6 +157,7 @@ The proposal asked for a simple way to filter Cardano blocks and receive only ne
 | Test report                         | [`test-report.md`](test-report.md)                                                                                    |
 | Examples                            | https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/tree/main/examples                                          |
 | Social media post                   | https://x.com/ItsDave_ADA/status/2083529870584226143                                                                  |
+| PCR PDF (Catalyst)                  | https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/blob/main/reports/milestone-4/close-out-report.pdf           |
 | Close-out video (PCV)               | https://youtu.be/4B1VjrD4_Og                                                                                          |
 | Technical demo (longer walkthrough) | https://youtu.be/-UUB0f4Dwfg                                                                                          |
 
