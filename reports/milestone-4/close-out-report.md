@@ -13,7 +13,7 @@
 | **Date project started** | January 2026 |
 | **Date project completed** | July 2026 |
 | **Repository** | [github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents) |
-| **Community release** | [`v1.0.1`](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/releases/tag/v1.0.1) (`TBD`) |
+| **Community release** | [`v1.0.1`](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/releases/tag/v1.0.1) (`9044690`) |
 | **Open source** | Yes — MIT Licence |
 | **PCR PDF** | [`close-out-report.pdf`](close-out-report.pdf) (this document as PDF for Catalyst) |
 
@@ -147,7 +147,7 @@ The proposal asked for a simple way to filter Cardano blocks and receive only ne
 | Source repository                   | https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents                                                             |
 | Catalyst proposal                   | https://projectcatalyst.io/funds/14/cardano-open-developers/ogmiosdotnet-cardano-blockchain-events-and-visualisation  |
 | GitHub Release `v1.0.1`             | https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/releases/tag/v1.0.1                                         |
-| Release workflow run                | https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/actions/runs/TBD                                    |
+| Release workflow run                | https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/actions/runs/31277341359                                    |
 | Worker image (GHCR)                 | https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/pkgs/container/ogmiosdotnet.blockchainevents                |
 | Event viewer image (GHCR)           | https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/pkgs/container/ogmiosdotnet.blockchainevents%2Fevent-viewer |
 | NuGet Domain 1.0.1                  | https://www.nuget.org/packages/OgmiosDotnet.BlockchainEvents.Domain/1.0.1                                             |
