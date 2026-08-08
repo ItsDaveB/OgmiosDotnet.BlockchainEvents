@@ -131,7 +131,7 @@ Include:
 - **Expected vs actual behaviour**
 - **Environment** — OS, .NET SDK version, Docker/Compose versions, network (mainnet/preprod), Ogmios version/host if relevant
 - **Logs / screenshots** — redact secrets and connection credentials
-- **Commit / tag** — e.g. `v1.0.0` or a SHA
+- **Commit / tag** — e.g. `v1.0.1` or a SHA
 
 ### Feature request
 

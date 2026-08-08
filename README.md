@@ -142,14 +142,14 @@ Or: `WORKER_APPSETTINGS=./examples/metadata/appsettings.json docker compose up -
 
 ### Published packages & images
 
-Latest community release: [`v1.0.0`](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/releases/tag/v1.0.0)
+Latest community release: [`v1.0.1`](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/releases/tag/v1.0.1)
 
 | Artifact | Location |
 | -------- | -------- |
-| Worker image | `ghcr.io/itsdaveb/ogmiosdotnet.blockchainevents:1.0.0` ([GHCR](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/pkgs/container/ogmiosdotnet.blockchainevents)) |
-| Event viewer image | `ghcr.io/itsdaveb/ogmiosdotnet.blockchainevents/event-viewer:1.0.0` ([GHCR](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/pkgs/container/ogmiosdotnet.blockchainevents%2Fevent-viewer)) |
-| NuGet Domain | [OgmiosDotnet.BlockchainEvents.Domain 1.0.0](https://www.nuget.org/packages/OgmiosDotnet.BlockchainEvents.Domain/1.0.0) |
-| NuGet Engine | [OgmiosDotnet.BlockchainEvents.Engine 1.0.0](https://www.nuget.org/packages/OgmiosDotnet.BlockchainEvents.Engine/1.0.0) |
+| Worker image | `ghcr.io/itsdaveb/ogmiosdotnet.blockchainevents:1.0.1` ([GHCR](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/pkgs/container/ogmiosdotnet.blockchainevents)) |
+| Event viewer image | `ghcr.io/itsdaveb/ogmiosdotnet.blockchainevents/event-viewer:1.0.1` ([GHCR](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/pkgs/container/ogmiosdotnet.blockchainevents%2Fevent-viewer)) |
+| NuGet Domain | [OgmiosDotnet.BlockchainEvents.Domain 1.0.1](https://www.nuget.org/packages/OgmiosDotnet.BlockchainEvents.Domain/1.0.1) |
+| NuGet Engine | [OgmiosDotnet.BlockchainEvents.Engine 1.0.1](https://www.nuget.org/packages/OgmiosDotnet.BlockchainEvents.Engine/1.0.1) |
 
 Subsequent `v*` tags publish the same artifacts via GHCR, nuget.org ([Trusted Publishing](https://learn.microsoft.com/nuget/nuget-org/trusted-publishing)), GitHub Packages, and a GitHub Release.
 

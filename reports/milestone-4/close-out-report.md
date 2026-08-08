@@ -13,7 +13,7 @@
 | **Date project started** | January 2026 |
 | **Date project completed** | July 2026 |
 | **Repository** | [github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents) |
-| **Community release** | [`v1.0.0`](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/releases/tag/v1.0.0) (`badd71e`) |
+| **Community release** | [`v1.0.1`](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/releases/tag/v1.0.1) (`TBD`) |
 | **Open source** | Yes — MIT Licence |
 | **PCR PDF** | [`close-out-report.pdf`](close-out-report.pdf) (this document as PDF for Catalyst) |
 
@@ -76,10 +76,10 @@ Challenge: **Fund 14 — Cardano Open: Developers** (Developer Tools).
 
 | Challenge outcome                           | How this project addressed it                                                                                                                                                          |
 | ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Open-source, reusable developer tooling     | MIT-licensed public repo from day one; Domain + Engine published on [nuget.org](https://www.nuget.org/packages/OgmiosDotnet.BlockchainEvents.Domain/1.0.0); Worker + UI images on GHCR |
+| Open-source, reusable developer tooling     | MIT-licensed public repo from day one; Domain + Engine published on [nuget.org](https://www.nuget.org/packages/OgmiosDotnet.BlockchainEvents.Domain/1.0.1); Worker + UI images on GHCR |
 | Lower barriers to building on Cardano       | Language-agnostic delivery (HTTP CloudEvents, gRPC, SSE) so consumers need no Ogmios SDK or WebSocket client                                                                           |
 | High-quality documentation & onboarding     | [`docs/getting-started.md`](../../docs/getting-started.md), architecture/event-schema/integration guides, example profiles, expanded [`CONTRIBUTING.md`](../../CONTRIBUTING.md)        |
-| Evidence of delivery & community visibility | Milestone PoAs under [`reports/`](../), tagged `v1.0.0`, public demo video, and [social launch post](https://x.com/ItsDave_ADA/status/2083529870584226143)                             |
+| Evidence of delivery & community visibility | Milestone PoAs under [`reports/`](../), tagged `v1.0.1`, public demo video, and [social launch post](https://x.com/ItsDave_ADA/status/2083529870584226143)                             |
 
 ---
 
@@ -94,7 +94,7 @@ Challenge: **Fund 14 — Cardano Open: Developers** (Developer Tools).
 | Docker Compose local stack                                 | Met    | Root `docker-compose.yml` (worker, Redis, Dapr, Grafana, viewers)                                         |
 | React consumer with real-time visualisation                | Met    | Tabbed UI (Overview / Minswap / Live Feed / Consumers) — [M3 PoA](../milestone-3/proof-of-achievement.md) |
 | ≥2 rule configs demonstrated visually                      | Met    | Governance/treasury + metadata examples; Minswap address-match demo                                       |
-| Public container images + versioned GitHub release         | Met    | GHCR `1.0.0`; [`v1.0.0`](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/releases/tag/v1.0.0)   |
+| Public container images + versioned GitHub release         | Met    | GHCR `1.0.1`; [`v1.0.1`](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/releases/tag/v1.0.1)   |
 | Example configs (governance, treasury, metadata)           | Met    | [`examples/`](../../examples/) + `run-example.sh`                                                         |
 | Community onboarding + close-out artefacts                 | Met    | Getting started, CONTRIBUTING, this PCR, PCV link below                                                   |
 | Unit tests passing                                         | Met    | 80/80 tests — [`test-report.md`](test-report.md)                                                          |
@@ -116,7 +116,7 @@ Challenge: **Fund 14 — Cardano Open: Developers** (Developer Tools).
 - Hosted Ogmios TLS/name mismatches need explicit HTTP handler policy — document early for adopters.
 - Compose volume merges append rather than replace; `WORKER_APPSETTINGS` is the reliable way to swap example configs.
 - Governance / treasury chain events are sparse on mainnet; demos should pair rare rules with high-frequency ones (metadata, DEX addresses).
-- Multi-arch Docker under QEMU failed for Grpc.Tools/`protoc`; `v1.0.0` ships `linux/amd64` for reliable CI publish.
+- Multi-arch Docker under QEMU failed for Grpc.Tools/`protoc`; `v1.0.1` ships `linux/amd64` for reliable CI publish.
 - Catalyst evidence works best with **stable URLs** (tags, release assets) rather than floating `main` links.
 - Treasury-withdrawal matching depends on correctly mapping Conway `treasuryWithdrawals` governance proposals from Ogmios into `HasTreasuryWithdrawal` (fixed in the post-review hardening pass).
 
@@ -126,7 +126,7 @@ Challenge: **Fund 14 — Cardano Open: Developers** (Developer Tools).
 
 Focus is on **adoption and continuous improvement**, not a large new feature programme:
 
-- Grow real-world adoption — onboarding, examples, and making the `v1.0.0` release easy for developers to run and embed
+- Grow real-world adoption — onboarding, examples, and making the `v1.0.1` release easy for developers to run and embed
 - Iterate on practical improvements driven by how people actually use the stack
 - Stay in sync with **Ogmios** upgrades and related schema/client changes
 - Listen to **community feedback** (GitHub issues, discussions, and contributor PRs) and prioritise accordingly
@@ -146,12 +146,12 @@ The proposal asked for a simple way to filter Cardano blocks and receive only ne
 | ----------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
 | Source repository                   | https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents                                                             |
 | Catalyst proposal                   | https://projectcatalyst.io/funds/14/cardano-open-developers/ogmiosdotnet-cardano-blockchain-events-and-visualisation  |
-| GitHub Release `v1.0.0`             | https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/releases/tag/v1.0.0                                         |
-| Release workflow run                | https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/actions/runs/30199956555                                    |
+| GitHub Release `v1.0.1`             | https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/releases/tag/v1.0.1                                         |
+| Release workflow run                | https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/actions/runs/TBD                                    |
 | Worker image (GHCR)                 | https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/pkgs/container/ogmiosdotnet.blockchainevents                |
 | Event viewer image (GHCR)           | https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/pkgs/container/ogmiosdotnet.blockchainevents%2Fevent-viewer |
-| NuGet Domain 1.0.0                  | https://www.nuget.org/packages/OgmiosDotnet.BlockchainEvents.Domain/1.0.0                                             |
-| NuGet Engine 1.0.0                  | https://www.nuget.org/packages/OgmiosDotnet.BlockchainEvents.Engine/1.0.0                                             |
+| NuGet Domain 1.0.1                  | https://www.nuget.org/packages/OgmiosDotnet.BlockchainEvents.Domain/1.0.1                                             |
+| NuGet Engine 1.0.1                  | https://www.nuget.org/packages/OgmiosDotnet.BlockchainEvents.Engine/1.0.1                                             |
 | Getting started                     | https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/blob/main/docs/getting-started.md                           |
 | Milestone PoAs                      | [M1](../milestone-1/), [M2](../milestone-2/), [M3](../milestone-3/), [M4](proof-of-achievement.md)                    |
 | Test report                         | [`test-report.md`](test-report.md)                                                                                    |

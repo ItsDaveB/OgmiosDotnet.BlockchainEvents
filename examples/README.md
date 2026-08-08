@@ -2,7 +2,7 @@
 
 Practical, end-to-end rule configurations for common Cardano filtering scenarios. Each example is a drop-in `appsettings.json` overlay that configures the built-in rule engine while keeping Ogmios, Redis, and delivery settings intact.
 
-Shipped with community release [`v1.0.0`](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/releases/tag/v1.0.0). Milestone evidence: [`reports/milestone-4/`](../reports/milestone-4/).
+Shipped with community release [`v1.0.1`](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/releases/tag/v1.0.1). Milestone evidence: [`reports/milestone-4/`](../reports/milestone-4/).
 
 | Example | Path | Demonstrates |
 | ------- | ---- | ------------ |

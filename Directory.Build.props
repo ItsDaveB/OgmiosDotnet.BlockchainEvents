@@ -11,7 +11,7 @@
     <RepositoryUrl>https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>cardano;ogmios;blockchain;events;cloudevents;filtering</PackageTags>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 </Project>

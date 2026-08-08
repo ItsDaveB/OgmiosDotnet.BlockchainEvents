@@ -71,16 +71,16 @@ grpcurl -plaintext -import-path . -proto protos/blockchain_events.proto \
 ### NuGet (embed the engine)
 
 ```bash
-dotnet add package OgmiosDotnet.BlockchainEvents.Domain --version 1.0.0
-dotnet add package OgmiosDotnet.BlockchainEvents.Engine --version 1.0.0
+dotnet add package OgmiosDotnet.BlockchainEvents.Domain --version 1.0.1
+dotnet add package OgmiosDotnet.BlockchainEvents.Engine --version 1.0.1
 ```
 
 Published packages:
 
-- [OgmiosDotnet.BlockchainEvents.Domain 1.0.0](https://www.nuget.org/packages/OgmiosDotnet.BlockchainEvents.Domain/1.0.0)
-- [OgmiosDotnet.BlockchainEvents.Engine 1.0.0](https://www.nuget.org/packages/OgmiosDotnet.BlockchainEvents.Engine/1.0.0)
+- [OgmiosDotnet.BlockchainEvents.Domain 1.0.1](https://www.nuget.org/packages/OgmiosDotnet.BlockchainEvents.Domain/1.0.1)
+- [OgmiosDotnet.BlockchainEvents.Engine 1.0.1](https://www.nuget.org/packages/OgmiosDotnet.BlockchainEvents.Engine/1.0.1)
 
-Releases use [Trusted Publishing](https://learn.microsoft.com/nuget/nuget-org/trusted-publishing) (OIDC; no long-lived API key) and also publish to [GitHub Packages](https://github.com/ItsDaveB?tab=packages). Container images: `ghcr.io/itsdaveb/ogmiosdotnet.blockchainevents:1.0.0` and `.../event-viewer:1.0.0` ([GitHub Release v1.0.0](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/releases/tag/v1.0.0)).
+Releases use [Trusted Publishing](https://learn.microsoft.com/nuget/nuget-org/trusted-publishing) (OIDC; no long-lived API key) and also publish to [GitHub Packages](https://github.com/ItsDaveB?tab=packages). Container images: `ghcr.io/itsdaveb/ogmiosdotnet.blockchainevents:1.0.1` and `.../event-viewer:1.0.1` ([GitHub Release v1.0.1](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/releases/tag/v1.0.1)).
 
 ## 3. Extend with a Custom Rule
 
@@ -99,7 +99,7 @@ Full walkthrough with worked examples: [`docs/integration-guide.md`](integration
 | Delivery | Redis Streams + retry/DLQ via Dapr resiliency |
 | Scaling consumers | Multiple SSE/gRPC subscribers; independent event-viewer replicas |
 | Config | Mount example or custom `appsettings.json` via `WORKER_APPSETTINGS` |
-| Images | Pin `ghcr.io/itsdaveb/ogmiosdotnet.blockchainevents:1.0.0` (or later semver) |
+| Images | Pin `ghcr.io/itsdaveb/ogmiosdotnet.blockchainevents:1.0.1` (or later semver) |
 | Security | CodeQL in CI; keep Ogmios credentials out of git (env / secrets) |
 
 Architecture deep dive: [`docs/architecture.md`](architecture.md)  

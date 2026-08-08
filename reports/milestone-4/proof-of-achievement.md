@@ -3,10 +3,10 @@
 **Project:** OgmiosDotnet.BlockchainEvents  
 **Repository:** [github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents)  
 **Milestone:** 4 — Finalisation, Documentation & Community Release  
-**Date:** July 2026  
-**Commit:** `badd71e` (main / `v1.0.0`)  
-**Release tag:** [`v1.0.0`](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/releases/tag/v1.0.0)  
-**Release workflow:** [successful run](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/actions/runs/30199956555)
+**Date:** July 2026 (patch release August 2026)  
+**Commit:** `TBD` (main / `v1.0.1`)  
+**Release tag:** [`v1.0.1`](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/releases/tag/v1.0.1)  
+**Release workflow:** [successful run](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/actions/runs/TBD)
 
 ---
 
@@ -26,8 +26,8 @@ Release workflow (`.github/workflows/release.yml`) builds and pushes versioned `
 
 | Image | GHCR path | Published tag |
 | ----- | --------- | ------------- |
-| Worker | `ghcr.io/itsdaveb/ogmiosdotnet.blockchainevents` | `1.0.0` / `1.0` / `1` / SHA |
-| Event viewer | `ghcr.io/itsdaveb/ogmiosdotnet.blockchainevents/event-viewer` | `1.0.0` / `1.0` / `1` / SHA |
+| Worker | `ghcr.io/itsdaveb/ogmiosdotnet.blockchainevents` | `1.0.1` / `1.0` / `1` / SHA |
+| Event viewer | `ghcr.io/itsdaveb/ogmiosdotnet.blockchainevents/event-viewer` | `1.0.1` / `1.0` / `1` / SHA |
 
 | Package page |
 | ------------ |
@@ -38,7 +38,7 @@ Local development continues to use `docker compose up --build`.
 
 ### Output 2 — Versioned GitHub Release
 
-[`v1.0.0`](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/releases/tag/v1.0.0) is published with release notes, attached `.nupkg` / `.snupkg` artifacts, and links to setup docs and example configurations. Source, templates, and instructions remain in-repo:
+[`v1.0.1`](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/releases/tag/v1.0.1) is published with release notes, attached `.nupkg` / `.snupkg` artifacts, and links to setup docs and example configurations. Source, templates, and instructions remain in-repo:
 
 | Asset | Location |
 | ----- | -------- |
@@ -99,14 +99,14 @@ Deep links: `#overview`, `#minswap`, `#feed`, `#consumers`. Address Match viewer
 
 | Package ID | nuget.org | Contents |
 | ---------- | --------- | -------- |
-| `OgmiosDotnet.BlockchainEvents.Domain` | [1.0.0](https://www.nuget.org/packages/OgmiosDotnet.BlockchainEvents.Domain/1.0.0) | Models, abstractions, CloudEvents types |
-| `OgmiosDotnet.BlockchainEvents.Engine` | [1.0.0](https://www.nuget.org/packages/OgmiosDotnet.BlockchainEvents.Engine/1.0.0) | Rule engine + built-in filters |
+| `OgmiosDotnet.BlockchainEvents.Domain` | [1.0.1](https://www.nuget.org/packages/OgmiosDotnet.BlockchainEvents.Domain/1.0.1) | Models, abstractions, CloudEvents types |
+| `OgmiosDotnet.BlockchainEvents.Engine` | [1.0.1](https://www.nuget.org/packages/OgmiosDotnet.BlockchainEvents.Engine/1.0.1) | Rule engine + built-in filters |
 
-Published on release to **nuget.org** via [Trusted Publishing](https://learn.microsoft.com/nuget/nuget-org/trusted-publishing) (GitHub OIDC → short-lived API key) and to **GitHub Packages**. Also attached to the [GitHub Release](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/releases/tag/v1.0.0).
+Published on release to **nuget.org** via [Trusted Publishing](https://learn.microsoft.com/nuget/nuget-org/trusted-publishing) (GitHub OIDC → short-lived API key) and to **GitHub Packages**. Also attached to the [GitHub Release](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/releases/tag/v1.0.1).
 
 ```bash
-dotnet add package OgmiosDotnet.BlockchainEvents.Domain --version 1.0.0
-dotnet add package OgmiosDotnet.BlockchainEvents.Engine --version 1.0.0
+dotnet add package OgmiosDotnet.BlockchainEvents.Domain --version 1.0.1
+dotnet add package OgmiosDotnet.BlockchainEvents.Engine --version 1.0.1
 ```
 
 ### Output 7 — Test Report
@@ -141,11 +141,11 @@ Public social post showcasing functioning filters, developer details, and transa
 
 ### AC-1: Publishable components containerised, versioned, and published to a public registry — **Met**
 
-Release workflow publishes worker + event-viewer `linux/amd64` images to GHCR with semver tags `1.0.0`. Evidence: [worker package](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/pkgs/container/ogmiosdotnet.blockchainevents), [event-viewer package](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/pkgs/container/ogmiosdotnet.blockchainevents%2Fevent-viewer), [release run](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/actions/runs/30199956555).
+Release workflow publishes worker + event-viewer `linux/amd64` images to GHCR with semver tags `1.0.1`. Evidence: [worker package](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/pkgs/container/ogmiosdotnet.blockchainevents), [event-viewer package](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/pkgs/container/ogmiosdotnet.blockchainevents%2Fevent-viewer), [release run](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/actions/runs/TBD).
 
 ### AC-2: Full release versioned and publicly available on GitHub — **Met**
 
-GitHub Release [`v1.0.0`](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/releases/tag/v1.0.0) includes source tag, NuGet artifacts, and links to configuration templates and setup docs.
+GitHub Release [`v1.0.1`](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/releases/tag/v1.0.1) includes source tag, NuGet artifacts, and links to configuration templates and setup docs.
 
 ### AC-3: Example configurations provided and verified end-to-end — **Met**
 
@@ -161,7 +161,7 @@ Config-bound rules, CI format + CodeQL + tests, packable libraries, 80/80 tests 
 
 ### AC-6: NuGet package exists for published version — **Met**
 
-`OgmiosDotnet.BlockchainEvents.Domain` and `.Engine` **1.0.0** on [nuget.org](https://www.nuget.org/packages/OgmiosDotnet.BlockchainEvents.Domain/1.0.0) (Trusted Publishing) and GitHub Packages.
+`OgmiosDotnet.BlockchainEvents.Domain` and `.Engine` **1.0.1** on [nuget.org](https://www.nuget.org/packages/OgmiosDotnet.BlockchainEvents.Domain/1.0.1) (Trusted Publishing) and GitHub Packages.
 
 ### AC-7: Test report exists; all tests passing — **Met**
 
@@ -185,12 +185,12 @@ Public social post: [https://x.com/ItsDave_ADA/status/2083529870584226143](https
 
 | # | Requirement | Evidence | Status |
 | - | ----------- | -------- | ------ |
-| 1 | Public container registry (versioned images) | [Worker GHCR](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/pkgs/container/ogmiosdotnet.blockchainevents), [Event viewer GHCR](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/pkgs/container/ogmiosdotnet.blockchainevents%2Fevent-viewer) — tags `1.0.0` | Done |
-| 2 | Versioned GitHub release | https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/releases/tag/v1.0.0 | Done |
+| 1 | Public container registry (versioned images) | [Worker GHCR](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/pkgs/container/ogmiosdotnet.blockchainevents), [Event viewer GHCR](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/pkgs/container/ogmiosdotnet.blockchainevents%2Fevent-viewer) — tags `1.0.1` | Done |
+| 2 | Versioned GitHub release | https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/releases/tag/v1.0.1 | Done |
 | 3 | Example configurations (gov / treasury / metadata) | https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/tree/main/examples | Done |
-| 4 | Source quality + CI | [Repository](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents), [Actions](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/actions/runs/30199956555), [`test-report.md`](test-report.md) | Done |
+| 4 | Source quality + CI | [Repository](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents), [Actions](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/actions/runs/TBD), [`test-report.md`](test-report.md) | Done |
 | 5 | README + onboarding docs | [`README.md`](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/blob/main/README.md), [`docs/getting-started.md`](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/blob/main/docs/getting-started.md) | Done |
-| 6 | NuGet package | [Domain 1.0.0](https://www.nuget.org/packages/OgmiosDotnet.BlockchainEvents.Domain/1.0.0), [Engine 1.0.0](https://www.nuget.org/packages/OgmiosDotnet.BlockchainEvents.Engine/1.0.0) | Done |
+| 6 | NuGet package | [Domain 1.0.1](https://www.nuget.org/packages/OgmiosDotnet.BlockchainEvents.Domain/1.0.1), [Engine 1.0.1](https://www.nuget.org/packages/OgmiosDotnet.BlockchainEvents.Engine/1.0.1) | Done |
 | 7 | Test report (all passing) | [`test-report.md`](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/blob/main/reports/milestone-4/test-report.md) | Done |
 | 8 | Close-out report (PCR) | [`close-out-report.md`](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/blob/main/reports/milestone-4/close-out-report.md) | Done |
 | 9 | Close-out video (PCV) | [https://youtu.be/4B1VjrD4_Og](https://youtu.be/4B1VjrD4_Og); technical demo: [https://youtu.be/-UUB0f4Dwfg](https://youtu.be/-UUB0f4Dwfg) | Done |
@@ -205,7 +205,7 @@ Public social post: [https://x.com/ItsDave_ADA/status/2083529870584226143](https
 ```bash
 git clone https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents.git
 cd OgmiosDotnet.BlockchainEvents
-git checkout v1.0.0
+git checkout v1.0.1
 docker compose up --build          # default demo rules
 ./examples/run-example.sh metadata # or governance | treasury
 dotnet test                        # 80 tests — 100% pass rate
@@ -221,8 +221,8 @@ dotnet test                        # 80 tests — 100% pass rate
 Pull published images:
 
 ```bash
-docker pull ghcr.io/itsdaveb/ogmiosdotnet.blockchainevents:1.0.0
-docker pull ghcr.io/itsdaveb/ogmiosdotnet.blockchainevents/event-viewer:1.0.0
+docker pull ghcr.io/itsdaveb/ogmiosdotnet.blockchainevents:1.0.1
+docker pull ghcr.io/itsdaveb/ogmiosdotnet.blockchainevents/event-viewer:1.0.1
 ```
 
 ---

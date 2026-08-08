@@ -26,7 +26,7 @@ labels: bug
 - Docker / Compose (if relevant):
 - Network (mainnet / preprod / preview):
 - Ogmios version / host (if relevant):
-- Commit or tag (e.g. `v1.0.0`):
+- Commit or tag (e.g. `v1.0.1`):
 
 ## Logs / screenshots
 
