@@ -8,6 +8,14 @@
 **Release tag:** [`v1.0.1`](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/releases/tag/v1.0.1)  
 **Release workflow:** [successful run](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/actions/runs/31277341359)
 
+### Catalyst close-out attachments
+
+| Artefact | Link |
+| -------- | ---- |
+| **Project Close-out Video (PCV)** | [https://youtu.be/4B1VjrD4_Og](https://youtu.be/4B1VjrD4_Og) |
+| **Project Close-out Report (PCR) — PDF** | [close-out-report.pdf](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/blob/main/reports/milestone-4/close-out-report.pdf) |
+| **Project Close-out Report (PCR) — Markdown** | [close-out-report.md](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/blob/main/reports/milestone-4/close-out-report.md) |
+
 ---
 
 ## Overview
@@ -115,11 +123,18 @@ dotnet add package OgmiosDotnet.BlockchainEvents.Engine --version 1.0.1
 
 ### Output 8 — Close-out Report (PCR)
 
-[`close-out-report.md`](close-out-report.md) / [`close-out-report.pdf`](close-out-report.pdf) — Catalyst Project Close-out Report (challenge/project KPIs, achievements, learnings, next steps, evidence links, PCV link).
+**Attached for Catalyst:**
+
+- **PDF (preferred for Milestone Module):** [close-out-report.pdf](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/blob/main/reports/milestone-4/close-out-report.pdf)
+- **Markdown source:** [close-out-report.md](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/blob/main/reports/milestone-4/close-out-report.md)
+
+Catalyst Project Close-out Report covering challenge/project KPIs, achievements, learnings, next steps, evidence links, and the PCV link.
 
 ### Output 9 — Close-out Video (PCV) + Technical Demo
 
-Catalyst requires a dedicated **PCV** (2–5 minutes) covering challenge/approach, progress & KPIs, a short product demo, and next steps. Script/shot list: [`close-out-video-script.md`](close-out-video-script.md).
+**Attached for Catalyst — Project Close-out Video (PCV):** [https://youtu.be/4B1VjrD4_Og](https://youtu.be/4B1VjrD4_Og)
+
+Catalyst requires a dedicated **PCV** (2–5 minutes) covering challenge/approach, progress & KPIs, a short product demo, and next steps.
 
 | Video | Role | Link |
 | ----- | ---- | ---- |
@@ -173,7 +188,7 @@ Config-bound rules, CI format + CodeQL + tests, packable libraries, 80/80 tests 
 
 ### AC-9: Close-out video (PCV) summarises challenge, KPIs, demo, next steps — **Met**
 
-Dedicated PCV: [https://youtu.be/4B1VjrD4_Og](https://youtu.be/4B1VjrD4_Og). Script: [`close-out-video-script.md`](close-out-video-script.md). Longer technical demo: [https://youtu.be/-UUB0f4Dwfg](https://youtu.be/-UUB0f4Dwfg).
+Dedicated PCV: [https://youtu.be/4B1VjrD4_Og](https://youtu.be/4B1VjrD4_Og). Longer technical demo: [https://youtu.be/-UUB0f4Dwfg](https://youtu.be/-UUB0f4Dwfg).
 
 ### AC-10: Social media demo post with metrics — **Met**
 
@@ -192,8 +207,8 @@ Public social post: [https://x.com/ItsDave_ADA/status/2083529870584226143](https
 | 5 | README + onboarding docs | [`README.md`](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/blob/main/README.md), [`docs/getting-started.md`](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/blob/main/docs/getting-started.md) | Done |
 | 6 | NuGet package | [Domain 1.0.1](https://www.nuget.org/packages/OgmiosDotnet.BlockchainEvents.Domain/1.0.1), [Engine 1.0.1](https://www.nuget.org/packages/OgmiosDotnet.BlockchainEvents.Engine/1.0.1) | Done |
 | 7 | Test report (all passing) | [`test-report.md`](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/blob/main/reports/milestone-4/test-report.md) | Done |
-| 8 | Close-out report (PCR) | [`close-out-report.md`](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/blob/main/reports/milestone-4/close-out-report.md) | Done |
-| 9 | Close-out video (PCV) | [https://youtu.be/4B1VjrD4_Og](https://youtu.be/4B1VjrD4_Og); technical demo: [https://youtu.be/-UUB0f4Dwfg](https://youtu.be/-UUB0f4Dwfg) | Done |
+| 8 | Close-out report (PCR) | **PDF:** [close-out-report.pdf](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/blob/main/reports/milestone-4/close-out-report.pdf); **MD:** [close-out-report.md](https://github.com/ItsDaveB/OgmiosDotnet.BlockchainEvents/blob/main/reports/milestone-4/close-out-report.md) | Done |
+| 9 | Close-out video (PCV) | **PCV:** [https://youtu.be/4B1VjrD4_Og](https://youtu.be/4B1VjrD4_Og); technical demo: [https://youtu.be/-UUB0f4Dwfg](https://youtu.be/-UUB0f4Dwfg) | Done |
 | 10 | Social media post + metrics | [https://x.com/ItsDave_ADA/status/2083529870584226143](https://x.com/ItsDave_ADA/status/2083529870584226143?s=20) | Done |
 | — | Tabbed consumer demo (UI) | [`tools/event-viewer`](../../tools/event-viewer/) — tabs `#overview` `#minswap` `#feed` `#consumers` | Done |
 | — | Minswap haul screenshots | [`screenshots/`](screenshots/) | Done |

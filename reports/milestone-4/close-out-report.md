@@ -167,4 +167,4 @@ The proposal asked for a simple way to filter Cardano blocks and receive only ne
 
 **PCV (2–5 minutes, public YouTube):** [https://youtu.be/4B1VjrD4_Og](https://youtu.be/4B1VjrD4_Og)
 
-> Dedicated Project Close-out Video covering challenge/approach, progress & KPIs, product demonstration (with pointer to the advanced technical demo), and next steps. Script: [`close-out-video-script.md`](close-out-video-script.md). The longer technical demo remains supplementary: [https://youtu.be/-UUB0f4Dwfg](https://youtu.be/-UUB0f4Dwfg).
+> Dedicated Project Close-out Video covering challenge/approach, progress & KPIs, product demonstration (with pointer to the advanced technical demo), and next steps. The longer technical demo remains supplementary: [https://youtu.be/-UUB0f4Dwfg](https://youtu.be/-UUB0f4Dwfg).

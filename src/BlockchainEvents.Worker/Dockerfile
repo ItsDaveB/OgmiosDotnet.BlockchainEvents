@@ -23,12 +23,6 @@ RUN dotnet publish src/BlockchainEvents.Worker/BlockchainEvents.Worker.csproj \
     -o /app/publish \
     -p:Protobuf_ProtocFullPath=/usr/bin/protoc
 
-FROM build AS debug
-RUN dotnet publish src/BlockchainEvents.Worker/BlockchainEvents.Worker.csproj \
-    -c Debug \
-    -o /app/debug-publish \
-    -p:Protobuf_ProtocFullPath=/usr/bin/protoc
-
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
 
@@ -39,22 +33,6 @@ COPY --from=build /app/publish .
 RUN chown -R appuser:appgroup /app
 
 USER appuser
-
-ENV ASPNETCORE_URLS="http://+:4000;http://+:4010"
-EXPOSE 4000 4010
-
-ENTRYPOINT ["dotnet", "BlockchainEvents.Worker.dll"]
-
-FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime-debug
-WORKDIR /app
-
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates curl unzip \
-    && update-ca-certificates \
-    && curl -sSL https://aka.ms/getvsdbgsh | bash /dev/stdin -v latest -l /vsdbg \
-    && rm -rf /var/lib/apt/lists/*
-
-COPY --from=debug /app/debug-publish .
 
 ENV ASPNETCORE_URLS="http://+:4000;http://+:4010"
 EXPOSE 4000 4010
